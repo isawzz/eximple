@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="../base/assets/fonts/fonts.css" />
+		<link href="../base/alibs/bs4/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../templates/mydash/base.css" />
+		<link rel="stylesheet" href="../base/css/shapes.css" />
+		<link rel="stylesheet" href="../base/css/cards.css" />
+		<link rel="stylesheet" href="../base/css/features.css" />
+		<link rel="stylesheet" href="../base/css/table_jquery.css" />
+
+		{% block icon_title %} {% endblock %}
+	</head>
+	<body style="opacity:0">
+
+		<div class="topmenu" style='background:silver;padding-left:10px'>
+			<a href="/consens">consens</a>
+			<a href="/car">car</a>
+			<a href="/dash">dash</a>
+			<a href="/mydash">my</a>
+			<a href="/todo">todo</a>
+			<a href="/user">user</a>
+		</div>
+
+		{% block content %} {% endblock %}
+		<script src="../base/alibs/jq3.js"></script>
+		<script src="../base/alibs/bs4/bootstrap.bundle.min.js"></script>
+		<script src="../base/alibs/jsyaml.js"></script>
+		<script src="../base/alibs/html2canvas.js"></script>
+		<script src="../base/alibs/color-thief.umd.js"></script>
+		<script src="../base/alibs/jscolor.js"></script>
+		<!-- #region my includes -->
+		<script src="../base/js/_config.js"></script>
+		<script src="../base/js/globals.js"></script>
+		<script src="../base/js/base.js"></script>
+		<script src="../base/features/syms.js"></script>
+		<script src="../base/js/cards.js"></script>
+		<script src="../base/js/features.js"></script>
+		<script src="../base/js/gen_helpers.js"></script>
+		<script src="../base/js/onclick.js"></script>
+		<script src="../templates/mydash/start.js"></script>
+		<!-- #endregion includes -->
+
+		{% block contentplus %} {% endblock %}
+
+	</body>
+</html>

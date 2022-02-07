@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+<!-- hier kommt head -->
+{% block icon_title %} {% block consensus_icon_title %} {% endblock %} {% endblock %}
+<!-- hier kommt body -->
+{% block content %}
+<nav class="navbar navbar-light bg-light">
+	<span class="navbar">
+		<a class="navbar-brand" href="/">
+			<img height=40 src="../templates/consens/group.png" />
+		</a>
+		<a class="nav-link" href="/consens/link1">Link1</a>
+		<a class="nav-link" href="/consens/link2">Link2</a>
+		<a class="nav-link" href="/consens/link3">Link3</a>
+		<!-- <a class="nav-link disabled" href="#">Disabled</a> -->
+	</span>
+	<form class="form-inline my-2 my-lg-0" style="min-width: 400px">
+		<input class="form-control mr-sm-2 w-75" type="search" placeholder="Search" aria-label="Search" />
+		<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+	</form>
+</nav>
+<div class="container">
+	{% if message %}
+	<p class="message">{{ message | safe }}</p>
+	{% endif %}
+</div>
+
+{% block consensus_content %} {% endblock %} {% endblock %}

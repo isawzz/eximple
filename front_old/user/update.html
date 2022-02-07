@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+<!-- hier kommt head -->
+{% block icon_title %}
+<link rel="icon" href="../templates/todo/logo.png" />
+<title>user</title>
+{% endblock %}
+<!-- hier kommt body -->
+{% block content %}
+<div class="container text-center mt-2">
+	<img src="../base/assets/images/{{user.name}}.jpg" alt="Lexus" class="logo" />
+</div>
+<div class="container text-center mt-3">
+	<p>List names you would like to follow (separated by comma)</p>
+
+	<div class="form">
+		<form action="/upuser/{{user.id}}" method="POST">
+			<input class="w-50" type="text" name="follows" id="follows" value="{{user.follows}}" />
+			<input type="submit" value="Update" />
+		</form>
+	</div>
+</div>
+{% endblock %}

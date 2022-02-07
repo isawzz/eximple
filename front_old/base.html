@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="../base/assets/fonts/fonts.css" />
+		<link href="../base/alibs/bs4/bootstrap.min.css" rel="stylesheet" />
+
+		{% block icon_title %} {% endblock %}
+	</head>
+	<body>
+		<div class="topmenu" style='background:silver;padding-left:10px'>
+			<a href="/consens">consens</a>
+			<a href="/car">car</a>
+			<a href="/dash">dash</a>
+			<a href="/mydash">my</a>
+			<a href="/todo">todo</a>
+			<a href="/user">user</a>
+		</div>
+
+		{% block content %} {% endblock %}
+		<script src="../base/alibs/jq3.js"></script>
+		<script src="../base/alibs/bs4/bootstrap.bundle.min.js"></script>
+	</body>
+</html>

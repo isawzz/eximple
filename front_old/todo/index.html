@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+<!-- hier kommt head -->
+{% block icon_title %}
+<link rel="icon" href="../templates/todo/logo.png" />
+<title>step 4: todo</title>
+{% endblock %}
+<!-- hier kommt body -->
+{% block content %}
+<div class="container text-center">
+	<img src="../templates/todo/logo.png" alt="Lexus" class="logo" />
+	{% if tasks|length < 1 %}
+	<h4>There are no tasks. Create one below!</h4>
+	{% else %}
+</div>
+<div class="container">
+	<table class="table mt-5">
+		<tr>
+			<th>Task</th>
+			<th>Added</th>
+			<th>Actions</th>
+		</tr>
+		{% for task in tasks %}
+		<tr>
+			<td>{{ task.content }}</td>
+			<td>{{ task.date_created.date() }}</td>
+			<td>
+				<a href="/deltodo/{{task.id}}">Delete</a>
+				<br />
+				<a href="/uptodo/{{task.id}}">Update</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+<div class="container text-center">
+	{% if message %}
+	<p class="message">{{ message | safe }}</p>
+	{% endif %}
+	<form action="/todosubmit" method="POST">
+		<div class="input-group">Add Todo Item:</div>
+		<div class="input-group">
+			<input class="form-control width100" type="text" name="content" placeholder="go shopping" />
+			<span class="input-group-btn">
+				<input type="submit" value="Submit" class="btn btn-info" />
+			</span>
+		</div>
+	</form>
+</div>
+{% endblock %}
