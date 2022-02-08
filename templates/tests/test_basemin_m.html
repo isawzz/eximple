@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/jpg" href="{{basepath}}assets/images/mimi.jpg" />
+		<title>HOME</title>
+	</head>
+	<body>
+		<script src="{{basepath}}/code/basemin.js"></script>
+
+		<script>
+
+			
+			// console.log('is a string an array?',Array.isArray('hallo')); //NEIN!
+			// console.log('is an array a string?',isString(['1','2','a'])); //NEIN!
+			//console.log('res',alphaToHex(.25)); //ok
+
+			let d = mDiv(document.body, {w: 100, h: 100, bg: 'blue'}, 'd', '<h1>TITLE</h1>');
+			console.log('d', d);
+			let o = {k1: 'hallo', k2: [d, 1, 'jajaja', {label: 'hallo', div: d}]};
+			console.log('o', jsCopySafe(o));
+		</script>
+	</body>
+</html>
