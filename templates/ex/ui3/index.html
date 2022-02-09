@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<link rel="stylesheet" href="{{basepath}}assets/fonts/fonts.css" />
+		<link rel="stylesheet" href="{{basepath}}code/basemin.css" />
+		
+		{# *** ALLES KOMPLETT UEBERFLUESSIG UND NUR STOEREND ***
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
+		<link rel="stylesheet" href="../templates/ex/ui3/code/normalize.css" />
+		<link rel="stylesheet" href="../templates/ex/ui3/code/main.css" />
+		<link rel="stylesheet" href="../templates/ex/ui3/code/my.css" />
+		#}
+
+		<link rel="icon" type="image/jpg" href="{{basepath}}assets/images/mimi.jpg" />
+		<title>No Need for Bulma!</title>
+		<script>
+			var serverData = {{serverData|tojson}};
+			console.log('serverData', serverData);
+		</script>
+	</head>
+	<body>
+		<div id="dHeader" class="myheader">header</div>
+		<div id="dMain" class="mymain">
+			<div id="dLeft" class="mysidebar" style="transition-duration:1.5s">
+				<div class="mycolumn" style="padding:12px">
+					<a>hallo das</a>
+					<a>hallo</a>
+					<a>hallodasda</a>
+					<a>hallo</a>
+					<a>hallo</a>
+				</div>
+			</div>
+			<div id="dCenter" class="mycenter">
+				<h1>Hello {{ serverData.name }}</h1>
+				<p>
+					My first website with
+					<strong>Basemin styles</strong>
+					!
+				</p>
+				<form action="" method="POST">
+					<textarea class="textarea" name="text" id="" cols="60" rows="14" placeholder="new proposal"></textarea>
+					<input class="textarea" type="submit" value="save" />
+				</form>
+			</div>
+			<div id="dRight" class="mysidebar" style="display:none"></div>
+		</div>
+
+		<script src="{{basepath}}code/basemin.js"></script>
+		<script src="../templates/ex/ui3/start.js"></script>
+	</body>
+</html>

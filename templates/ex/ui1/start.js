@@ -2,6 +2,7 @@ onload = start;
 
 function start() {
 	// using only basemin library (see https://github.com/isawzz/aroot/tree/master/base/code/basemin.js)
+	mDiv(document.body, { align: 'center' }, 'dTitle', '<h1>Hello, Felix!</h1>')
 	for (const i of range(1, 10)) {
 		let p = i * 50;
 		let d = mDiv(document.body, { align: 'center', w: 200, h: 100, bg: 'random', fg: 'contrast', padding: 10 }, 'd', `<h1>TITLE ${i}</h1>`);

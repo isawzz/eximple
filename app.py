@@ -3,6 +3,7 @@ from flask import Flask, request, send_from_directory, render_template, redirect
 app = Flask(__name__, static_folder='')
 #app = Flask(__name__)
 
+#set location of front end code
 basepath = "http://localhost:8080/aroot/base/"
 #basepath = "https://www.telecave.net/aroot/base/"
 
@@ -118,7 +119,7 @@ def db_remove_following(user):
 # ROUTES _______________________________________
 @app.route('/')
 def base_route():
-	return redirect('/ui2')
+	return redirect('/ui3')
 
 #region example routes
 @app.route('/ui0')
@@ -129,7 +130,30 @@ def ui1():
 	return render_template('ex/ui1/index.html',basepath=basepath)
 @app.route('/ui2')
 def ui2():
-	return render_template('ex/ui2/index.html',basepath=basepath)
+	serverData = {"name" : "John", "age" : 36}
+	return render_template('ex/ui2/index.html',basepath=basepath, serverData=serverData)
+@app.route('/ui3', methods=['GET','POST'])
+def ui3():
+	serverData = {"name" : "John", "age" : 36}
+	if request.method == 'POST':
+		text = request.form['text']
+		print('save text',text)
+		return redirect('/ui3') 
+	return render_template('ex/ui3/index.html',basepath=basepath, serverData=serverData)
+
+@app.route('/web0')
+@app.route('/web0_ui0')
+def web0_ui0():
+	serverData = {"name" : "John", "age" : 36}
+	return render_template('ex/web0/ui0.html',basepath=basepath, serverData=serverData)
+@app.route('/web0_ui1')
+def web0_ui1():
+	serverData = {"name" : "John", "age" : 36}
+	return render_template('ex/web0/ui1.html',basepath=basepath, serverData=serverData)
+@app.route('/web0_ui2')
+def web0_ui2():
+	serverData = {"name" : "John", "age" : 36}
+	return render_template('ex/web0/ui2.html',basepath=basepath, serverData=serverData)
 
 #endregion example routes
 

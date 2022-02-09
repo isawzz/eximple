@@ -8,19 +8,18 @@
 		<link rel="stylesheet" href="{{basepath}}assets/fonts/fonts.css" />
 		<link rel="stylesheet" href="{{basepath}}code/basemin.css" />
 
-		<link rel="icon" type="image/jpg" href="{{basepath}}assets/images/mimi.jpg" />
-		<title>HOME</title>
+		<link rel="icon" type="image/jpg" href="{{basepath}}assets/images/mike.jpg" />
+		{% block title %} {% endblock %}
 	</head>
 	<body>
-		<script>
-			var serverData = {{serverData|tojson}};
-			console.log('serverData', serverData);
-		</script>
-
-		<div id="dTitle" style='text-align:center;background:white;'><h1>{{ serverData.name }}</h1></div>
-		<div id="dMain"></div>
+		<div class="topmenu" style="background: silver; padding-left: 10px">
+			<a href="/web0_ui0">template</a>
+			<a href="/web0_ui1">javascript</a>
+			<a href="/web0_ui2">serverdata</a>
+		</div>
 
 		<script src="{{basepath}}code/basemin.js"></script>
-		<script src="../templates/ex/ui2/start.js"></script>
+
+		{% block content %} {% endblock %}
 	</body>
 </html>
