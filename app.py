@@ -1,11 +1,10 @@
 from flask import Flask, request, send_from_directory, render_template, redirect
 
 app = Flask(__name__, static_folder='')
-#app = Flask(__name__)
 
-#set location of front end code
-basepath = "http://localhost:8080/aroot/base/"
-#basepath = "https://www.telecave.net/aroot/base/"
+#set location of front end code: to run on Heroku set telecave location!!!
+heroku = False #set True for production
+basepath = "https://www.telecave.net/aroot/base/" if heroku else "http://localhost:8080/aroot/base/"
 
 # DB, LOGIN _______________________________________
 
@@ -13,9 +12,9 @@ basepath = "http://localhost:8080/aroot/base/"
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dblocal.db'
+herokudb = 'postgresql://yrvygqeoxvvsbc:a1626c4355cc68f0e885cdd1a136d47b05f0a1dbc13c3b48e591663c3be1abae@ec2-54-145-9-12.compute-1.amazonaws.com:5432/d82a71hp3riqvf'
+app.config['SQLALCHEMY_DATABASE_URI'] = herokudb if heroku else 'sqlite:///dblocal.db'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres: @localhost:5434/lexus'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://yrvygqeoxvvsbc:a1626c4355cc68f0e885cdd1a136d47b05f0a1dbc13c3b48e591663c3be1abae@ec2-54-145-9-12.compute-1.amazonaws.com:5432/d82a71hp3riqvf'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
