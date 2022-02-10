@@ -1,0 +1,40 @@
+{% extends 'ex/web0/base.html' %}
+<!-- hier kommt head -->
+{% block title %}
+<title>web0_ui3</title>
+{% endblock %}
+<!-- hier kommt body -->
+{% block content %}
+<script>
+	var serverData = {{serverData|tojson}};
+	console.log('serverData', serverData);
+</script>
+
+<div id="dHeader" class="myheader">header</div>
+<div id="dMain" class="mymain">
+	<div id="dLeft" class="mysidebar" style="transition-duration: 0.5s">
+		<div class="mycolumn" style="padding: 12px">
+			<a>hallo das</a>
+			<a>hallo</a>
+			<a>hallodasda</a>
+			<a>hallo</a>
+			<a>hallo</a>
+		</div>
+	</div>
+	<div id="dCenter" class="mycenter">
+		<h1>Hello {{ serverData.name }}</h1>
+		<p>
+			My first website with
+			<strong>Basemin styles</strong>
+			!
+		</p>
+		<form action="" method="POST">
+			<textarea class="textarea" name="text" id="" cols="60" rows="14" placeholder="new proposal"></textarea>
+			<input class="textarea" type="submit" value="save" />
+		</form>
+	</div>
+	<div id="dRight" class="mysidebar" style="display: none"></div>
+</div>
+<script src="../templates/ex/web0/start.js"></script>
+<script>onload=ui3;</script>
+{% endblock %}

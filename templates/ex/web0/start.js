@@ -20,7 +20,15 @@ function ui2(){
 		mPos(d, p, p * 1.5);
 	}
 }
+function ui3(){
+	let dLeft = mBy('dLeft');
+	dLeft.style.flex = 0;
+	dLeft.onclick = () => dLeft.style.flex = 0;
 
+	let dHeader = mBy('dHeader');
+	dHeader.onclick = () => dLeft.style.flex = 1;
+
+}
 
 
 

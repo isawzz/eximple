@@ -6,19 +6,26 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 		<link rel="stylesheet" href="{{basepath}}assets/fonts/fonts.css" />
-		<link rel="stylesheet" href="{{basepath}}code/basemin.css" />
+		{# <link rel="stylesheet" href="{{basepath}}code/basemin.css" /> #}
+		<link rel="stylesheet" href="../templates/ex/web0/basemin.css" />
 
 		<link rel="icon" type="image/jpg" href="{{basepath}}assets/images/mike.jpg" />
 		{% block title %} {% endblock %}
 	</head>
 	<body>
 		<div class="topmenu" style="background: silver; padding-left: 10px">
-			<a href="/web0_ui0">template</a>
-			<a href="/web0_ui1">javascript</a>
-			<a href="/web0_ui2">serverdata</a>
+			<a href="/ui0">ui0</a>
+			<a href="/ui1">ui1</a>
+			<a href="/ui2">ui2</a>
+			<a href="/ui3">ui3</a>
+			<a href="/web0_ui0">web0_ui0</a>
+			<a href="/web0_ui1">web0_ui1</a>
+			<a href="/web0_ui2">web0_ui2</a>
+			<a href="/web0_ui3">web0_ui3</a>
 		</div>
 
-		<script src="{{basepath}}code/basemin.js"></script>
+		<script src="../templates/ex/web0/basemin.js"></script>
+		{# <script src="{{basepath}}code/basemin.js"></script> #}
 
 		{% block content %} {% endblock %}
 	</body>

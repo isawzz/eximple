@@ -3,8 +3,11 @@ from flask import Flask, request, send_from_directory, render_template, redirect
 app = Flask(__name__, static_folder='')
 
 #set location of front end code: to run on Heroku set telecave location!!!
-heroku = False #set True for production
-basepath = "https://www.telecave.net/aroot/base/" if heroku else "http://localhost:8080/aroot/base/"
+#WAS??!?!?!?!?!? DAS GEHT AUCH MIT LOCALHOST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#ich muss garnicht auf telecave und heroku postgres gehen!!!!!!!!!!!!!!!!!!!!!!!
+#(also mit der db bin ich nicht sicher! aber werd ich checken!)
+HEROKUPROD = False #set True for production
+basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://localhost:8080/aroot/base/"
 
 # DB, LOGIN _______________________________________
 
@@ -13,7 +16,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 herokudb = 'postgresql://yrvygqeoxvvsbc:a1626c4355cc68f0e885cdd1a136d47b05f0a1dbc13c3b48e591663c3be1abae@ec2-54-145-9-12.compute-1.amazonaws.com:5432/d82a71hp3riqvf'
-app.config['SQLALCHEMY_DATABASE_URI'] = herokudb if heroku else 'sqlite:///dblocal.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = herokudb if HEROKUPROD else 'sqlite:///dblocal.db'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres: @localhost:5434/lexus'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -118,7 +121,7 @@ def db_remove_following(user):
 # ROUTES _______________________________________
 @app.route('/')
 def base_route():
-	return redirect('/ui3')
+	return redirect('/web0_ui0')
 
 #region example routes
 @app.route('/ui0')
@@ -153,6 +156,10 @@ def web0_ui1():
 def web0_ui2():
 	serverData = {"name" : "John", "age" : 36}
 	return render_template('ex/web0/ui2.html',basepath=basepath, serverData=serverData)
+@app.route('/web0_ui3')
+def web0_ui3():
+	serverData = {"name" : "John", "age" : 36}
+	return render_template('ex/web0/ui3.html',basepath=basepath, serverData=serverData)
 
 #endregion example routes
 
