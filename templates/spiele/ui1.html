@@ -1,0 +1,44 @@
+{% extends 'spiele/base.html' %}
+<!-- hier kommt head -->
+{% block title %}
+<title>users</title>
+{% endblock %}
+<!-- hier kommt body -->
+{% block content %} {% if users|length < 1 %}
+<h4>There are no users. Create one below!</h4>
+{% else %}
+
+<div class="container">
+	<table class="table">
+		<tr>
+			<th>name</th>
+			<th>color</th>
+			<th>created</th>
+			<th>actions</th>
+		</tr>
+		{% for user in users %}
+		<tr id="tr_{{user.id}}">
+			<td>{{ user.name }}</td>
+			<td>{{ user.color }}</td>
+			<td>{{ user.date_created.date() }}</td>
+			<td>
+				<a href="/spiele/tables/{{user.id}}">login</a>
+				<a href="/delete_user/{{user.id}}">delete</a>
+				<a href="/update_user/{{user.id}}">update</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+{% endif %}
+
+<script>
+	var serverData = {{serverData|tojson}};
+	console.log('serverData', serverData);
+</script>
+{# <script src="{{basepath}}code/basemin.js"></script> #}
+<script src="../templates/spiele/basemin.js"></script>
+<script src="../templates/spiele/functions.js"></script>
+<script src="../templates/spiele/start.js"></script>
+<script>onload=color_users</script>
+{% endblock %}

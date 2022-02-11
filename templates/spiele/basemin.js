@@ -1,5 +1,6 @@
 //#region globals
 var ColorDi;
+var User,Table;
 
 //#endregion
 
@@ -428,6 +429,20 @@ function copyKeys(ofrom, oto, except = {}, only) {
 		if (isdef(except[k])) continue;
 		oto[k] = ofrom[k];
 	}
+}
+function firstCond(arr, func) {
+	//return first elem that fulfills condition
+	if (nundef(arr)) return null;
+	for (const a of arr) {
+		if (func(a)) return a;
+
+	}
+	return null;
+}
+function firstCondDict(dict, func) {
+	//return first elem that fulfills condition
+	for (const k in dict) { if (func(dict[k])) return k; }
+	return null;
 }
 function getRect(elem, relto) {
 

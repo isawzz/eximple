@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory, render_template, redirect
+from flask import jsonify, Flask, request, send_from_directory, render_template, redirect
 
 app = Flask(__name__, static_folder='')
 
@@ -6,7 +6,7 @@ app = Flask(__name__, static_folder='')
 #WAS??!?!?!?!?!? DAS GEHT AUCH MIT LOCALHOST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #ich muss garnicht auf telecave und heroku postgres gehen!!!!!!!!!!!!!!!!!!!!!!!
 #(also mit der db bin ich nicht sicher! aber werd ich checken!)
-HEROKUPROD = False #set True for production
+HEROKUPROD = False #set True for production (need to re-create db on heroku!)
 basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://localhost:8080/aroot/base/"
 
 # DB, LOGIN _______________________________________
@@ -22,6 +22,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = herokudb if HEROKUPROD else 'sqlite:///d
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
 #endregion
 
 #region login config
@@ -38,24 +39,46 @@ usersLoggedIn = []
 class User(UserMixin, db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(30), unique=True)
-	stars = db.Column(db.Integer, default=0)
-	follows = db.Column(db.Text, default='')
-	followers = db.Column(db.Text, default='')
+	color = db.Column(db.String(10), nullable=True)
+	stars = db.Column(db.Integer, default = 0)
+	follows = db.Column(db.Text, default = '')
+	followers = db.Column(db.Text, default = '')
 	email = db.Column(db.String(120), nullable=True)
 	password = db.Column(db.String(120), nullable=True)
 	date_created = db.Column(db.DateTime, default=datetime.utcnow)
-	def __init__(self, name):
-		self.name = name
+	# def __init__(self, name, color):
+	# 	self.name = name
+	# 	self.color = color
+	def __repr__(self):
+		return self.name
+
+class Table(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	game = db.Column(db.String(50), nullable=False)
+	status = db.Column(db.Integer, nullable=True)
+	fen = db.Column(db.Text, nullable=True)
+	date_created = db.Column(db.DateTime, default=datetime.utcnow)
+	date_modified = db.Column(db.DateTime, default=datetime.utcnow)
+	players = db.relationship('Player', backref='table', lazy=True)
+	# def __init__(self, game):
+	# 	self.game = game
+
+class Player(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	role = db.Column(db.Integer, nullable=True)
+	status = db.Column(db.Integer, nullable=True)
+	data = db.Column(db.Text, nullable=True)
+	date_modified = db.Column(db.DateTime, default=datetime.utcnow)
+	table_id = db.Column(db.Integer, db.ForeignKey('table.id'), nullable=False)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Todo(db.Model):
 	__tablename__ = 'todo'
 	id = db.Column(db.Integer, primary_key=True)
 	content = db.Column(db.String(200), nullable=False)
 	date_created = db.Column(db.DateTime, default=datetime.utcnow)
-
 	def __init__(self, content):
 		self.content = content
-
 	def __repr__(self):
 		return '<Task %r>' % self.id
 
@@ -66,7 +89,6 @@ class Feedback(db.Model):
 	dealer = db.Column(db.String(200))
 	rating = db.Column(db.Integer)
 	comments = db.Column(db.Text())
-
 	def __init__(self, customer, dealer, rating, comments):
 		self.customer = customer
 		self.dealer = dealer
@@ -80,10 +102,33 @@ class Feedback(db.Model):
 def load_user(user_id):
 	return User.query.get(int(user_id))
 
-
 #endregion
 
 #region db functions
+def db_init_all():
+	print('.....init db')
+	db.drop_all()
+	db.create_all()
+	for info in [('amanda','GREEN'),('felix','BLUE'),('gul','RED'),('lauren','BLUEGREEN'),('mac','ORANGE'),('mimi','skyblue'),('nasi','YELLOW')]:
+		pl = User(name=info[0],color=info[1])
+		print('added user',pl.name)
+		db.session.add(pl)
+	db.session.commit()
+	#lets enter a dixit game for felix,gul,mimi
+	#roles can be: admin,None,
+	t = Table()
+	for info in [('amanda','GREEN'),('felix','BLUE'),('gul','RED'),('lauren','BLUEGREEN'),('mac','ORANGE'),('mimi','skyblue'),('nasi','YELLOW')]:
+		pl = User(name=info[0],color=info[1])
+		print('added user',pl.name)
+		db.session.add(pl)
+	for info in [('amanda','GREEN'),('felix','BLUE'),('gul','RED'),('lauren','BLUEGREEN'),('mac','ORANGE'),('mimi','skyblue'),('nasi','YELLOW')]:
+		pl = User(name=info[0],color=info[1])
+		print('added user',pl.name)
+		db.session.add(pl)
+
+from sqlalchemy_utils.functions import database_exists
+if not database_exists(app.config["SQLALCHEMY_DATABASE_URI"]): db_init_all()
+
 def db_update_following(user):
 	#here need to update the following info for each other user in db!!!!
 	flist = string_to_arr(user.follows)
@@ -120,8 +165,7 @@ def db_remove_following(user):
 
 # ROUTES _______________________________________
 @app.route('/')
-def base_route():
-	return redirect('/web0_ui0')
+def base_route():	return redirect('/spiele')
 
 #region example routes
 @app.route('/ui0')
@@ -175,6 +219,64 @@ def test_cors():
 
 #endregion test routes
 
+#region spiele routes
+@app.route('/spiele')
+def spiele():
+	serverData = {"players" : "felix,mimi", "games":"aristocracy,mysterium"}
+	return render_template('spiele/ui0.html',basepath=basepath, serverData=serverData)
+
+@app.route('/spiele/users')
+def spiele_users():
+	#wie bekomm ich alle user records? sqlalchemy!
+	users = User.query.all()
+	ulist=[]
+	for u in users:
+		uj={'id':u.id,'name':u.name,'color':u.color}
+		ulist.append(uj)
+	#print('***users',users)
+	#print('***users',ulist)
+	serverData = {"users":ulist}; #jsonify("hallo") # {"users" : jsonify(ulist), "games":"aristocracy,mysterium"}
+	return render_template('spiele/ui1.html',users=users,basepath=basepath, serverData=serverData)
+
+@app.route('/spiele/tables/<user_id>')
+def spiele_tables(user_id):
+	#wie bekomm ich alle user records? sqlalchemy!
+	plrecs = db.session.query(Player).filter(Player.user_id == user_id).all()
+	print('.....',plrecs)
+	tlist=[]
+	for t in plrecs:
+		ut={'id':t.id,'name':u.name,'color':u.color}
+		ulist.append(uj)
+	data = {"tables":plrecs,"games":['aristocracy','dixit','innovation','spotit']}
+	#table_ids = [x.table_id for x in plrecs]
+	#print('plrecs',plrecs,'tableids',table_ids)
+	return render_template('spiele/ui2.html',basepath=basepath, serverData=data)
+
+@app.route('/delete_user/<int:id>')
+def delete_user(id):
+	user = User.query.get_or_404(id)
+	try:
+		db.session.delete(user)
+		db.session.commit()
+		return redirect('/spiele/users')
+	except:
+		return f'There was a problem deleting user {id}'
+
+@app.route('/set_user/<int:id>')
+def set_user(id):
+	user = User.query.get_or_404(id)
+	tables = Table
+	try:
+		db.session.delete(user)
+		db.session.commit()
+		return redirect('/spiele/users')
+	except:
+		return f'There was a problem deleting user {id}'
+
+@app.route('/dbinit')
+def dbinit_route():
+	db_init_all()
+	return redirect('/spiele/users')
 
 
 if __name__ == "__main__":
