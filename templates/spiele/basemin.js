@@ -1,6 +1,6 @@
-//#region globals
+//#region globals: Session data
 var ColorDi;
-var User,Table;
+var Users,User,Tables,Table; //User,Table are objects
 
 //#endregion
 

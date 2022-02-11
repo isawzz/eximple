@@ -4,7 +4,13 @@
 <title>users</title>
 {% endblock %}
 <!-- hier kommt body -->
-{% block content %} {% if users|length < 1 %}
+{% block content %} 
+
+<script>
+	Users = serverData.users;
+</script>
+
+{% if users|length < 1 %}
 <h4>There are no users. Create one below!</h4>
 {% else %}
 
@@ -22,7 +28,7 @@
 			<td>{{ user.color }}</td>
 			<td>{{ user.date_created.date() }}</td>
 			<td>
-				<a href="/spiele/tables/{{user.id}}">login</a>
+				<a href="/spiele/tables/{{user.name}}">login</a>
 				<a href="/delete_user/{{user.id}}">delete</a>
 				<a href="/update_user/{{user.id}}">update</a>
 			</td>
@@ -32,13 +38,5 @@
 </div>
 {% endif %}
 
-<script>
-	var serverData = {{serverData|tojson}};
-	console.log('serverData', serverData);
-</script>
-{# <script src="{{basepath}}code/basemin.js"></script> #}
-<script src="../templates/spiele/basemin.js"></script>
-<script src="../templates/spiele/functions.js"></script>
-<script src="../templates/spiele/start.js"></script>
 <script>onload=color_users</script>
 {% endblock %}

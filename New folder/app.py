@@ -51,12 +51,26 @@ class Table(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(30), index=True, unique=True)
 	game = db.Column(db.String(50), nullable=False)
-	host = db.Column(db.String(30))
-	players = db.Column(db.Text, nullable=True)
 	status = db.Column(db.Integer, nullable=True)
 	fen = db.Column(db.Text, nullable=True)
 	date_created = db.Column(db.DateTime, default=datetime.utcnow)
 	date_modified = db.Column(db.DateTime, default=datetime.utcnow)
+	# players = db.relationship('Player', backref='table', lazy=True)
+	# def __init__(self, game):
+	# 	self.game = game
+	def toDict(self):
+		return { c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs }
+
+class Player(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	role = db.Column(db.Integer, nullable=True)
+	status = db.Column(db.Integer, nullable=True)
+	data = db.Column(db.Text, nullable=True)
+	date_modified = db.Column(db.DateTime, default=datetime.utcnow)
+	table = db.Column(db.String(30), nullable=False)
+	user = db.Column(db.String(30), nullable=False)
+	# tablename = db.Column(db.String(30), db.ForeignKey('table.name'), nullable=False)
+	# username = db.Column(db.String(30), db.ForeignKey('user.name'), nullable=False)
 	def toDict(self):
 		return { c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs }
 
@@ -98,13 +112,19 @@ def load_user(user_id):
 
 #region db functions
 def add_table(game,name,players):
-	t = Table(game=game,name=name, host=players[0],players=','.join(players))
+	t = Table(game=game,name=name) #,id=1)
 	db.session.add(t)
+	role='admin'
+	for uname in players:
+		p1 = Player(user=uname,role=role,table=name)
+		role=None
+		db.session.add(p1)
 	db.session.commit()
 
 def db_init_all():
 	# User:id,name,color,stars,follows,followers,email,password,date_created
-	# Table:id,game,name,host,players,status,fen,date_created,date_modified
+	# Player:id,role,status,data,date_modified,table,user
+	# Table:id,game,name,status,fen,date_created,date_modified
 	print('.....init db')
 	db.drop_all()
 	db.create_all()
@@ -155,6 +175,10 @@ def db_remove_following(user):
 		u.followers = arr_to_string(followers2)
 		u.follows = arr_to_string(follows2)
 
+def find_players_on_table(name):
+	plrecs = db.session.query(Player).filter(Player.table == name).all()
+	return [x.user for x in plrecs]
+
 
 #endregion
 
@@ -171,49 +195,28 @@ def spiele():
 	# serverData = {"players" : "felix,mimi", "games":"aristocracy,mysterium"}
 	# return render_template('spiele/ui0.html',basepath=basepath, serverData=serverData)
 
-def get_users():
-	users = User.query.all()
-	ulist=[x.toDict() for x in users]
-	return users,ulist
-def is_contained(sfull,spart):
-	print('.......full',sfull)
-	print('part',spart)
-	return True
-
-def get_tables(user):
-	tables = db.session.query(Table).all() #filter(is_contained(Table.players,user)).all()
-	tf=tables.filter(user in Table.players)
-	for table in tables:
-		print('???',table.players,type(table.players))
-		print('---',user,user in table.players)
-		t=table.toDict()
-
-	return [],[]
-	tablelist = [x.toDict for x in tables]
-	return tables,tablelist
-def get_table(table):
-	table = db.session.query(Table).filter(Table.name == table).first()
-	table = table.toDict()
-	table.players = table.players.plit(',')
-	return table
-
 @app.route('/spiele/users')
 def spiele_users():
-	users,ulist = get_users()
+	users = User.query.all()
+	ulist=[x.toDict() for x in users]
 	serverData = {"users":ulist}; 
 	return render_template('spiele/ui1.html',users=users,basepath=basepath, serverData=serverData)
 
 @app.route('/spiele/tables/<user>')
 def spiele_tables(user):
-	users,ulist = get_users()
-	tables,tablelist = get_tables(user)
-	serverData = {"users":ulist, "tables":tablelist, "user":user}; 
-	return render_template('spiele/ui2.html',users=users, tables=tables, basepath=basepath, serverData=serverData)
+	plrecs = db.session.query(Player).filter(Player.user == user).all()
+	tables = []
+	for rec in plrecs:
+		name = rec.table
+		trec = db.session.query(Table).filter(Table.name == name).first()
+		t1 = trec.toDict()
+		t1['players'] = find_players_on_table(t1['name'])
+		tables.append(t1)
+	serverData = {"tables":tables,"user":user}; 
+	return render_template('spiele/ui2.html',tables=tables, basepath=basepath, serverData=serverData)
 
 @app.route('/play/<table>/<user>', methods=['GET','POST'])
 def spiele_play(table,user):
-	users,ulist = get_users()
-	table = get_table(table)
 	if request.method == 'POST':
 		msg = request.form['text']
 		print('text',msg)
@@ -221,7 +224,7 @@ def spiele_play(table,user):
 	else:	
 		msg='user ' + user + ' is now playing table '+ table
 	print("...",msg)
-	serverData = {"users":ulist, "table":table, "user":user, "message":msg}; 
+	serverData = {"table":table, "user":user, "message":msg}; 
 	return render_template('spiele/ui3.html',basepath=basepath, serverData=serverData)
 
 @app.route('/delete_user/<int:id>')
