@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="{{basepath}}assets/fonts/fonts.css" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+		<script src="{{basepath}}alibs/jsyaml.js"></script>
+		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
+		<script src="{{ url_for('static', filename='start.js') }}"></script>
+		<link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/microsoft/310/shortcake_1f370.png" />
+		<script>
+			var basepath = "{{basepath}}";
+			var serverData = {{serverData|tojson}};
+			if (isdef(serverData.users)) Users = serverData.users;
+			if (isdef(serverData.user)) User = serverData.user;
+			if (isdef(serverData.games)) Tables = serverData.games;
+			if (isdef(serverData.game)) Table = serverData.game;
+			console.log('serverData', serverData);
+		</script>
+		{% block title %} {% endblock %}
+	</head>
+	<body>
+		<div class="topmenu" style="background: silver; padding-left: 10px">
+			<a href="/info">home</a>
+			<a href="/loggedin/mimi">mimi</a>
+			<a href="/table/paris/mimi">paris</a>
+			<a href="/reset" style='color:red'>dbinit!</a>
+		</div>
+		{% if serverData.message %}
+		<div id="dMessage">{{ serverData.message}}</div>
+		{% endif %}
+
+		{% block content %} {% endblock %}
+	</body>
+</html>

@@ -28,9 +28,10 @@ function start_table() {
 	console.log('serverData', serverData);
 }
 
-function show_home_logo(dParent) {
+async function show_home_logo(dParent) {
 	//erstmal muss ich home logo machen in obere ecke!
 	//let d = mSym
+
 }
 
 function mTable(dParent, headers) {
@@ -58,7 +59,6 @@ function mTableHeader(t, val) {
 	col.innerHTML = val;
 	return col;
 }
-
 function mTableRow(t, o, keys) {
 	let elem = mCreate('tr');
 	mAppend(t, elem);
@@ -103,14 +103,24 @@ function mTableCommandify(rowitems, di) {
 	for (const item of rowitems) {
 		for (const index in di) {
 			let colitem = item.colitems[index];
+			console.log('colitem',colitem)
 			colitem.div.innerHTML = di[index](item, colitem.val);
+
 		}
 	}
+}
+function makeListOfLinks(item,val){
+	let names=isString(val)?val.split(','):val;
+	let html='';
+	for(const name of names){
+		html+=`<a href="/table/${item.o.name}/${name}">${name}</a>`
+	}
+	return html;
 }
 function show_games(dParent) {
 	let items = mDataTable(serverData.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
 	if (nundef(serverData.user)) serverData.user = {name:'anonymous'};
-	mTableCommandify(items, { 0: (item, val) => `<a href="/table/${item.o.name}/${serverData.user.name}">${val}</a>` })
+	mTableCommandify(items, { 0: (item, val) => `<a href="/table/${item.o.name}/${serverData.user.name}">${val}</a>`, 2: makeListOfLinks });
 
 	// if (isdef(serverData.user)){
 	// 	mTableCommandify(items, { 0: (item, val) => `<a href="/table/${item.o.name}${isdef(serverData.user)?`/${serverData.user.name}`:''}">${val}</a>` })

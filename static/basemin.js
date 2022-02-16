@@ -649,6 +649,12 @@ function range(f, t, st = 1) {
 	}
 	return arr;
 }
+async function route_path_yaml_dict(url) {
+	let data = await fetch_wrapper(url);
+	let text = await data.text();
+	let dict = jsyaml.load(text);
+	return dict;
+}
 function startsWith(s, sSub) {
 	//console.log('s',s,'sSub',sSub)
 	//testHelpers('startWith: s='+s+', sSub='+sSub,typeof(s),typeof(sSub));

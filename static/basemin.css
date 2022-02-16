@@ -10,6 +10,7 @@ h1 {
 a{
 	color: inherit;
   text-decoration: none;
+	padding-right: 6px;
 }
 a:hover {
   color: inherit;

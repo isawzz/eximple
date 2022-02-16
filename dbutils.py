@@ -247,10 +247,11 @@ def add_games():
 def add_game_players():
 	games = Game.query.all()
 	users = User.query.all()
-	for game in games:
-		k = random.randint(2,5)
+	for game in games[1:]: #hab 1 test game mimi-felix drin!
+		#k = random.randint(2,5)
 		players = random.sample(users,3)
 		game.players.extend(players)
+		#print('...',len(game.players))
 		game.host_id = players[0].id
 	db.session.commit()
 
@@ -267,7 +268,10 @@ def add_actions():
 def create_random_data():
 	db.drop_all()	
 	db.create_all()
+	add_user('mimi','skyblue')	
+	add_user('felix','BLUE')	
 	add_users()
+	add_game('paris','aristocracy',['mimi','felix'])
 	add_games()
 	add_game_players()
 	add_actions()

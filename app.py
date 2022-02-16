@@ -1,6 +1,7 @@
 from flask import jsonify, Flask, request, send_from_directory, render_template, redirect
-
 app = Flask(__name__)
+HEROKUPROD = False #set True for production (need to re-create db on heroku!)
+basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://localhost:8080/aroot/base/"
 
 from dbutils import *
 db_init(app)
@@ -28,17 +29,17 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 #region ui routes
 @app.route('/info')
 def r_info(): 
-	return render_template('info.html',serverData={"users":get_users(),"games":get_games(),"actions":get_actions()})
+	return render_template('info.html',basepath=basepath, serverData={"users":get_users(),"games":get_games(),"actions":get_actions()})
 
 @app.route('/loggedin/<user>', methods=['GET','POST'])
 def r_loggedin(user): 
-	return render_template('loggedin.html',serverData={"user":get_user(user),"games":get_games_for(user)}) #,"actions":get_user_actions(user)})
+	return render_template('loggedin.html',basepath=basepath, serverData={"user":get_user(user),"games":get_games_for(user)}) #,"actions":get_user_actions(user)})
 
 @app.route('/table/<game>/<user>', methods=['GET','POST'])
 def r_table(game,user): 
 	if user == 'anonymous':
 		return 'show anonymous table'
-	return render_template('table.html',serverData={"user":get_user(user),"game":get_game(game)}) #,"actions":get_user_actions(user)})
+	return render_template('table.html',basepath=basepath, serverData={"user":get_user(user),"game":get_game(game)}) #,"actions":get_user_actions(user)})
 #endregion
 
 #region spiele: complex stuff!!!!!!!!!!!!!!!!!

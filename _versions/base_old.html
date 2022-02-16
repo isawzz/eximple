@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<link rel="stylesheet" href="{{basepath}}assets/fonts/fonts.css" />
+		<link rel="stylesheet" href="../../templates/spiele/basemin.css" />
+
+		<link rel="icon" type="image/jpg" href="{{basepath}}assets/images/mike.png" />
+
+		<script>
+			var serverData = {{serverData|tojson}};
+			var basepath = "{{basepath}}";
+			console.log('serverData', serverData);
+		</script>
+
+		{% block title %} {% endblock %}
+	</head>
+	<body>
+
+		<div class="topmenu" style="background: silver; padding-left: 10px">
+			<a href="/spiele">home</a>
+			<a href="/spiele/users">users</a>
+			<a href="/dbinit" style='color:red'>dbinit!</a>
+		</div>
+		{% if serverData.message %}
+		<div id="dMessage">{{ serverData.message}}</div>
+		{% endif %}
+		
+		<script src="../../../templates/spiele/basemin.js"></script>
+		<script src="../../../templates/spiele/functions.js"></script>
+		<script src="../../../templates/spiele/start.js"></script>
+		{#
+		<script src="{{basepath}}code/basemin.js"></script>
+		#}
+
+		{% block content %} {% endblock %}
+	</body>
+</html>
