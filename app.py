@@ -30,10 +30,15 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 def r_info(): 
 	return render_template('info.html',serverData={"users":get_users(),"games":get_games(),"actions":get_actions()})
 
-@app.route('/loggedin/<user>')
+@app.route('/loggedin/<user>', methods=['GET','POST'])
 def r_loggedin(user): 
 	return render_template('loggedin.html',serverData={"user":get_user(user),"games":get_games_for(user)}) #,"actions":get_user_actions(user)})
 
+@app.route('/table/<game>/<user>', methods=['GET','POST'])
+def r_table(game,user): 
+	if user == 'anonymous':
+		return 'show anonymous table'
+	return render_template('table.html',serverData={"user":get_user(user),"game":get_game(game)}) #,"actions":get_user_actions(user)})
 #endregion
 
 #region spiele: complex stuff!!!!!!!!!!!!!!!!!
@@ -44,7 +49,7 @@ def process_action(data,choice):
 
 @app.route('/game/<gamename>/<username>', methods=['GET','POST'])
 def game_route(gamename,username):	
-	user = get_user(username)
+	user = get_user(username) if username!='anonymous' else {'name':'anonymous'}
 	game = get_game(gamename)
 	actions = get_actions(game,user)
 	serverData = {'actions':actions,'user':user,'game':game}
