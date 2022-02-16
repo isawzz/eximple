@@ -116,9 +116,12 @@ a,button,input[type=submit]{
 	text-align: left;
   border-top: 1px solid #dee2e6;
 }
-
-
-
+.magnify_on_hover:hover{
+	transform: scale(2);
+	transform-origin: 50%;
+	transition: transform .2s; /* Animation */
+	z-index: 100;
+}
 
 
 

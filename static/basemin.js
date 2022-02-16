@@ -1,6 +1,6 @@
 //#region globals: Session data
 var ColorDi;
-var Users,User,Tables,Table; //User,Table are objects
+var Users, User, Tables, Table; //User,Table are objects
 
 //#endregion
 
@@ -17,7 +17,31 @@ function mButton(caption, handler, dParent, styles, classes, id) {
 	return x;
 }
 function mBy(id) { return document.getElementById(id); }
+function mClass0(d) { d.className = ''; }
+function mClass(d) {
+	if (arguments.length == 2 && isList(arguments[1])) for (let i = 0; i < arguments[1].length; i++) d.classList.add(arguments[1][i]);
+	else for (let i = 1; i < arguments.length; i++) d.classList.add(arguments[i]);
+}
+function mClassRemove(d) { for (let i = 1; i < arguments.length; i++) d.classList.remove(arguments[i]); }
+function mCenterFlex(d, hCenter = true, vCenter = false, wrap = true) {
+	let styles = { display: 'flex' };
+	if (hCenter) styles['justify-content'] = 'center';
+	styles['align-content'] = vCenter ? 'center' : 'flex-start';
+	if (wrap) styles['flex-wrap'] = 'wrap';
+	mStyle(d, styles);
+	//console.log('d', d)
+}
 function mCreate(tag, styles, id) { let d = document.createElement(tag); if (isdef(id)) d.id = id; if (isdef(styles)) mStyle(d, styles); return d; }
+function mCreateFrom(htmlString) {
+	//console.log('---------------',htmlString)
+	var div = document.createElement('div');
+	div.innerHTML = htmlString.trim();// '<div>halloooooooooooooo</div>';// htmlString.trim();
+
+	// Change this to div.childNodes to support multiple top-level nodes
+	//console.log(div.firstChild)
+	return div.firstChild;
+}
+
 function mDiv(dParent, styles, id, inner, classes, sizing) {
 	let d = mCreate('div');
 	if (dParent) mAppend(dParent, d);
@@ -27,6 +51,14 @@ function mDiv(dParent, styles, id, inner, classes, sizing) {
 	if (isdef(inner)) d.innerHTML = inner;
 	if (isdef(sizing)) { setRect(d, sizing); }
 
+	return d;
+}
+function mLinebreak(dParent, gap) {
+	if (isString(dParent)) dParent = mBy(dParent);
+	let d = mDiv(dParent);
+	if (dParent.style.display == 'flex') mStyle(d, { 'flex-basis': '100%', h: 0 });
+	else d.innerHTML = '<br>';
+	if (isdef(gap)) { d.style.minHeight = gap + 'px'; d.innerHTML = ' &nbsp; '; d.style.opacity = .2; }//return mLinebreak(dParent);}
 	return d;
 }
 function mPlace(elem, pos, offx, offy) {
@@ -444,6 +476,8 @@ function firstCondDict(dict, func) {
 	for (const k in dict) { if (func(dict[k])) return k; }
 	return null;
 }
+function get_keys(o) { return Object.keys(o); }
+function get_values(o) { return Object.values(o); }
 function getRect(elem, relto) {
 
 	if (isString(elem)) elem = document.getElementById(elem);
@@ -723,7 +757,7 @@ function ensureColorDict() {
 		OLIVE: { c: '#808000', E: 'olive', D: 'oliv' },
 		orange: { c: '#f58231', D: 'orange' },
 		ORANGE: { c: '#f58231', E: 'orange', D: 'orange' },
-		pink: { c: 'deeppink', D: 'rosa' },
+		PINK: { c: 'deeppink', D: 'rosa' },
 		purple: { c: '#911eb4', D: 'lila' },
 		PURPLE: { c: '#911eb4', E: 'purple', D: 'lila' },
 		red: { c: 'red', D: 'rot' },

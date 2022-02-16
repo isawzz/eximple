@@ -1,11 +1,6 @@
+#!/var/www/html/flask/scriptapp/scriptapp-venv/bin/python3
 from flask import jsonify, Flask, request, send_from_directory, render_template, redirect
-
 app = Flask(__name__, static_folder='')
-
-#set location of front end code: to run on Heroku set telecave location!!!
-#WAS??!?!?!?!?!? DAS GEHT AUCH MIT LOCALHOST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#ich muss garnicht auf telecave und heroku postgres gehen!!!!!!!!!!!!!!!!!!!!!!!
-#(also mit der db bin ich nicht sicher! aber werd ich checken!)
 HEROKUPROD = False #set True for production (need to re-create db on heroku!)
 basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://localhost:8080/aroot/base/"
 
@@ -57,26 +52,12 @@ class Table(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(30), index=True, unique=True)
 	game = db.Column(db.String(50), nullable=False)
+	host = db.Column(db.String(30))
+	players = db.Column(db.Text, nullable=True)
 	status = db.Column(db.Integer, nullable=True)
 	fen = db.Column(db.Text, nullable=True)
 	date_created = db.Column(db.DateTime, default=datetime.utcnow)
 	date_modified = db.Column(db.DateTime, default=datetime.utcnow)
-	# players = db.relationship('Player', backref='table', lazy=True)
-	# def __init__(self, game):
-	# 	self.game = game
-	def toDict(self):
-		return { c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs }
-
-class Player(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
-	role = db.Column(db.Integer, nullable=True)
-	status = db.Column(db.Integer, nullable=True)
-	data = db.Column(db.Text, nullable=True)
-	date_modified = db.Column(db.DateTime, default=datetime.utcnow)
-	table = db.Column(db.String(30), nullable=False)
-	user = db.Column(db.String(30), nullable=False)
-	# tablename = db.Column(db.String(30), db.ForeignKey('table.name'), nullable=False)
-	# username = db.Column(db.String(30), db.ForeignKey('user.name'), nullable=False)
 	def toDict(self):
 		return { c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs }
 
@@ -118,20 +99,16 @@ def load_user(user_id):
 
 #region db functions
 def add_table(game,name,players):
-	t = Table(game=game,name=name) #,id=1)
+	t = Table(game=game,name=name, host=players[0],players=','.join(players))
 	db.session.add(t)
-	role='admin'
-	for uname in players:
-		p1 = Player(user=uname,role=role,table=name)
-		role=None
-		db.session.add(p1)
 	db.session.commit()
 
 def db_init_all():
+	# User:id,name,color,stars,follows,followers,email,password,date_created
+	# Table:id,game,name,host,players,status,fen,date_created,date_modified
 	print('.....init db')
 	db.drop_all()
 	db.create_all()
-	# User:id,name,color,stars,follows,followers,email,password,date_created
 	i=0
 	for info in [('amanda','GREEN'),('felix','BLUE'),('gul','RED'),('lauren','BLUEGREEN'),('mac','ORANGE'),('mimi','skyblue'),('nasi','YELLOW')]:
 		pl = User(name=info[0],color=info[1],id=i)
@@ -139,22 +116,11 @@ def db_init_all():
 		#print('added user',pl.name)
 		db.session.add(pl)
 	db.session.commit()
-	#lets enter a dixit game for mimi,felix
-	# Player:id,role,status,data,date_modified,table,user
-	# Table:id,game,name,status,fen,date_created,date_modified
-	#roles can be: admin,None,
 	add_table('dixit','paris',['felix','mimi'])
 	add_table('aristocracy','stockholm',['mimi','amanda','felix'])
 	add_table('aristocracy','vienna',['mimi','amanda','felix'])
 	add_table('dixit','rome',['mimi','gul','mac'])
 	return
-	t = Table(game='dixit',name='paris',id=1)
-	db.session.add(t)
-	p1 = Player(user='mimi',role='admin',table='paris',id=1)
-	db.session.add(p1)
-	p2 = Player(user='felix',table='paris',id=2)
-	db.session.add(p2)
-	db.session.commit()
 
 from sqlalchemy_utils.functions import database_exists
 if not database_exists(app.config["SQLALCHEMY_DATABASE_URI"]): db_init_all()
@@ -195,9 +161,9 @@ def db_remove_following(user):
 
 # ROUTES _______________________________________
 @app.route('/')
-def base_route():	return redirect('/spiele')
+def base_route():	return redirect('/testsocketio') # spiele testsocketio
 @app.route('/dbinit')
-def dbinit_route():	db_init_all(); return redirect('/spiele/users')
+def dbinit_route():	db_init_all(); return redirect('/spiele')
 
 #region spiele routes
 @app.route('/spiele')
@@ -206,71 +172,66 @@ def spiele():
 	# serverData = {"players" : "felix,mimi", "games":"aristocracy,mysterium"}
 	# return render_template('spiele/ui0.html',basepath=basepath, serverData=serverData)
 
+def get_users():
+	users = User.query.all()
+	ulist=[x.toDict() for x in users]
+	return users,ulist
+
+def is_contained(sfull,spart):
+	print('.......full',sfull)
+	print('part',spart)
+	return True
+
+def get_tables(user):
+	#tables = db.session.query(Table).all() #filter(is_contained(Table.players,user)).all()
+	#tables = db.session.query(Table.players.contains(user))
+	tables = Table.query.filter(Table.players.contains(user)).all()
+	#tables = Table.query.order_by(Table.name).all() 
+	# tlist = [x.toDict() for x in tables]
+	#filtered = filter(lambda x: user in x.players, tables)
+	#tf=tables.filter(user in Table.players)
+	# for t in tables:
+		#print('???',table.players,type(table.players))
+		#print('---',user,user in table.players)
+		# t=table.toDict()
+	#return filtered
+	tablelist = [x.toDict() for x in tables]
+	return tables,tablelist
+
+def get_table(table):
+	table = db.session.query(Table).filter(Table.name == table).first()
+	table = table.toDict()
+	#table.players = table.players.split(',')
+	return table
+
 @app.route('/spiele/users')
 def spiele_users():
-	#wie bekomm ich alle user records? sqlalchemy!
-	users = User.query.all()
-	ulist=[]
-	for u in users:
-		uj={'id':u.id,'name':u.name,'color':u.color}
-		ulist.append(uj)
-	#print('***users',users)
-	#print('***users',ulist)
-	serverData = {"users":ulist}; #jsonify("hallo") # {"users" : jsonify(ulist), "games":"aristocracy,mysterium"}
+	users,ulist = get_users()
+	serverData = {"users":ulist}; 
 	return render_template('spiele/ui1.html',users=users,basepath=basepath, serverData=serverData)
-
-def find_players_on_table(name):
-	plrecs = db.session.query(Player).filter(Player.table == name).all()
-	return [x.user for x in plrecs]
 
 @app.route('/spiele/tables/<user>')
 def spiele_tables(user):
-	plrecs = db.session.query(Player).filter(Player.user == user).all()
-	# Player:id,role,status,data,date_modified,table,user
-	# Table:id,name,game,status,fen,date_created,date_modified
-	tables = []
-	for rec in plrecs:
-		name = rec.table
-		trec = db.session.query(Table).filter(Table.name == name).first()
-		t1 = trec.toDict()
-		t1['players'] = find_players_on_table(t1['name'])
-		#t1 = trec.toDict() # dict(trec.items()) #t1 = trec.as_dict() #jsonify(trec)
-		#t={'id':trec.id,'name':trec.name,'game':trec.game,'status':trec.status,'fen':trec.fen,'date_created':trec.date_created,'date_modified':trec.date_modified}
-		tables.append(t1)
-	#print('.....',tables)
-	#return ' '.join([x['table'] for x in plrecs])  #das geht einfach nicht egal was ich mache!!!
-	#return jsonify(tables[0]) #'hallo' 
-	#return jsonify(tables) 
-	serverData = {"tables":tables,"user":user}; 
-	return render_template('spiele/ui2.html',tables=tables, basepath=basepath, serverData=serverData)
+	users,ulist = get_users()
+	tables,tablelist = get_tables(user)
+	print('tables',tables)
+	print('tlist',tablelist)
+	serverData = {"users":ulist, "tables":tablelist, "user":user}; 
+	return render_template('spiele/ui2.html',users=users, tables=tables, basepath=basepath, serverData=serverData)
 
 @app.route('/play/<table>/<user>', methods=['GET','POST'])
 def spiele_play(table,user):
+	users,ulist = get_users()
+	tabledata = get_table(table)
 	if request.method == 'POST':
 		msg = request.form['text']
+		action = request.form['action']
 		print('text',msg)
 		#return 'you send a text:'+msg
 	else:	
 		msg='user ' + user + ' is now playing table '+ table
 	print("...",msg)
-	serverData = {"table":table, "user":user, "message":msg}; 
-	return render_template('spiele/ui3.html',basepath=basepath, serverData=serverData)
-
-@app.route('/message', methods=['GET','POST'])
-#@app.route('/message/<table>/<user>', methods=['GET','POST'])
-def spiele_message():
-	table="paris"
-	user="felix"
-	print('===>got message from',table,user)
-	serverData = {"name" : "John", "age" : 36}
-	if request.method == 'POST':
-		text = request.form['text']
-		print('text',text)
-		return redirect(f'/play/{table}/{user}') 
-	return render_template('ex/ui3/index.html',basepath=basepath, serverData=serverData)
-	msg='user ' + user + ' is now playing table '+ table
-	print("...",msg)
-	serverData = {"table":table,"user":user,"message":msg}; 
+	serverData = {"users":ulist, "table":table, "tabledata":tabledata, "user":user, "message":msg}; 
 	return render_template('spiele/ui3.html',basepath=basepath, serverData=serverData)
 
 @app.route('/delete_user/<int:id>')
@@ -285,16 +246,56 @@ def delete_user(id):
 
 #endregion
 
-@app.route('/set_user/<int:id>')
-def set_user(id):
-	user = User.query.get_or_404(id)
-	tables = Table
-	try:
-		db.session.delete(user)
-		db.session.commit()
-		return redirect('/spiele/users')
-	except:
-		return f'There was a problem deleting user {id}'
+#region socketio
+from flask_socketio import SocketIO, send
+from flask_cors import CORS
+import eventlet
+CORS(app)
+eventlet.monkey_patch()
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+@socketio.on('message')
+def handle_message(msg):
+	print('message: '+msg)
+	send('rec '+msg, broadcast=True) #without broadcast, will just send to msg sender
+
+@app.route('/testsocketio')
+def testsock():	
+	return render_template('tests/test_socketio.html')
+
+@app.get('/stop')
+def shutdown():
+	socketio.stop()
+
+#region action routes
+actions = {}
+
+@app.route('/actionprep/<tablename>/<user>', methods=['POST'])
+def r_actionprep(tablename):
+	global actions
+	#get table record!
+	#table = Table.query.filter(Table.name == tablename).first()
+	#print('...table',table.id)
+	if request.method == 'POST':
+		names = request.form['names'].split(',')
+		print('......',names)
+		actions[tablename] = {}
+		for name in names:
+			actions[tablename][name] = None
+		#here should broadcast table to all players in names!
+		#inreaction to this broadcast, they will poll the table
+		emit('poll', names, broadcast=True)
+		return redirect('/play/<tablename>/<user>') 
+
+@app.route('/action/<table>/<user>/<a>')
+def action_route(a):	
+	#wenn ein neuer step prepped wir, erhalte 
+	if not actions[table]:
+		actions[table] = {}
+	actions[table][user] = a
+
+	return redirect('/spiele')
+
 #endregion
 
 #region example routes
@@ -350,9 +351,9 @@ def test_cors():
 #endregion test routes
 
 
-
 if __name__ == "__main__":
-	app.run(debug=True)
+	socketio.run(app, port=5000, debug=True)
+	#app.run(debug=True)
 
 
 

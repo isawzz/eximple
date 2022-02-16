@@ -15,6 +15,7 @@
 
 		<script>
 			var serverData = {{serverData|tojson}};
+			var basepath = "{{basepath}}";
 			console.log('serverData', serverData);
 		</script>
 
@@ -25,15 +26,15 @@
 		<div class="topmenu" style="background: silver; padding-left: 10px">
 			<a href="/spiele">home</a>
 			<a href="/spiele/users">users</a>
-			<a href="/dbinit">dbinit (achtung! loescht database!!!)</a>
+			<a href="/dbinit" style='color:red'>dbinit!</a>
 		</div>
 		{% if serverData.message %}
 		<div id="dMessage">{{ serverData.message}}</div>
 		{% endif %}
 		
-		<script src="../../templates/spiele/basemin.js"></script>
-		<script src="../../templates/spiele/functions.js"></script>
-		<script src="../../templates/spiele/start.js"></script>
+		<script src="../../../templates/spiele/basemin.js"></script>
+		<script src="../../../templates/spiele/functions.js"></script>
+		<script src="../../../templates/spiele/start.js"></script>
 		{#
 		<script src="{{basepath}}code/basemin.js"></script>
 		#}
