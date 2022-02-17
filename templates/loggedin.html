@@ -1,9 +1,9 @@
 {% extends 'base.html' %} {% block title %}
-<title>{{serverData.user}}</title>
+<title>{{serverData.user.name}}</title>
 {% endblock %} {% block content %}
-<div id="dTable"></div>
+{# <div id="dMain"></div>
 <br />
-<br />
+<br /> #}
 <form action="" method="POST">
 	<input type="text" name="text" placeholder="enter action" />
 	<input type="submit" />

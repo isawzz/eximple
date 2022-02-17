@@ -132,8 +132,17 @@ def get_games(): return [x.toDict() for x in Game.query.all()]
 def get_actions(): return [x.toDict() for x in Action.query.all()]
 def get_game_actions(game): 
 	g=Game.query.filter_by(name=game).first()
-	print('...',g.name,g.id)
+	#print('...',g.name,g.id)
 	return [x.toDict() for x in Action.query.filter_by(game=g).all()]
+def get_user_actions(user): 
+	g=User.query.filter_by(name=user).first()
+	#print('...',g.name,g.id)
+	return [x.toDict() for x in Action.query.filter_by(user=g).all()]
+def get_actions_for(game,user): 
+	g=Game.query.filter_by(name=game).first()
+	u=User.query.filter_by(name=user).first()
+	print('...',g.name,g.id,u.name,u.id)
+	return [x.toDict() for x in Action.query.filter_by(game=g,user=u).all()]
 
 def get_user(name):	return User.query.filter_by(name=name).first().toDict()
 def get_game(name):	return Game.query.filter_by(name=name).first().toDict()

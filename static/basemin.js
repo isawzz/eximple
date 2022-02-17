@@ -1,6 +1,7 @@
 //#region globals: Session data
 var ColorDi;
-var Users, User, Tables, Table; //User,Table are objects
+var Users, User, Tables, Table, Actions, dTable, dTitle;
+var Syms, SymKeys;
 
 //#endregion
 
@@ -31,6 +32,9 @@ function mCenterFlex(d, hCenter = true, vCenter = false, wrap = true) {
 	mStyle(d, styles);
 	//console.log('d', d)
 }
+function mColorLetters(s) {
+	return toLetters(s).map(x => `<div style='display:inline-block;transform:rotate(${rChoose([10, 5, -10, -5])}deg);color:${rColor()}'>${x == ' ' ? '&nbsp;' : x}</div>`).join('');
+}
 function mCreate(tag, styles, id) { let d = document.createElement(tag); if (isdef(id)) d.id = id; if (isdef(styles)) mStyle(d, styles); return d; }
 function mCreateFrom(htmlString) {
 	//console.log('---------------',htmlString)
@@ -41,7 +45,17 @@ function mCreateFrom(htmlString) {
 	//console.log(div.firstChild)
 	return div.firstChild;
 }
-
+function mDataTable(reclist, dParent, rowstylefunc, headers) {
+	if (nundef(headers)) headers = get_keys(reclist[0]);
+	let t = mTable(dParent, headers);
+	let rowitems = [];
+	for (const u of reclist) {
+		r = mTableRow(t, u, headers);
+		if (isdef(rowstylefunc)) mStyle(r.div, rowstylefunc(u));
+		rowitems.push({ div: r.div, colitems: r.colitems, o: u });
+	}
+	return rowitems;
+}
 function mDiv(dParent, styles, id, inner, classes, sizing) {
 	let d = mCreate('div');
 	if (dParent) mAppend(dParent, d);
@@ -262,16 +276,74 @@ function mStyle(elem, styles, unit = 'px') {
 		}
 	}
 }
+function mTable(dParent, headers) {
+	let d = mDiv(dParent);
+	let t = mCreate('table');
+	mAppend(d, t);
+	mClass(t, 'table');
+	let code = `<tr>`;
+	for (const h of headers) {
+		code += `<th>${h}</th>`
+	}
+	code += `</tr>`;
+	t.innerHTML = code;
+	return t;
+}
+function mTableCol(r, val) {
+	let col = mCreate('td');
+	mAppend(r, col);
+	if (isdef(val)) col.innerHTML = val;
+	return col;
+}
+function mTableHeader(t, val) {
+	let col = mCreate('th');
+	mAppend(t.firstChild, col);
+	col.innerHTML = val;
+	return col;
+}
+function mTableRow(t, o, headers) {
+	let elem = mCreate('tr');
+	mAppend(t, elem);
+	let colitems = [];
+	for (const k of headers) {
+		let val = isdef(o[k]) ? o[k] : '';
+		let col = mTableCol(elem, val);
+		colitems.push({ div: col, key: k, val: val });
+	}
+	return { div: elem, colitems: colitems };
+}
+function mTableCommandify(rowitems, di) {
+	//di: index:function(rowitem,current_colitem.val)
+	for (const item of rowitems) {
+		for (const index in di) {
+			let colitem = item.colitems[index];
+			//console.log('colitem', colitem)
+			colitem.div.innerHTML = di[index](item, colitem.val);
 
-//#region array arr prefix
+		}
+	}
+}
+function mTableCommandifyList(rowitem, val, func) {
+	//func should take in rowitem,listval and return html
+	let names = isString(val) ? val.replaceAll(' ',',').split(',') : val;
+	let html = '';
+	for (const name of names) {
+		html += func(rowitem, name); //`<a href="/table/${rowitem.o.name}/${name}">${name}</a>`
+	}
+	return html;
+}
+//#endregion
+
+//#region arr
 function arrRemovip(arr, el) {
 	let i = arr.indexOf(el);
 	if (i > -0) arr.splice(i, 1);
 	return i;
 }
 function arrShufflip(arr) { if (isEmpty(arr)) return []; else return fisherYates(arr); }
+//#endregion
 
-//#region color prefix
+//#region color
 function alphaToHex(zero1) {
 	zero1 = Math.round(zero1 * 100) / 100;
 	var alpha = Math.round(zero1 * 255);
@@ -415,6 +487,7 @@ function colorIdealText(bg, grayPreferred = false) {
 function colorTrans(cAny, alpha = 0.5) {
 	return colorFrom(cAny, alpha);
 }
+//#endregion
 
 //#region random
 function rCoin(percent = 50) {
@@ -445,15 +518,63 @@ function rColor() {
 	}
 	return s;
 }
+//#endregion
 
-//#region misc
-function addKeys(ofrom, oto) { for (const k in ofrom) if (nundef(oto[k])) oto[k] = ofrom[k]; return oto; }
+//#region string functions
 function allNumbers(s) {
 	//returns array of all numbers within string s
 	let m = s.match(/\-.\d+|\-\d+|\.\d+|\d+\.\d+|\d+\b|\d+(?=\w)/g);
 	if (m) return m.map(v => Number(v)); else return null;
 	// {console.log(v,typeof v,v[0],v[0]=='-',v[0]=='-'?-(+v):+v,Number(v));return Number(v);});
 }
+function capitalize(s) {
+	if (typeof s !== 'string') return '';
+	return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function contains(s, sSub) { return s.toLowerCase().includes(sSub.toLowerCase()); }
+function endsWith(s, sSub) { let i = s.indexOf(sSub); return i >= 0 && i == s.length - sSub.length; }
+function startsWith(s, sSub) {
+	//console.log('s',s,'sSub',sSub)
+	//testHelpers('startWith: s='+s+', sSub='+sSub,typeof(s),typeof(sSub));
+	return s.substring(0, sSub.length) == sSub;
+}
+function stringAfter(sFull, sSub) {
+	//testHelpers('s='+sFull,'sub='+sSub)
+	let idx = sFull.indexOf(sSub);
+	//testHelpers('idx='+idx)
+	if (idx < 0) return '';
+	return sFull.substring(idx + sSub.length);
+}
+function stringAfterLast(sFull, sSub) {
+	let parts = sFull.split(sSub);
+	return arrLast(parts);
+}
+function stringBefore(sFull, sSub) {
+	let idx = sFull.indexOf(sSub);
+	if (idx < 0) return sFull;
+	return sFull.substring(0, idx);
+}
+function stringBeforeLast(sFull, sSub) {
+	let parts = sFull.split(sSub);
+	return sFull.substring(0, sFull.length - arrLast(parts).length - 1);
+}
+function stringBetween(sFull, sStart, sEnd) {
+	return stringBefore(stringAfter(sFull, sStart), isdef(sEnd) ? sEnd : sStart);
+}
+function stringBetweenLast(sFull, sStart, sEnd) {
+	let s1 = stringBeforeLast(sFull, isdef(sEnd) ? sEnd : sStart);
+	return stringAfterLast(s1, sStart);
+	//return stringBefore(stringAfter(sFull,sStart),isdef(sEnd)?sEnd:sStart);
+}
+function toLetters(s) { return [...s]; }
+//function toWords(s) { return s.split('\W+'); }
+
+
+
+//#endregion
+
+//#region misc
+function addKeys(ofrom, oto) { for (const k in ofrom) if (nundef(oto[k])) oto[k] = ofrom[k]; return oto; }
 function copyKeys(ofrom, oto, except = {}, only) {
 	//console.log(ofrom)
 	let keys = isdef(only) ? only : Object.keys(ofrom);
@@ -461,6 +582,25 @@ function copyKeys(ofrom, oto, except = {}, only) {
 		if (isdef(except[k])) continue;
 		oto[k] = ofrom[k];
 	}
+}
+function dict2list(d, keyName = 'id') {
+	let res = [];
+	for (const key in d) {
+		let val = d[key];
+		let o;
+		if (isDict(val)) { o = jsCopy(val); } else { o = { value: val }; }
+		o[keyName] = key;
+		res.push(o);
+	}
+	return res;
+}
+function list2dict(arr, keyprop = 'id', uniqueKeys = true) {
+	let di = {};
+	for (const a of arr) {
+		if (uniqueKeys) lookupSet(di, [a[keyprop]], a);
+		else lookupAddToList(di, [a[keyprop]], a);
+	}
+	return di;
 }
 function firstCond(arr, func) {
 	//return first elem that fulfills condition
@@ -650,43 +790,10 @@ function range(f, t, st = 1) {
 	return arr;
 }
 async function route_path_yaml_dict(url) {
-	let data = await fetch_wrapper(url);
+	let data = await fetch(url);
 	let text = await data.text();
 	let dict = jsyaml.load(text);
 	return dict;
-}
-function startsWith(s, sSub) {
-	//console.log('s',s,'sSub',sSub)
-	//testHelpers('startWith: s='+s+', sSub='+sSub,typeof(s),typeof(sSub));
-	return s.substring(0, sSub.length) == sSub;
-}
-function stringAfter(sFull, sSub) {
-	//testHelpers('s='+sFull,'sub='+sSub)
-	let idx = sFull.indexOf(sSub);
-	//testHelpers('idx='+idx)
-	if (idx < 0) return '';
-	return sFull.substring(idx + sSub.length);
-}
-function stringAfterLast(sFull, sSub) {
-	let parts = sFull.split(sSub);
-	return arrLast(parts);
-}
-function stringBefore(sFull, sSub) {
-	let idx = sFull.indexOf(sSub);
-	if (idx < 0) return sFull;
-	return sFull.substring(0, idx);
-}
-function stringBeforeLast(sFull, sSub) {
-	let parts = sFull.split(sSub);
-	return sFull.substring(0, sFull.length - arrLast(parts).length - 1);
-}
-function stringBetween(sFull, sStart, sEnd) {
-	return stringBefore(stringAfter(sFull, sStart), isdef(sEnd) ? sEnd : sStart);
-}
-function stringBetweenLast(sFull, sStart, sEnd) {
-	let s1 = stringBeforeLast(sFull, isdef(sEnd) ? sEnd : sStart);
-	return stringAfterLast(s1, sStart);
-	//return stringBefore(stringAfter(sFull,sStart),isdef(sEnd)?sEnd:sStart);
 }
 function valf(val, def) { return isdef(val) ? val : def; }
 

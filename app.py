@@ -33,31 +33,45 @@ def r_info():
 
 @app.route('/loggedin/<user>', methods=['GET','POST'])
 def r_loggedin(user): 
-	return render_template('loggedin.html',basepath=basepath, serverData={"user":get_user(user),"games":get_games_for(user)}) #,"actions":get_user_actions(user)})
+	games = get_games_for(user)
+	#for each of these games should get actions
+	return render_template('loggedin.html',basepath=basepath, serverData={"user":get_user(user),"games":games,"actions":get_user_actions(user)}) 
 
 @app.route('/table/<game>/<user>', methods=['GET','POST'])
 def r_table(game,user): 
 	if user == 'anonymous':
-		return 'show anonymous table'
-	return render_template('table.html',basepath=basepath, serverData={"user":get_user(user),"game":get_game(game)}) #,"actions":get_user_actions(user)})
-#endregion
+		return render_template('table.html',basepath=basepath, serverData={"user":{"name":"anonymous","color":'YELLOW'},"game":get_game(game)}) 
+	return render_template('table.html',basepath=basepath, serverData={"user":get_user(user),"game":get_game(game),"actions":get_actions_for(game,user)}) 
 
-#region spiele: complex stuff!!!!!!!!!!!!!!!!!
-def process_action(data,choice):
-	print('...user picked action',choice)
-	data['hallo'] = 'hallo'
-	pass
+@app.route('/action/<game>/<user>/<action>', methods=['GET','POST'])
+def r_action(game,user,action): 
+	print('action',action)
+	action_result = process_action(game,user,action)
+	return render_template('table.html',basepath=basepath, serverData={"user":get_user(user),"game":get_game(game),"actions":get_actions_for(game,user), "action_result":action_result}) 
 
-@app.route('/game/<gamename>/<username>', methods=['GET','POST'])
-def game_route(gamename,username):	
-	user = get_user(username) if username!='anonymous' else {'name':'anonymous'}
-	game = get_game(gamename)
-	actions = get_actions(game,user)
-	serverData = {'actions':actions,'user':user,'game':game}
-	if request.method == 'POST':
-		process_action(serverData,request.form['text'])
-
-	return render_template('simplegame.html',serverData=serverData) 
+def process_action(game,user,action):
+	#die gewaehlte action muss aus der action list raus
+	#choice wird zu action gesetzt
+	print('...user',user,'game',game,'action',action)
+	g=Game.query.filter_by(name=game).first()
+	print('=>game.id',g.id)
+	u=User.query.filter_by(name=user).first()
+	print('=>user.id',u.id)
+	a = Action.query.filter_by(user_id=u.id,game_id=g.id).first()
+	print('=>action.choices',a.choices)
+	a.choice = action
+	s = a.choices
+	s=s.replace(action,'').replace('  ',' ')
+	print('...res=',s)
+	
+	a.choices = s # '2 3 4 5' #a.choices.split('\W+')
+	print('....',a.choices)
+	#choices.remove(action)
+	#a.choices = ' '.join(choices)
+	#a.choices.remove(action)
+	print('a',a.toDict()) #,a.choice)
+	db.session.commit()
+	return a.toDict()
 
 #endregion
 

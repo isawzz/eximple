@@ -5,8 +5,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="{{basepath}}assets/fonts/fonts.css" />
-		<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}">
-		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 		<script src="{{basepath}}alibs/jsyaml.js"></script>
 		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
 		<script src="{{ url_for('static', filename='start.js') }}"></script>
@@ -18,6 +18,8 @@
 			if (isdef(serverData.user)) User = serverData.user;
 			if (isdef(serverData.games)) Tables = serverData.games;
 			if (isdef(serverData.game)) Table = serverData.game;
+			if (isdef(serverData.actions)) Actions = serverData.actions;
+			if (isdef(serverData.action_result)) console.log('ActionResult: was brauch ich da im simpelsten fall???',serverData.action_result);
 			console.log('serverData', serverData);
 		</script>
 		{% block title %} {% endblock %}
@@ -27,12 +29,20 @@
 			<a href="/info">home</a>
 			<a href="/loggedin/mimi">mimi</a>
 			<a href="/table/paris/mimi">paris</a>
-			<a href="/reset" style='color:red'>dbinit!</a>
+			<a href="/reset" style="color: red">dbinit!</a>
 		</div>
 		{% if serverData.message %}
 		<div id="dMessage">{{ serverData.message}}</div>
 		{% endif %}
 
+		<div id="dMain">
+			<div id="dTitle" style="opacity:0;box-sizing: border-box; position: relative; height: 44px; text-align: center">
+				<h1 id="dTitleCenter"></h1>
+				<h1 id="dTitleLeft" style="display: inline-block; top: 0; left: 8px; position: absolute"></h1>
+				<h1 id="dTitleRight" style="display: inline; position: absolute; top: 0; right: 8px"></h1>
+			</div>
+			<div id="dTable" style="opacity:0; min-height: 440px"></div>
+		</div>
 		{% block content %} {% endblock %}
 	</body>
 </html>
