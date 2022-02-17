@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>flask test</title>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script>
+		<script src="../static/basemin.js"></script>
+	</head>
+	<body>
+		<script>
+			onload = start;
+			var socket;
+
+			function start() {
+				socket = io.connect('http://127.0.0.1:5051');
+				socket.on('connect', () => {
+					socket.send('user has connected');
+				});
+				socket.on('message', (x) => {
+					console.log('message from server 1:', x);
+					let elem = mBy('messages');
+					mAppend(elem,mCreateFrom(`<li>${x}</li>`))
+				});
+			}
+			function socketsend() {
+				let elem = mBy('myMessage');
+				let text = elem.value;
+				elem.value = '';
+				socket.send(text);
+				return false;
+			}
+		</script>
+		<ul id="messages" ></ul>
+		<form action="javascript:void(0);" onsubmit="socketsend()">
+			<input type="text" id="myMessage" />
+			<input type="submit" id="sendbutton" />
+		</form>
+	</body>
+</html>

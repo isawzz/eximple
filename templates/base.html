@@ -7,6 +7,7 @@
 		<link rel="stylesheet" href="{{basepath}}assets/fonts/fonts.css" />
 		<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}" />
 		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script>
 		<script src="{{basepath}}alibs/jsyaml.js"></script>
 		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
 		<script src="{{ url_for('static', filename='start.js') }}"></script>
@@ -21,6 +22,7 @@
 			if (isdef(serverData.actions)) Actions = serverData.actions;
 			if (isdef(serverData.action_result)) console.log('ActionResult: was brauch ich da im simpelsten fall???',serverData.action_result);
 			console.log('serverData', serverData);
+
 		</script>
 		{% block title %} {% endblock %}
 	</head>
@@ -44,5 +46,11 @@
 			<div id="dTable" style="opacity:0; min-height: 440px"></div>
 		</div>
 		{% block content %} {% endblock %}
+
+		<ul id="messages" ></ul>
+		<form action="javascript:void(0);" onsubmit="socketsend()">
+			<input type="text" id="myMessage" />
+			<input type="submit" id="sendbutton" />
+		</form>
 	</body>
 </html>

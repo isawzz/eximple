@@ -1,3 +1,27 @@
+//onload = startsocket;
+var socket;
+
+function startsocket() {
+	socket = io.connect('http://127.0.0.1:5051');
+	socket.on('connect', () => {
+		socket.send('user has connected');
+	});
+	socket.on('message', (x) => {
+		console.log('message from server 1:', x);
+		let elem = mBy('messages');
+		mAppend(elem,mCreateFrom(`<li>${x}</li>`))
+	});
+}
+function socketsend() {
+	let elem = mBy('myMessage');
+	let text = elem.value;
+	elem.value = '';
+	socket.send(text);
+	return false;
+}
+
+
+
 function start_info() {
 	general_start();
 	let useritems = show_users(dTable);
@@ -20,8 +44,10 @@ async function start_table() {
 
 //#region components
 function general_start() {
+	//startsocket();
+
 	dTitle = mBy('dTitle');
-	if (isdef(Table)) show_title('Battle of ' + capitalize(Table.name),{fg: User.color}, false);
+	if (isdef(Table)) show_title('Battle of ' + capitalize(Table.name), { fg: User.color }, false);
 	else show_title('My Little World');
 
 	show_user();
@@ -82,8 +108,12 @@ function show_actions(dParent) {
 	mTableCommandify(items, {
 		0: (item, val) => `<a href="/table/${item.o.game}/${item.o.user}">${val}</a>`,
 		1: (item, val) => `<a href="/table/${item.o.game}/${item.o.user}">${val}</a>`,
-		2: (item, val) => mTableCommandifyList(item, val, (x, p) => `<a href="/action/${x.o.game}/${x.o.user}/${p}">${p}</a>`)
+		2: (item, val) => {
+			console.log('???',item.choice, 'isEmpty?',isEmpty(item.choice));
+			return isEmpty(item.choice)? mTableCommandifyList(item, val, (x, p) => `<a href="/action/${x.o.game}/${x.o.user}/${p}">${p}</a>`):val;
+		}
 	});
+
 	return items;
 }
 
