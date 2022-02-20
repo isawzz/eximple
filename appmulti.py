@@ -1,50 +1,40 @@
-#region init
 from flask import jsonify, Flask, request, send_from_directory, render_template, redirect
 app = Flask(__name__)
 HEROKUPROD = False #set True for production (need to re-create db on heroku!)
 Basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://localhost:8080/aroot/base/"
-app.config['SECRET_KEY'] = 'IJustHopeThisWorks!' #do I need this???
 
 from dbutils import *
 db_init(app)
 
+#region socketio
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 import eventlet
-
 CORS(app)
 eventlet.monkey_patch()
 socketio = SocketIO(app, cors_allowed_origins="*")
-clients = []
+
+@socketio.on('message')
+def handle_message(msg):
+	print('message: '+msg)
+	send('rec '+msg, broadcast=True) #without broadcast, will just send to msg sender
+
+@app.route('/testsocketio')
+def testsock():	
+	return render_template('tests/test_socketio.html')
+
+@app.get('/stop')
+def shutdown():
+	socketio.stop()
 #endregion
 
-@socketio.on('message') #public event
-def handle_message(msg):
-	print(f'....message from: {msg}', '==>id',request.sid)
-	send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
-# @socketio.on('login') #custom event
-# def handle_login(msg):
-# 	print('....login: '+msg, '==>id',request.sid)
-# 	emit('login',f'client: {request.sid} connected: {msg}', broadcast=True) #without broadcast, will just send to msg sender
-
 @app.route('/')
-def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')
-
-@app.route('/singlepage', methods=['GET','POST'])
-@app.route('/singlepage/<user>', methods=['GET','POST'])
-@app.route('/singlepage/<user>/<game>', methods=['GET','POST'])
-@app.route('/singlepage/<user>/<game>/<action>', methods=['GET','POST'])
-def r_singlepage(user=None,game=None,action=None):
-	if not user:
-		user = {'name':'anonymous','color':'blue'}
-	if request.method == 'POST':
-		socketio.send('hallo', broadcast=True)	
-	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"user":user,"game":game,"action":action,"users":get_users(),"games":get_games(),"actions":get_actions()})
+def base_route():	return redirect ('/info'); # ('/game/paris/felix')
 
 @app.route('/reset')
 def r_reset(): 
 	create_random_data()
-	return redirect('/')
+	return redirect('/info')
 
 @app.route('/info')
 def r_info(): 
@@ -87,12 +77,11 @@ def process_action(game,user,action):
 		print('!!!!!',msg)
 		send(msg, broadcast=True)	
 
+
+
 	return a.toDict()
 
 #region test routes
-@app.route('/testsocketio')
-def testsock():	
-	return render_template('tests/test_socketio.html')
 @app.route('/get_players/<game>')
 def r_get_players(game): return jsonify(get_players(game))
 @app.route('/get_playernames/<game>')

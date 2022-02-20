@@ -11,14 +11,14 @@
 	<body>
 		<script>
 			onload = start;
-			var socket;
+			var Socket;
 
 			function start() {
-				socket = io.connect('http://127.0.0.1:5051');
-				socket.on('connect', () => {
-					socket.send('user has connected');
+				Socket = io.connect('http://127.0.0.1:5051');
+				Socket.on('connect', () => {
+					Socket.send('user has connected');
 				});
-				socket.on('message', (x) => {
+				Socket.on('message', (x) => {
 					console.log('message from server 1:', x);
 					let elem = mBy('messages');
 					mAppend(elem,mCreateFrom(`<li>${x}</li>`))
@@ -28,7 +28,7 @@
 				let elem = mBy('myMessage');
 				let text = elem.value;
 				elem.value = '';
-				socket.send(text);
+				Socket.send(text);
 				return false;
 			}
 		</script>

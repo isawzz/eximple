@@ -1,9 +1,7 @@
 //#region globals: Session data
 var ColorDi;
-var Users, User, Tables, Table, Actions, dTable, dTitle;
-var Syms, SymKeys;
-
-//#endregion
+var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
+var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
 //#region m prefix (DOM)
 function mAppend(d, child) { d.appendChild(child); return child; }
@@ -32,6 +30,7 @@ function mCenterFlex(d, hCenter = true, vCenter = false, wrap = true) {
 	mStyle(d, styles);
 	//console.log('d', d)
 }
+function mCenterCenterFlex(d) { mCenterFlex(d, true, true, true); }
 function mColorLetters(s) {
 	return toLetters(s).map(x => `<div style='display:inline-block;transform:rotate(${rChoose([10, 5, -10, -5])}deg);color:${rColor()}'>${x == ' ' ? '&nbsp;' : x}</div>`).join('');
 }
@@ -88,7 +87,7 @@ function mPlace(elem, pos, offx, offy) {
 		let [wParent, hParent] = [rParent.w, rParent.h];
 		let rElem = getRect(elem);
 		let [wElem, hElem] = [rElem.w, rElem.h];
-		//console.log('_____________\nelem',elem,'\nrect',rSym,'v',v)
+		console.log('_____________\nelem', rElem, '\nparent', rParent)
 		switch (pos) {
 			case 'cc': mStyle(elem, { position: 'absolute', left: hor + (wParent - wElem) / 2, top: vert + (hParent - hElem) / 2 }); break;
 			case 'tc': mStyle(elem, { position: 'absolute', left: hor + (wParent - wElem) / 2, top: vert }); break;
@@ -276,6 +275,57 @@ function mStyle(elem, styles, unit = 'px') {
 		}
 	}
 }
+function miPic(item, dParent, styles, classes) {
+	let info = isString(item) ? Syms[item] : isdef(item.info) ? item.info : item;
+	let d = mDiv(dParent);
+	d.innerHTML = info.text;
+	if (nundef(styles)) styles = {};
+	addKeys({ family: info.family, fz: 50, display: 'inline-block' }, styles);
+	mStyle(d, styles);
+	if (isdef(classes)) mClass(d, classes);
+	mCenterCenterFlex(d);
+	return d;
+}
+function mSym(key, dParent, styles = {}, pos, classes) {
+	let info = Syms[key];
+	styles.display = 'inline-block';
+	styles.family = info.family;
+
+	console.log('vorher: styles', jsCopy(styles))
+
+	let sizes;
+	if (isdef(styles.sz)) { sizes = mSymSizeToBox(info, styles.sz, styles.sz); }
+	else if (isdef(styles.w) && isdef(styles.h)) { sizes = mSymSizeToBox(info, styles.w, styles.h); }
+	else if (isdef(styles.fz)) { sizes = mSymSizeToFz(info, styles.fz); }
+	else if (isdef(styles.h)) { sizes = mSymSizeToH(info, styles.h); }
+	else if (isdef(styles.w)) { sizes = mSymSizeToW(info, styles.w); }
+	else { sizes = mSymSizeToFz(info, CSZ / 8); }
+
+	styles.fz = sizes.fz;
+	styles.w = sizes.w;
+	styles.h = sizes.h;
+	styles.align = 'center';
+	if (isdef(styles.bg) && info.family != 'emoNoto') { styles.fg = styles.bg; delete styles.bg; }
+
+	console.log('nachher: styles', jsCopy(styles))
+
+
+	let x = mDiv(dParent, styles, null, info.text);
+	if (isdef(classes)) mClass(x, classes);
+	if (isdef(pos)) { mPlace(x, pos); }
+	return x;
+}
+function mSymSizeToH(info, h) { let f = h / info.h; return { fz: 100 * f, w: info.w * f, h: h }; }
+function mSymSizeToW(info, w) { let f = w / info.w; return { fz: 100 * f, w: w, h: info.h * f }; }
+function mSymSizeToFz(info, fz) { let f = fz / 100; return { fz: fz, w: info.w * f, h: info.h * f }; }
+function mSymSizeToBox(info, w, h) {
+	//console.log('mSymSizeToBox', w, h, '\ninfo:', info.w, info.h);
+	let fw = w / info.w;
+	let fh = h / info.h;
+	let f = Math.min(fw, fh);
+	//console.log('fw', fw, '\nfh', fh, '\nf', f);
+	return { fz: 100 * f, w: info.w * f, h: info.h * f };
+}
 function mTable(dParent, headers) {
 	let d = mDiv(dParent);
 	let t = mCreate('table');
@@ -325,7 +375,7 @@ function mTableCommandify(rowitems, di) {
 }
 function mTableCommandifyList(rowitem, val, func) {
 	//func should take in rowitem,listval and return html
-	let names = isString(val) ? val.replaceAll(' ',',').split(',') : val;
+	let names = isString(val) ? val.replaceAll(' ', ',').split(',') : val;
 	let html = '';
 	for (const name of names) {
 		html += func(rowitem, name); //`<a href="/table/${rowitem.o.name}/${name}">${name}</a>`
@@ -334,13 +384,164 @@ function mTableCommandifyList(rowitem, val, func) {
 }
 //#endregion
 
-//#region arr
+//#region arr dict
 function arrRemovip(arr, el) {
 	let i = arr.indexOf(el);
 	if (i > -0) arr.splice(i, 1);
 	return i;
 }
 function arrShufflip(arr) { if (isEmpty(arr)) return []; else return fisherYates(arr); }
+function addKeys(ofrom, oto) { for (const k in ofrom) if (nundef(oto[k])) oto[k] = ofrom[k]; return oto; }
+function copyKeys(ofrom, oto, except = {}, only) {
+	//console.log(ofrom)
+	let keys = isdef(only) ? only : Object.keys(ofrom);
+	for (const k of keys) {
+		if (isdef(except[k])) continue;
+		oto[k] = ofrom[k];
+	}
+}
+function dict2list(d, keyName = 'id') {
+	let res = [];
+	for (const key in d) {
+		let val = d[key];
+		let o;
+		if (isDict(val)) { o = jsCopy(val); } else { o = { value: val }; }
+		o[keyName] = key;
+		res.push(o);
+	}
+	return res;
+}
+function list2dict(arr, keyprop = 'id', uniqueKeys = true) {
+	let di = {};
+	for (const a of arr) {
+		if (uniqueKeys) lookupSet(di, [a[keyprop]], a);
+		else lookupAddToList(di, [a[keyprop]], a);
+	}
+	return di;
+}
+function fisherYates(array) {
+	//shuffles in place!
+	var rnd, temp;
+	for (var i = array.length - 1; i; i--) {
+		rnd = Math.random() * i | 0;
+		temp = array[i];
+		array[i] = array[rnd];
+		array[rnd] = temp;
+	}
+	return array;
+}
+function firstCond(arr, func) {
+	//return first elem that fulfills condition
+	if (nundef(arr)) return null;
+	for (const a of arr) {
+		if (func(a)) return a;
+
+	}
+	return null;
+}
+function firstCondDict(dict, func) {
+	//return first elem that fulfills condition
+	for (const k in dict) { if (func(dict[k])) return k; }
+	return null;
+}
+function get_keys(o) { return Object.keys(o); }
+function get_values(o) { return Object.values(o); }
+function lookup(dict, keys) {
+	let d = dict;
+	let ilast = keys.length - 1;
+	let i = 0;
+	for (const k of keys) {
+		if (k === undefined) break;
+		let e = d[k];
+		if (e === undefined || e === null) return null;
+		d = d[k];
+		if (i == ilast) return d;
+		i += 1;
+	}
+	return d;
+}
+function lookupSet(dict, keys, val) {
+	let d = dict;
+	let ilast = keys.length - 1;
+	let i = 0;
+	for (const k of keys) {
+		if (nundef(k)) continue; //skip undef or null values
+		if (d[k] === undefined) d[k] = (i == ilast ? val : {});
+		if (nundef(d[k])) d[k] = (i == ilast ? val : {});
+		d = d[k];
+		if (i == ilast) return d;
+		i += 1;
+	}
+	return d;
+}
+function lookupSetOverride(dict, keys, val) {
+	let d = dict;
+	let ilast = keys.length - 1;
+	let i = 0;
+	for (const k of keys) {
+
+		//console.log(k,d)
+		if (i == ilast) {
+			if (nundef(k)) {
+				//letzter key den ich eigentlich setzen will ist undef!
+				//alert('lookupAddToList: last key indefined!' + keys.join(' '));
+				return null;
+			} else {
+				d[k] = val;
+			}
+			return d[k];
+		}
+
+		if (nundef(k)) continue; //skip undef or null values
+
+		if (nundef(d[k])) d[k] = {};
+
+		d = d[k];
+		i += 1;
+	}
+	return d;
+}
+function lookupAddToList(dict, keys, val) {
+	//usage: lookupAddToList({a:{b:[2]}}, [a,b], 3) => {a:{b:[2,3]}}
+	//usage: lookupAddToList({a:{b:[2]}}, [a,c], 3) => {a:{b:[2],c:[3]}}
+	//usage: lookupAddToList({a:[0, [2], {b:[]}]}, [a,1], 3) => { a:[ 0, [2,3], {b:[]} ] }
+	let d = dict;
+	//console.log(dict)
+	let ilast = keys.length - 1;
+	let i = 0;
+	for (const k of keys) {
+
+		if (i == ilast) {
+			if (nundef(k)) {
+				//letzter key den ich eigentlich setzen will ist undef!
+				console.assert(false, 'lookupAddToList: last key indefined!' + keys.join(' '));
+				return null;
+			} else if (isList(d[k])) {
+				d[k].push(val);
+			} else {
+				d[k] = [val];
+			}
+			return d[k];
+		}
+
+		if (nundef(k)) continue; //skip undef or null values
+
+		// if (i ==ilast && d[k]) d[k]=val;
+
+		if (d[k] === undefined) d[k] = {};
+
+		d = d[k];
+		i += 1;
+	}
+	return d;
+}
+function lookupAddIfToList(dict, keys, val) {
+	//usage see lookupAddToList 
+	//only adds it to list if not contained!
+	let lst = lookup(dict, keys);
+	if (isList(lst) && lst.includes(val)) return;
+	lookupAddToList(dict, keys, val);
+}
 //#endregion
 
 //#region color
@@ -355,6 +556,10 @@ function alphaToHex(zero1) {
 	//console.log('alpha from', zero1, 'to', hex);
 	return hex;
 }
+function colorDark(c, zero1 = -.5, log = true) {
+	if (nundef(c)) c = rColor();
+	return pSBC(zero1, c, undefined, !log);
+}
 function colorFrom(cAny, a, allowHsl = false) {
 	//returns a standard color (rgb or hex format, unless allowHsl==true it could return hsl format)
 	//creates ColorDi if needed
@@ -367,6 +572,15 @@ function colorFrom(cAny, a, allowHsl = false) {
 			let c = ColorDi[cAny].c;
 			if (a == undefined) return c;
 			c = c.substring(0, 7);
+			return c + (a == 1 ? '' : alphaToHex(a));
+		} else if (startsWith(cAny, 'rand')) {
+			let spec = capitalize(cAny.substring(4));
+			if (isdef(window['color' + spec])) {
+				//console.log('found function!', 'color' + spec);
+				c = window['color' + spec]();
+			} else c = rColor();
+			//console.log('==>(hex) color is', c);
+			if (a == undefined) return c;
 			return c + (a == 1 ? '' : alphaToHex(a));
 		} else if (cAny[0] == 'r' && cAny[1] == 'g') {
 			if (a == undefined) return cAny;
@@ -471,333 +685,6 @@ function colorFrom(cAny, a, allowHsl = false) {
 		}
 	}
 }
-function colorIdealText(bg, grayPreferred = false) {
-	let rgb = colorRGB(bg, true);
-	//jetzt ist bg rgb object
-	const nThreshold = 105; //40; //105;
-	let r = rgb.r;
-	let g = rgb.g;
-	let b = rgb.b;
-	var bgDelta = r * 0.299 + g * 0.587 + b * 0.114;
-	var foreColor = 255 - bgDelta < nThreshold ? 'black' : 'white';
-	if (grayPreferred) foreColor = 255 - bgDelta < nThreshold ? 'dimgray' : 'snow';
-	return foreColor;
-	// return 'white';
-}
-function colorTrans(cAny, alpha = 0.5) {
-	return colorFrom(cAny, alpha);
-}
-//#endregion
-
-//#region random
-function rCoin(percent = 50) {
-	let r = Math.random();
-	//r ist jetzt zahl zwischen 0 und 1
-	r *= 100;
-	return r < percent;
-}
-function rChoose(arr, n = 1, func = null, exceptIndices = null) {
-	let arr1 = jsCopy(arr);
-	if (isdef(exceptIndices)) {
-		for (const i of exceptIndices) arripRemove(arr1, arr[i]);
-	}
-	if (isdef(func)) arr1 = arr1.filter(func);
-
-	if (n == 1) {
-		let idx = Math.floor(Math.random() * arr1.length);
-		return arr1[idx];
-	}
-	arrShufflip(arr1);
-	return arr1.slice(0, n);
-
-}
-function rColor() {
-	let s = '#';
-	for (let i = 0; i < 6; i++) {
-		s += rChoose(['f', 'c', '9', '6', '3', '0']);
-	}
-	return s;
-}
-//#endregion
-
-//#region string functions
-function allNumbers(s) {
-	//returns array of all numbers within string s
-	let m = s.match(/\-.\d+|\-\d+|\.\d+|\d+\.\d+|\d+\b|\d+(?=\w)/g);
-	if (m) return m.map(v => Number(v)); else return null;
-	// {console.log(v,typeof v,v[0],v[0]=='-',v[0]=='-'?-(+v):+v,Number(v));return Number(v);});
-}
-function capitalize(s) {
-	if (typeof s !== 'string') return '';
-	return s.charAt(0).toUpperCase() + s.slice(1);
-}
-function contains(s, sSub) { return s.toLowerCase().includes(sSub.toLowerCase()); }
-function endsWith(s, sSub) { let i = s.indexOf(sSub); return i >= 0 && i == s.length - sSub.length; }
-function startsWith(s, sSub) {
-	//console.log('s',s,'sSub',sSub)
-	//testHelpers('startWith: s='+s+', sSub='+sSub,typeof(s),typeof(sSub));
-	return s.substring(0, sSub.length) == sSub;
-}
-function stringAfter(sFull, sSub) {
-	//testHelpers('s='+sFull,'sub='+sSub)
-	let idx = sFull.indexOf(sSub);
-	//testHelpers('idx='+idx)
-	if (idx < 0) return '';
-	return sFull.substring(idx + sSub.length);
-}
-function stringAfterLast(sFull, sSub) {
-	let parts = sFull.split(sSub);
-	return arrLast(parts);
-}
-function stringBefore(sFull, sSub) {
-	let idx = sFull.indexOf(sSub);
-	if (idx < 0) return sFull;
-	return sFull.substring(0, idx);
-}
-function stringBeforeLast(sFull, sSub) {
-	let parts = sFull.split(sSub);
-	return sFull.substring(0, sFull.length - arrLast(parts).length - 1);
-}
-function stringBetween(sFull, sStart, sEnd) {
-	return stringBefore(stringAfter(sFull, sStart), isdef(sEnd) ? sEnd : sStart);
-}
-function stringBetweenLast(sFull, sStart, sEnd) {
-	let s1 = stringBeforeLast(sFull, isdef(sEnd) ? sEnd : sStart);
-	return stringAfterLast(s1, sStart);
-	//return stringBefore(stringAfter(sFull,sStart),isdef(sEnd)?sEnd:sStart);
-}
-function toLetters(s) { return [...s]; }
-//function toWords(s) { return s.split('\W+'); }
-
-
-
-//#endregion
-
-//#region misc
-function addKeys(ofrom, oto) { for (const k in ofrom) if (nundef(oto[k])) oto[k] = ofrom[k]; return oto; }
-function copyKeys(ofrom, oto, except = {}, only) {
-	//console.log(ofrom)
-	let keys = isdef(only) ? only : Object.keys(ofrom);
-	for (const k of keys) {
-		if (isdef(except[k])) continue;
-		oto[k] = ofrom[k];
-	}
-}
-function dict2list(d, keyName = 'id') {
-	let res = [];
-	for (const key in d) {
-		let val = d[key];
-		let o;
-		if (isDict(val)) { o = jsCopy(val); } else { o = { value: val }; }
-		o[keyName] = key;
-		res.push(o);
-	}
-	return res;
-}
-function list2dict(arr, keyprop = 'id', uniqueKeys = true) {
-	let di = {};
-	for (const a of arr) {
-		if (uniqueKeys) lookupSet(di, [a[keyprop]], a);
-		else lookupAddToList(di, [a[keyprop]], a);
-	}
-	return di;
-}
-function firstCond(arr, func) {
-	//return first elem that fulfills condition
-	if (nundef(arr)) return null;
-	for (const a of arr) {
-		if (func(a)) return a;
-
-	}
-	return null;
-}
-function firstCondDict(dict, func) {
-	//return first elem that fulfills condition
-	for (const k in dict) { if (func(dict[k])) return k; }
-	return null;
-}
-function get_keys(o) { return Object.keys(o); }
-function get_values(o) { return Object.values(o); }
-function getRect(elem, relto) {
-
-	if (isString(elem)) elem = document.getElementById(elem);
-
-	let res = elem.getBoundingClientRect();
-	//console.log(res)
-	if (isdef(relto)) {
-		//console.log(relto)
-		let b2 = relto.getBoundingClientRect();
-		let b1 = res;
-		res = {
-			x: b1.x - b2.x,
-			y: b1.y - b2.y,
-			left: b1.left - b2.left,
-			top: b1.top - b2.top,
-			right: b1.right - b2.right,
-			bottom: b1.bottom - b2.bottom,
-			width: b1.width,
-			height: b1.height
-		};
-	}
-	let r = { x: res.left, y: res.top, w: res.width, h: res.height };
-	addKeys({ l: r.x, t: r.y, r: r.x + r.w, b: r.t + r.h }, r);
-	return r;
-}
-function jsCopy(o) { return JSON.parse(JSON.stringify(o)); }
-function jsCopySafe(o) { return JSON.parse(JSON.stringify(jsClean(o))); }
-function jsClean(o) {
-	//replace all DOM objects in o by null
-	if (nundef(o)) return o;
-	else if (isDOM(o)) return null;
-	else if (isLiteral(o)) return o;
-	else if (isList(o)) {
-		let onew = o.map(x => jsClean(x));
-		return onew.filter(x => x !== null);
-	} else if (isDict(o)) {
-		for (const k in o) o[k] = jsClean(o[k]);
-		let onew = {};
-		for (const k in o) if (o[k] !== null) onew[k] = o[k];
-		return onew;
-	}
-}
-function isdef(x) { return x !== null && x !== undefined; }
-function nundef(x) { return x === null || x === undefined; }
-function isDOM(x) { let c = lookup(x, ['constructor', 'name']); return c ? startsWith(c, 'HTML') || startsWith(c, 'SVG') : false; }
-function isDict(d) { let res = (d !== null) && (typeof (d) == 'object') && !isList(d); return res; }
-function isDictOrList(d) { return typeof (d) == 'object'; }
-function isDigit(s) { return /^[0-9]$/i.test(s); }
-function isEmpty(arr) {
-	return arr === undefined || !arr
-		|| (isString(arr) && (arr == 'undefined' || arr == ''))
-		|| (Array.isArray(arr) && arr.length == 0)
-		|| Object.entries(arr).length === 0;
-}
-function isEmptyOrWhiteSpace(s) { return isEmpty(s.trim()); }
-function isLetter(s) { return /^[a-zA-Z]$/i.test(s); }
-function isList(arr) { return Array.isArray(arr); }
-function isLiteral(x) { return isString(x) || isNumber(x); }
-function isNumber(x) { return x !== ' ' && x !== true && x !== false && isdef(x) && (x == 0 || !isNaN(+x)); }
-function isString(param) { return typeof param == 'string'; }
-function isSvg(elem) { return startsWith(elem.constructor.name, 'SVG'); }
-function lookup(dict, keys) {
-	let d = dict;
-	let ilast = keys.length - 1;
-	let i = 0;
-	for (const k of keys) {
-		if (k === undefined) break;
-		let e = d[k];
-		if (e === undefined || e === null) return null;
-		d = d[k];
-		if (i == ilast) return d;
-		i += 1;
-	}
-	return d;
-}
-function lookupSet(dict, keys, val) {
-	let d = dict;
-	let ilast = keys.length - 1;
-	let i = 0;
-	for (const k of keys) {
-		if (nundef(k)) continue; //skip undef or null values
-		if (d[k] === undefined) d[k] = (i == ilast ? val : {});
-		if (nundef(d[k])) d[k] = (i == ilast ? val : {});
-		d = d[k];
-		if (i == ilast) return d;
-		i += 1;
-	}
-	return d;
-}
-function lookupSetOverride(dict, keys, val) {
-	let d = dict;
-	let ilast = keys.length - 1;
-	let i = 0;
-	for (const k of keys) {
-
-		//console.log(k,d)
-		if (i == ilast) {
-			if (nundef(k)) {
-				//letzter key den ich eigentlich setzen will ist undef!
-				//alert('lookupAddToList: last key indefined!' + keys.join(' '));
-				return null;
-			} else {
-				d[k] = val;
-			}
-			return d[k];
-		}
-
-		if (nundef(k)) continue; //skip undef or null values
-
-		if (nundef(d[k])) d[k] = {};
-
-		d = d[k];
-		i += 1;
-	}
-	return d;
-}
-function lookupAddToList(dict, keys, val) {
-	//usage: lookupAddToList({a:{b:[2]}}, [a,b], 3) => {a:{b:[2,3]}}
-	//usage: lookupAddToList({a:{b:[2]}}, [a,c], 3) => {a:{b:[2],c:[3]}}
-	//usage: lookupAddToList({a:[0, [2], {b:[]}]}, [a,1], 3) => { a:[ 0, [2,3], {b:[]} ] }
-	let d = dict;
-	//console.log(dict)
-	let ilast = keys.length - 1;
-	let i = 0;
-	for (const k of keys) {
-
-		if (i == ilast) {
-			if (nundef(k)) {
-				//letzter key den ich eigentlich setzen will ist undef!
-				console.assert(false, 'lookupAddToList: last key indefined!' + keys.join(' '));
-				return null;
-			} else if (isList(d[k])) {
-				d[k].push(val);
-			} else {
-				d[k] = [val];
-			}
-			return d[k];
-		}
-
-		if (nundef(k)) continue; //skip undef or null values
-
-		// if (i ==ilast && d[k]) d[k]=val;
-
-		if (d[k] === undefined) d[k] = {};
-
-		d = d[k];
-		i += 1;
-	}
-	return d;
-}
-function lookupAddIfToList(dict, keys, val) {
-	//usage see lookupAddToList 
-	//only adds it to list if not contained!
-	let lst = lookup(dict, keys);
-	if (isList(lst) && lst.includes(val)) return;
-	lookupAddToList(dict, keys, val);
-}
-function range(f, t, st = 1) {
-	if (nundef(t)) {
-		//if only 1 arg, will return numbers 0..f-1 
-		t = f - 1;
-		f = 0;
-	}
-	let arr = [];
-	//console.log(f,t)
-	for (let i = f; i <= t; i += st) {
-		//console.log('dsdsdshallo')
-		arr.push(i);
-	}
-	return arr;
-}
-async function route_path_yaml_dict(url) {
-	let data = await fetch(url);
-	let text = await data.text();
-	let dict = jsyaml.load(text);
-	return dict;
-}
-function valf(val, def) { return isdef(val) ? val : def; }
-
-//#region internal
 function colorsFromBFA(bg, fg, alpha) {
 	//handles fg,bg 'inherit', 'contrast', 'rand___' ,or any color
 	if (fg == 'contrast') {
@@ -812,6 +699,10 @@ function colorsFromBFA(bg, fg, alpha) {
 	}
 	return [bg, fg];
 }
+function colorFromHSL(hue, sat = 100, lum = 50) { 
+	return hslToHex(valf(hue,rHue()), sat, lum);
+	//return colorFrom(colorHSLBuild(valf(hue,rHue()), sat, lum)); 
+}
 function colorHex(cAny) {
 	//returns hex string w/ alpha channel or without
 	let c = colorFrom(cAny);
@@ -823,6 +714,30 @@ function colorHex(cAny) {
 		//console.log('in colorHex!!!!', c, res);
 		return res;
 	}
+}
+function colorHSLBuild(hue, sat = 100, lum = 50) { let result = "hsl(" + hue + ',' + sat + '%,' + lum + '%)'; return result; }
+function colorIdealText(bg, grayPreferred = false) {
+	let rgb = colorRGB(bg, true);
+	//jetzt ist bg rgb object
+	const nThreshold = 105; //40; //105;
+	let r = rgb.r;
+	let g = rgb.g;
+	let b = rgb.b;
+	var bgDelta = r * 0.299 + g * 0.587 + b * 0.114;
+	var foreColor = 255 - bgDelta < nThreshold ? 'black' : 'white';
+	if (grayPreferred) foreColor = 255 - bgDelta < nThreshold ? 'dimgray' : 'snow';
+	return foreColor;
+	// return 'white';
+}
+function colorLight(c, zero1 = .3, log = true) {
+	if (nundef(c)) {
+		//console.log('HAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLOOOOOOO')
+		let hue = rHue();
+
+		return colorFromHSL(rHue(),100,85);
+	}
+	// if (nundef(c)) c = colorFrom(rChoose(['yellow', 'skyblue', 'orange', 'violet', 'pink', 'GREEN', 'lime']));//rPrimaryColor();
+	return pSBC(zero1, c, undefined, !log);
 }
 function colorRGB(cAny, asObject = false) {
 	//returns { r:[0,255], g:[0,255], b:[0,255]}
@@ -839,6 +754,9 @@ function colorRGB(cAny, asObject = false) {
 	} else {
 		return srgb;
 	}
+}
+function colorTrans(cAny, alpha = 0.5) {
+	return colorFrom(cAny, alpha);
 }
 function ensureColorDict() {
 	if (isdef(ColorDi)) return;
@@ -891,17 +809,6 @@ function ensureColorDict() {
 		if (cnew.c[0] != '#' && isdef(ColorDi[cnew.c])) cnew.c = ColorDi[cnew.c].c;
 		ColorDi[k] = cnew;
 	}
-}
-function fisherYates(array) {
-	//shuffles in place!
-	var rnd, temp;
-	for (var i = array.length - 1; i; i--) {
-		rnd = Math.random() * i | 0;
-		temp = array[i];
-		array[i] = array[rnd];
-		array[rnd] = temp;
-	}
-	return array;
 }
 function getColorNames() {
 	return [
@@ -1207,8 +1114,6 @@ function getColorHexes(x) {
 		'9acd32'
 	];
 }
-
-//#region color legacy functions
 function hexToHSL(H) {
 	let ex = /^#([\da-f]{3}){1,2}$/i;
 	if (ex.test(H)) {
@@ -1255,6 +1160,16 @@ function hexToHSL(H) {
 		return 'Invalid input color';
 	}
 } //ok
+function hslToHex(h, s, l) {
+  l /= 100;
+  const a = s * Math.min(l, 1 - l) / 100;
+  const f = n => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
 function hexAToHSLA(H) {
 	let ex = /^#([\da-f]{4}){1,2}$/i;
 	if (ex.test(H)) {
@@ -1612,245 +1527,6 @@ function RGBAToHSLA(rgba) {
 		return 'Invalid input color';
 	}
 } //ok
-function HSLAToRGBA(hsla, isPct) {
-	//if isPct == true, will output 'rgb(xx%,xx%,xx%)' umgerechnet in % von 255
-	let ex = /^hsla\(((((([12]?[1-9]?\d)|[12]0\d|(3[0-5]\d))(\.\d+)?)|(\.\d+))(deg)?|(0|0?\.\d+)turn|(([0-6](\.\d+)?)|(\.\d+))rad)(((,\s?(([1-9]?\d(\.\d+)?)|100|(\.\d+))%){2},\s?)|((\s(([1-9]?\d(\.\d+)?)|100|(\.\d+))%){2}\s\/\s))((0?\.\d+)|[01]|(([1-9]?\d(\.\d+)?)|100|(\.\d+))%)\)$/i;
-	if (ex.test(hsla)) {
-		let sep = hsla.indexOf(',') > -1 ? ',' : ' ';
-		hsla = hsla
-			.substr(5)
-			.split(')')[0]
-			.split(sep);
-
-		// strip the slash if using space-separated syntax
-		if (hsla.indexOf('/') > -1) hsla.splice(3, 1);
-
-		isPct = isPct === true;
-
-		// must be fractions of 1
-		let h = hsla[0],
-			s = hsla[1].substr(0, hsla[1].length - 1) / 100,
-			l = hsla[2].substr(0, hsla[2].length - 1) / 100,
-			a = hsla[3];
-
-		// strip label and convert to degrees (if necessary)
-		if (h.indexOf('deg') > -1) h = h.substr(0, h.length - 3);
-		else if (h.indexOf('rad') > -1) h = Math.round((h.substr(0, h.length - 3) / (2 * Math.PI)) * 360);
-		else if (h.indexOf('turn') > -1) h = Math.round(h.substr(0, h.length - 4) * 360);
-		if (h >= 360) h %= 360;
-
-		let c = (1 - Math.abs(2 * l - 1)) * s,
-			x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
-			m = l - c / 2,
-			r = 0,
-			g = 0,
-			b = 0;
-
-		if (0 <= h && h < 60) {
-			r = c;
-			g = x;
-			b = 0;
-		} else if (60 <= h && h < 120) {
-			r = x;
-			g = c;
-			b = 0;
-		} else if (120 <= h && h < 180) {
-			r = 0;
-			g = c;
-			b = x;
-		} else if (180 <= h && h < 240) {
-			r = 0;
-			g = x;
-			b = c;
-		} else if (240 <= h && h < 300) {
-			r = x;
-			g = 0;
-			b = c;
-		} else if (300 <= h && h < 360) {
-			r = c;
-			g = 0;
-			b = x;
-		}
-
-		r = Math.round((r + m) * 255);
-		g = Math.round((g + m) * 255);
-		b = Math.round((b + m) * 255);
-
-		let pctFound = a.indexOf('%') > -1;
-
-		if (isPct) {
-			r = +((r / 255) * 100).toFixed(1);
-			g = +((g / 255) * 100).toFixed(1);
-			b = +((b / 255) * 100).toFixed(1);
-			if (!pctFound) {
-				a *= 100;
-			} else {
-				a = a.substr(0, a.length - 1);
-			}
-		} else if (pctFound) {
-			a = a.substr(0, a.length - 1) / 100;
-		}
-
-		return 'rgba(' + (isPct ? r + '%,' + g + '%,' + b + '%,' + a + '%' : +r + ',' + +g + ',' + +b + ',' + +a) + ')';
-	} else {
-		return 'Invalid input color';
-	}
-} //ok
-function HSLToRGB(hsl, isPct) {
-	//if isPct == true, will output 'rgb(xx%,xx%,xx%)' umgerechnet in % von 255
-	let ex = /^hsl\(((((([12]?[1-9]?\d)|[12]0\d|(3[0-5]\d))(\.\d+)?)|(\.\d+))(deg)?|(0|0?\.\d+)turn|(([0-6](\.\d+)?)|(\.\d+))rad)((,\s?(([1-9]?\d(\.\d+)?)|100|(\.\d+))%){2}|(\s(([1-9]?\d(\.\d+)?)|100|(\.\d+))%){2})\)$/i;
-	if (ex.test(hsl)) {
-		let sep = hsl.indexOf(',') > -1 ? ',' : ' ';
-		hsl = hsl
-			.substr(4)
-			.split(')')[0]
-			.split(sep);
-		isPct = isPct === true;
-
-		let h = hsl[0],
-			s = hsl[1].substr(0, hsl[1].length - 1) / 100,
-			l = hsl[2].substr(0, hsl[2].length - 1) / 100;
-
-		// strip label and convert to degrees (if necessary)
-		if (h.indexOf('deg') > -1) h = h.substr(0, h.length - 3);
-		else if (h.indexOf('rad') > -1) h = Math.round((h.substr(0, h.length - 3) / (2 * Math.PI)) * 360);
-		else if (h.indexOf('turn') > -1) h = Math.round(h.substr(0, h.length - 4) * 360);
-		// keep hue fraction of 360 if ending up over
-		if (h >= 360) h %= 360;
-
-		let c = (1 - Math.abs(2 * l - 1)) * s,
-			x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
-			m = l - c / 2,
-			r = 0,
-			g = 0,
-			b = 0;
-
-		if (0 <= h && h < 60) {
-			r = c;
-			g = x;
-			b = 0;
-		} else if (60 <= h && h < 120) {
-			r = x;
-			g = c;
-			b = 0;
-		} else if (120 <= h && h < 180) {
-			r = 0;
-			g = c;
-			b = x;
-		} else if (180 <= h && h < 240) {
-			r = 0;
-			g = x;
-			b = c;
-		} else if (240 <= h && h < 300) {
-			r = x;
-			g = 0;
-			b = c;
-		} else if (300 <= h && h < 360) {
-			r = c;
-			g = 0;
-			b = x;
-		}
-
-		r = Math.round((r + m) * 255);
-		g = Math.round((g + m) * 255);
-		b = Math.round((b + m) * 255);
-
-		if (isPct) {
-			r = +((r / 255) * 100).toFixed(1);
-			g = +((g / 255) * 100).toFixed(1);
-			b = +((b / 255) * 100).toFixed(1);
-		}
-
-		return 'rgb(' + (isPct ? r + '%,' + g + '%,' + b + '%' : +r + ',' + +g + ',' + +b) + ')';
-	} else {
-		return 'Invalid input color';
-	}
-} //ok
-function HSLAToRGBA(hsla, isPct) {
-	//if isPct == true, will output 'rgb(xx%,xx%,xx%)' umgerechnet in % von 255
-	let ex = /^hsla\(((((([12]?[1-9]?\d)|[12]0\d|(3[0-5]\d))(\.\d+)?)|(\.\d+))(deg)?|(0|0?\.\d+)turn|(([0-6](\.\d+)?)|(\.\d+))rad)(((,\s?(([1-9]?\d(\.\d+)?)|100|(\.\d+))%){2},\s?)|((\s(([1-9]?\d(\.\d+)?)|100|(\.\d+))%){2}\s\/\s))((0?\.\d+)|[01]|(([1-9]?\d(\.\d+)?)|100|(\.\d+))%)\)$/i;
-	if (ex.test(hsla)) {
-		let sep = hsla.indexOf(',') > -1 ? ',' : ' ';
-		hsla = hsla
-			.substr(5)
-			.split(')')[0]
-			.split(sep);
-
-		// strip the slash if using space-separated syntax
-		if (hsla.indexOf('/') > -1) hsla.splice(3, 1);
-
-		isPct = isPct === true;
-
-		// must be fractions of 1
-		let h = hsla[0],
-			s = hsla[1].substr(0, hsla[1].length - 1) / 100,
-			l = hsla[2].substr(0, hsla[2].length - 1) / 100,
-			a = hsla[3];
-
-		// strip label and convert to degrees (if necessary)
-		if (h.indexOf('deg') > -1) h = h.substr(0, h.length - 3);
-		else if (h.indexOf('rad') > -1) h = Math.round((h.substr(0, h.length - 3) / (2 * Math.PI)) * 360);
-		else if (h.indexOf('turn') > -1) h = Math.round(h.substr(0, h.length - 4) * 360);
-		if (h >= 360) h %= 360;
-
-		let c = (1 - Math.abs(2 * l - 1)) * s,
-			x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
-			m = l - c / 2,
-			r = 0,
-			g = 0,
-			b = 0;
-
-		if (0 <= h && h < 60) {
-			r = c;
-			g = x;
-			b = 0;
-		} else if (60 <= h && h < 120) {
-			r = x;
-			g = c;
-			b = 0;
-		} else if (120 <= h && h < 180) {
-			r = 0;
-			g = c;
-			b = x;
-		} else if (180 <= h && h < 240) {
-			r = 0;
-			g = x;
-			b = c;
-		} else if (240 <= h && h < 300) {
-			r = x;
-			g = 0;
-			b = c;
-		} else if (300 <= h && h < 360) {
-			r = c;
-			g = 0;
-			b = x;
-		}
-
-		r = Math.round((r + m) * 255);
-		g = Math.round((g + m) * 255);
-		b = Math.round((b + m) * 255);
-
-		let pctFound = a.indexOf('%') > -1;
-
-		if (isPct) {
-			r = +((r / 255) * 100).toFixed(1);
-			g = +((g / 255) * 100).toFixed(1);
-			b = +((b / 255) * 100).toFixed(1);
-			if (!pctFound) {
-				a *= 100;
-			} else {
-				a = a.substr(0, a.length - 1);
-			}
-		} else if (pctFound) {
-			a = a.substr(0, a.length - 1) / 100;
-		}
-
-		return 'rgba(' + (isPct ? r + '%,' + g + '%,' + b + '%,' + a + '%' : +r + ',' + +g + ',' + +b + ',' + +a) + ')';
-	} else {
-		return 'Invalid input color';
-	}
-} //ok
-//#endregion
 
 function pSBC(p, c0, c1, l) {
 	//usage:
@@ -1902,13 +1578,181 @@ function pSBC(p, c0, c1, l) {
 	else return '#' + (4294967296 + r * 16777216 + g * 65536 + b * 256 + (f ? m(a * 255) : 0)).toString(16).slice(1, f ? undefined : -2);
 }
 
+//#endregion
+
+//#region random
+function rCoin(percent = 50) {
+	let r = Math.random();
+	//r ist jetzt zahl zwischen 0 und 1
+	r *= 100;
+	return r < percent;
+}
+function rChoose(arr, n = 1, func = null, exceptIndices = null) {
+	let arr1 = jsCopy(arr);
+	if (isdef(exceptIndices)) {
+		for (const i of exceptIndices) arripRemove(arr1, arr[i]);
+	}
+	if (isdef(func)) arr1 = arr1.filter(func);
+
+	if (n == 1) {
+		let idx = Math.floor(Math.random() * arr1.length);
+		return arr1[idx];
+	}
+	arrShufflip(arr1);
+	return arr1.slice(0, n);
+
+}
+function rColor() {
+	let s = '#';
+	for (let i = 0; i < 6; i++) {
+		s += rChoose(['f', 'c', '9', '6', '3', '0']);
+	}
+	return s;
+}
+function rHue(){return (rNumber(0,36)*10)%360; }
+function rNumber(min = 0, max = 100) {
+	return Math.floor(Math.random() * (max - min + 1)) + min; //min and max inclusive!
+}
+function rPrimaryColor() { let c = '#' + rChoose(['ff', '00']) + rChoose(['ff', '00']); c += c == '#0000' ? 'ff' : c == '#ffff' ? '00' : rChoose(['ff', '00']); return c; }
+
+//#endregion
+
+//#region string functions
+function allNumbers(s) {
+	//returns array of all numbers within string s
+	let m = s.match(/\-.\d+|\-\d+|\.\d+|\d+\.\d+|\d+\b|\d+(?=\w)/g);
+	if (m) return m.map(v => Number(v)); else return null;
+	// {console.log(v,typeof v,v[0],v[0]=='-',v[0]=='-'?-(+v):+v,Number(v));return Number(v);});
+}
+function capitalize(s) {
+	if (typeof s !== 'string') return '';
+	return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function contains(s, sSub) { return s.toLowerCase().includes(sSub.toLowerCase()); }
+function endsWith(s, sSub) { let i = s.indexOf(sSub); return i >= 0 && i == s.length - sSub.length; }
+function startsWith(s, sSub) {
+	//console.log('s',s,'sSub',sSub)
+	//testHelpers('startWith: s='+s+', sSub='+sSub,typeof(s),typeof(sSub));
+	return s.substring(0, sSub.length) == sSub;
+}
+function stringAfter(sFull, sSub) {
+	//testHelpers('s='+sFull,'sub='+sSub)
+	let idx = sFull.indexOf(sSub);
+	//testHelpers('idx='+idx)
+	if (idx < 0) return '';
+	return sFull.substring(idx + sSub.length);
+}
+function stringAfterLast(sFull, sSub) {
+	let parts = sFull.split(sSub);
+	return arrLast(parts);
+}
+function stringBefore(sFull, sSub) {
+	let idx = sFull.indexOf(sSub);
+	if (idx < 0) return sFull;
+	return sFull.substring(0, idx);
+}
+function stringBeforeLast(sFull, sSub) {
+	let parts = sFull.split(sSub);
+	return sFull.substring(0, sFull.length - arrLast(parts).length - 1);
+}
+function stringBetween(sFull, sStart, sEnd) {
+	return stringBefore(stringAfter(sFull, sStart), isdef(sEnd) ? sEnd : sStart);
+}
+function stringBetweenLast(sFull, sStart, sEnd) {
+	let s1 = stringBeforeLast(sFull, isdef(sEnd) ? sEnd : sStart);
+	return stringAfterLast(s1, sStart);
+	//return stringBefore(stringAfter(sFull,sStart),isdef(sEnd)?sEnd:sStart);
+}
+function toLetters(s) { return [...s]; }
+//function toWords(s) { return s.split('\W+'); }
+
+
+
+//#endregion
+
+//#region misc
+function getRect(elem, relto) {
+
+	if (isString(elem)) elem = document.getElementById(elem);
+
+	let res = elem.getBoundingClientRect();
+	//console.log(res)
+	if (isdef(relto)) {
+		//console.log(relto)
+		let b2 = relto.getBoundingClientRect();
+		let b1 = res;
+		res = {
+			x: b1.x - b2.x,
+			y: b1.y - b2.y,
+			left: b1.left - b2.left,
+			top: b1.top - b2.top,
+			right: b1.right - b2.right,
+			bottom: b1.bottom - b2.bottom,
+			width: b1.width,
+			height: b1.height
+		};
+	}
+	let r = { x: res.left, y: res.top, w: res.width, h: res.height };
+	addKeys({ l: r.x, t: r.y, r: r.x + r.w, b: r.t + r.h }, r);
+	return r;
+}
+function jsCopy(o) { return JSON.parse(JSON.stringify(o)); }
+function jsCopySafe(o) { return JSON.parse(JSON.stringify(jsClean(o))); }
+function jsClean(o) {
+	//replace all DOM objects in o by null
+	if (nundef(o)) return o;
+	else if (isDOM(o)) return null;
+	else if (isLiteral(o)) return o;
+	else if (isList(o)) {
+		let onew = o.map(x => jsClean(x));
+		return onew.filter(x => x !== null);
+	} else if (isDict(o)) {
+		for (const k in o) o[k] = jsClean(o[k]);
+		let onew = {};
+		for (const k in o) if (o[k] !== null) onew[k] = o[k];
+		return onew;
+	}
+}
+function isdef(x) { return x !== null && x !== undefined; }
+function nundef(x) { return x === null || x === undefined; }
+function isDOM(x) { let c = lookup(x, ['constructor', 'name']); return c ? startsWith(c, 'HTML') || startsWith(c, 'SVG') : false; }
+function isDict(d) { let res = (d !== null) && (typeof (d) == 'object') && !isList(d); return res; }
+function isDictOrList(d) { return typeof (d) == 'object'; }
+function isDigit(s) { return /^[0-9]$/i.test(s); }
+function isEmpty(arr) {
+	return arr === undefined || !arr
+		|| (isString(arr) && (arr == 'undefined' || arr == ''))
+		|| (Array.isArray(arr) && arr.length == 0)
+		|| Object.entries(arr).length === 0;
+}
+function isEmptyOrWhiteSpace(s) { return isEmpty(s.trim()); }
+function isLetter(s) { return /^[a-zA-Z]$/i.test(s); }
+function isList(arr) { return Array.isArray(arr); }
+function isLiteral(x) { return isString(x) || isNumber(x); }
+function isNumber(x) { return x !== ' ' && x !== true && x !== false && isdef(x) && (x == 0 || !isNaN(+x)); }
+function isString(param) { return typeof param == 'string'; }
+function isSvg(elem) { return startsWith(elem.constructor.name, 'SVG'); }
 function makeUnitString(nOrString, unit = 'px', defaultVal = '100%') {
 	if (nundef(nOrString)) return defaultVal;
 	if (isNumber(nOrString)) nOrString = '' + nOrString + unit;
 	return nOrString;
 }
+function range(f, t, st = 1) {
+	if (nundef(t)) {
+		//if only 1 arg, will return numbers 0..f-1 
+		t = f - 1;
+		f = 0;
+	}
+	let arr = [];
+	//console.log(f,t)
+	for (let i = f; i <= t; i += st) {
+		//console.log('dsdsdshallo')
+		arr.push(i);
+	}
+	return arr;
+}
+function valf(val, def) { return isdef(val) ? val : def; }
 
-//#endregion
 
 
 

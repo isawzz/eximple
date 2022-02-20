@@ -28,7 +28,7 @@ function mTableCommands(rowitems, di) {
 function show_users(dParent) {
 	let headers = ['id', 'name', 'rating', 'commands'];
 	let extracolumn = 'commands';
-	let rowitems = mDataTable(serverData.users, dParent, rec => ({ bg: rec.color }), headers);
+	let rowitems = mDataTable(Serverdata.users, dParent, rec => ({ bg: rec.color }), headers);
 	for (const item of rowitems) {
 		let d = item.div;
 		let col = mTableCol(d, `<a href="/loggedin/${item.o.name}">login</a>`);
@@ -52,7 +52,7 @@ function mDataTable4(reclist, dParent, rowstylefunc, headers, extracolumns) {
 }
 function show_users_3(dParent) {
 	let extracolumn = 'commands';
-	let rowitems = mDataTable3(serverData.users, dParent, rec => ({ bg: rec.color }), ['id', 'name', 'rating'], [extracolumn]);
+	let rowitems = mDataTable3(Serverdata.users, dParent, rec => ({ bg: rec.color }), ['id', 'name', 'rating'], [extracolumn]);
 	for (const item of rowitems) {
 		let d = item.div;
 		let col = mTableCol(d, `<a href="/loggedin/${item.o.name}">login</a>`);
@@ -75,7 +75,7 @@ function mDataTable3(reclist, dParent, rowstylefunc, headers, extracolumns) {
 }
 
 function show_users_2(dParent) {
-	let rowitems = mDataTable(serverData.users, dParent, rec => ({ bg: rec.color }), ['id', 'name', 'rating']);
+	let rowitems = mDataTable(Serverdata.users, dParent, rec => ({ bg: rec.color }), ['id', 'name', 'rating']);
 	mTableCommands(rowitems, { login: x => `<a href="/loggedin/${x.o.name}">login</a>` });
 	return rowitems;
 }

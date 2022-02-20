@@ -1,26 +1,34 @@
-//onload = startsocket;
-var socket;
+onload = startsinglepage;
 
-function startsocket() {
-	socket = io.connect('http://127.0.0.1:5051');
-	socket.on('connect', () => {
-		socket.send('user has connected');
+function socketinit() {
+	Socket = io.connect('http://127.0.0.1:5051');
+	Socket.on('connect', () => {
+		console.log('...........connected!')
+		Socket.send({ user: 'felix', message: 'felix connected' });
+		//Socket.emit('login', { user: 'felix', message: 'felix connected' });
+		//Socket.send('user has connected');
 	});
-	socket.on('message', (x) => {
+	Socket.on('message', (x) => {
 		console.log('message from server 1:', x);
 		let elem = mBy('messages');
-		mAppend(elem,mCreateFrom(`<li>${x}</li>`))
+		mAppend(elem, mCreateFrom(`<li>${x}</li>`))
 	});
 }
 function socketsend() {
 	let elem = mBy('myMessage');
 	let text = elem.value;
 	elem.value = '';
-	socket.send(text);
+	Socket.send({user:User.name,text:text});
 	return false;
 }
 
-
+function startsinglepage() {
+	general_start();
+	let useritems = show_users(dTable);
+	let gameitems = show_games(dTable);
+	let actionitems = show_actions(dTable);
+	show_home_logo(dTitle);
+}
 
 function start_info() {
 	general_start();
@@ -44,7 +52,7 @@ async function start_table() {
 
 //#region components
 function general_start() {
-	//startsocket();
+	socketinit();
 
 	dTitle = mBy('dTitle');
 	if (isdef(Table)) show_title('Battle of ' + capitalize(Table.name), { fg: User.color }, false);
@@ -65,20 +73,20 @@ async function show_home_logo(dParent) {
 
 }
 
-function show_user() { if (isdef(serverData.user)) show_title_left(serverData.user.name, { fg: serverData.user.color }); }
+function show_user() { if (isdef(Serverdata.user)) show_title_left(Serverdata.user.name, { fg: Serverdata.user.color }); }
 
 function show_users(dParent) {
 	let headers = ['id', 'name', 'rating', 'commands'];
-	let rowitems = mDataTable(serverData.users, dParent, rec => ({ bg: rec.color }), headers);
+	let rowitems = mDataTable(Serverdata.users, dParent, rec => ({ bg: rec.color }), headers);
 	mTableCommandify(rowitems, { 1: (item, val) => `<a href="/loggedin/${val}">${val}</a>`, 3: (item, val) => `<a href="/loggedin/${item.o.name}">login</a>` });
 	return rowitems;
 }
 function show_games(dParent) {
-	let items = mDataTable(serverData.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
-	if (nundef(serverData.user)) serverData.user = { name: 'anonymous' };
+	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
+	if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
 	mTableCommandify(
 		items, {
-		0: (item, val) => `<a href="/table/${item.o.name}/${serverData.user.name}">${val}</a>`,
+		0: (item, val) => `<a href="/table/${item.o.name}/${Serverdata.user.name}">${val}</a>`,
 		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => `<a href="/table/${rowitem.o.name}/${valpart}">${valpart}</a>`)
 	});
 	return items;
@@ -96,7 +104,7 @@ function show_actions(dParent) {
 	let gamesById = list2dict(Tables);
 	console.log('gamesByid', gamesById);
 
-	for (const rec of serverData.actions) {
+	for (const rec of Serverdata.actions) {
 		rec.user = usersById[rec.user_id].name;
 		rec.game = gamesById[rec.game_id].name;
 		// console.log('liste?',rec.choices,typeof rec.choices)
@@ -104,13 +112,13 @@ function show_actions(dParent) {
 		// removeInPlace(choices,rec.choice);
 		// rec.choice = 
 	}
-	let items = mDataTable(serverData.actions, dParent, null, ['game', 'user', 'choices', 'choice']);
+	let items = mDataTable(Serverdata.actions, dParent, null, ['game', 'user', 'choices', 'choice']);
 	mTableCommandify(items, {
 		0: (item, val) => `<a href="/table/${item.o.game}/${item.o.user}">${val}</a>`,
 		1: (item, val) => `<a href="/table/${item.o.game}/${item.o.user}">${val}</a>`,
 		2: (item, val) => {
-			console.log('???',item.choice, 'isEmpty?',isEmpty(item.choice));
-			return isEmpty(item.choice)? mTableCommandifyList(item, val, (x, p) => `<a href="/action/${x.o.game}/${x.o.user}/${p}">${p}</a>`):val;
+			console.log('???', item.choice, 'isEmpty?', isEmpty(item.choice));
+			return isEmpty(item.choice) ? mTableCommandifyList(item, val, (x, p) => `<a href="/action/${x.o.game}/${x.o.user}/${p}">${p}</a>`) : val;
 		}
 	});
 
@@ -120,7 +128,7 @@ function show_actions(dParent) {
 //#region helpers
 async function ensureAssets() {
 	if (nundef(Syms)) {
-		Syms = await route_path_yaml_dict(`${basepath}assets/allSyms.yaml`);
+		Syms = await route_path_yaml_dict(`${Basepath}assets/allSyms.yaml`);
 	}
 }
 

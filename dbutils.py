@@ -225,7 +225,7 @@ def get_unique_gamenames(n=100):
 	gamenames = list(gamenames)
 	return gamenames
 
-N = 10
+N = 3
 def add_users():
 	usernames = get_unique_usernames()
 	for i in range(N):
@@ -245,7 +245,7 @@ def add_games():
 	users = User.query.all()
 	games = ['aristocracy','innovation','catan','powergrid','puerto rico','ferrocarril','dixit','mysterium','dialogue']
 	gamenames = get_unique_gamenames()
-	for i in range(3):
+	for i in range(2):
 		#players = random_players(users,2,5)
 		name,gamename=gamenames[i],random.choice(games)
 		#host_id = _get_user(players[0]).id
@@ -258,7 +258,7 @@ def add_game_players():
 	users = User.query.all()
 	for game in games[1:]: #hab 1 test game mimi-felix drin!
 		#k = random.randint(2,5)
-		players = random.sample(users,3)
+		players = random.sample(users,2)
 		game.players.extend(players)
 		#print('...',len(game.players))
 		game.host_id = players[0].id
