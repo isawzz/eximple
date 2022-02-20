@@ -16,17 +16,22 @@ function startsinglepage() {
 	let actionitems = show_actions(dTable);
 	show_user(); //show_home_logo();
 }
-function onclick_user(name){
-	User = firstCond(Users,x=>x.name == name);
+function onclick_user(name) {
+	User = firstCond(Users, x => x.name == name);
 	show_user();
 	//should I filter tables for this user only? at least actions table?
 	//should I sort tables by this user name?
 }
-function onclick_game(name){
-	Table = firstCond(Tables,x=>x.name == name);
+function onclick_game(name) {
+	Table = firstCond(Tables, x => x.name == name);
 	show_title();
 	//should I filter tables for this user only? at least actions table?
 	//should I sort tables by this user name?
+}
+function onclick_action(user, game, action) {
+	//socketsend
+	console.log('user',user,'has picked action',action,'in game',game)
+	Socket.emit('action',{user:user,game:game,action:action});
 }
 //#region helpers
 async function ensureAssets() {
@@ -72,11 +77,11 @@ function show_actions(dParent) {
 	}
 	let items = mDataTable(Actions, dParent, null, ['game', 'user', 'choices', 'choice']);
 	mTableCommandify(items, {
-		0: (item, val) => `<a href="/singlepage/${item.o.user}/${item.o.game}">${val}</a>`,
-		1: (item, val) => `<a href="/singlepage/${item.o.user}/${item.o.game}">${val}</a>`,
+		0: (item, val) => hFunc(val, 'onclick_game', val), //`<a href="/singlepage/${item.o.user}/${item.o.game}">${val}</a>`,
+		1: (item, val) => hFunc(val, 'onclick_user', val), //`<a href="/singlepage/${item.o.user}/${item.o.game}">${val}</a>`,
 		2: (item, val) => {
 			//console.log('???', item.choice, 'isEmpty?', isEmpty(item.choice));
-			return isEmpty(item.choice) ? mTableCommandifyList(item, val, (x, p) => `<a href="/singlepage/${x.o.user}/${x.o.game}/${p}">${p}</a>`) : val;
+			return isEmpty(item.choice) ? mTableCommandifyList(item, val, (x, p) => hFunc(p, 'onclick_action', x.o.user, x.o.game, p)) : val; //`<a href="/singlepage/${x.o.user}/${x.o.game}/${p}">${p}</a>`) : val;
 		}
 	});
 
@@ -90,9 +95,9 @@ function show_games(dParent) {
 	// 	//0: (item, val) => `<a href="/singlepage/${User.name}/${item.o.name}">${val}</a>`,
 	// 	2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
 	// });
-	mTableCommandify(items, { 
-		0: (item, val) => hFunc(val,'onclick_game',val), //`<a href="/singlepage/${val}">${val}</a>`, 
-		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart,'onclick_user',valpart)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
+	mTableCommandify(items, {
+		0: (item, val) => hFunc(val, 'onclick_game', val), //`<a href="/singlepage/${val}">${val}</a>`, 
+		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, 'onclick_user', valpart)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
 	});
 	return items;
 }
@@ -109,13 +114,13 @@ async function show_home_logo() {
 	//console.log('h',h)
 	//bg = hslToHex(h, 100, 50);
 	//console.log('bg',bg);
-	let d=miPic('airplane',mBy('dTitleLeft'),{fz:28,padding:6,h:40,box:true,matop:2,bg:bg,rounding:'50%'});
+	let d = miPic('airplane', mBy('dTitleLeft'), { fz: 28, padding: 6, h: 40, box: true, matop: 2, bg: bg, rounding: '50%' });
 	//mPlace(d,'cc');
 }
 function show_title(s, styles = {}, funnyLetters = true) {
 	let d = mBy('dTitleCenter');
-	d.innerHTML = isdef(Table)? `Battle of ${mColorLetters(capitalize(Table.name))}`:`${funnyLetters ? mColorLetters(s) : s}`;
-	if (isdef(styles)) mStyle(d, {fg:'grey'});
+	d.innerHTML = isdef(Table) ? `Battle of ${mColorLetters(capitalize(Table.name))}` : `${funnyLetters ? mColorLetters(s) : s}`;
+	if (isdef(styles)) mStyle(d, { fg: 'grey' });
 }
 function show_title_left(s, styles, funnyLetters = false) {
 	let d = mBy('dTitleLeft');
@@ -127,21 +132,16 @@ function show_title_right(s, styles, funnyLetters = false) {
 	d.innerHTML = `${funnyLetters ? mColorLetters(s) : s}`;
 	if (isdef(styles)) mStyle(d, styles);
 }
-function show_user() { 
-	if (isdef(User) && User.name != 'anonymous') show_title_left(User.name, { fg: User.color }); 
-	else show_home_logo(); 
+function show_user() {
+	if (isdef(User) && User.name != 'anonymous') show_title_left(User.name, { fg: User.color });
+	else show_home_logo();
 }
 function show_users(dParent) {
 	let headers = ['id', 'name', 'rating', 'commands'];
 	let rowitems = mDataTable(Serverdata.users, dParent, rec => ({ bg: rec.color }), headers);
-	// mTableCommandify(rowitems, { 1: (item, val) => `<a href="/singlepage/${val}">${val}</a>`, 3: (item, val) => `<a href="/loggedin/${item.o.name}">login</a>` });
-	// mTableCommandify(rowitems, { 
-	// 	1: (item, val) => hRoute(val,'singlepage',val), //`<a href="/singlepage/${val}">${val}</a>`, 
-	// 	3: (item, val) => hRoute('login','singlepage',item.o.name), //`<a href="/loggedin/${item.o.name}">login</a>` 
-	// });
-	mTableCommandify(rowitems, { 
-		1: (item, val) => hFunc(val,'onclick_user',val), //`<a href="/singlepage/${val}">${val}</a>`, 
-		3: (item, val) => hRoute('login','onclick_user',item.o.name), //`<a href="/loggedin/${item.o.name}">login</a>` 
+	mTableCommandify(rowitems, {
+		1: (item, val) => hFunc(val, 'onclick_user', val), //`<a href="/singlepage/${val}">${val}</a>`, 
+		3: (item, val) => hRoute('login', 'onclick_user', item.o.name), //`<a href="/loggedin/${item.o.name}">login</a>` 
 	});
 	return rowitems;
 }

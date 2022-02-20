@@ -22,10 +22,13 @@ clients = []
 def handle_message(msg):
 	print(f'....message from: {msg}', '==>id',request.sid)
 	send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
-# @socketio.on('login') #custom event
-# def handle_login(msg):
-# 	print('....login: '+msg, '==>id',request.sid)
-# 	emit('login',f'client: {request.sid} connected: {msg}', broadcast=True) #without broadcast, will just send to msg sender
+
+@socketio.on('action') #custom event
+def handle_action(data):
+	print(f'....action: {data}', '==>id',request.sid)
+	a = process_action(data['user'],data['game'],data['action'])
+	print(f'....result: {a}')
+	#emit('login',f'client: {request.sid} connected: {msg}', broadcast=True) #without broadcast, will just send to msg sender
 
 @app.route('/')
 def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')
@@ -63,10 +66,10 @@ def r_table(game,user):
 @app.route('/action/<game>/<user>/<action>', methods=['GET','POST'])
 def r_action(game,user,action): 
 	print('action',action)
-	action_result = process_action(game,user,action)
+	action_result = process_action(user,game,action)
 	return render_template('table.html', Basepath=Basepath, Serverdata={"user":get_user(user),"game":get_game(game),"actions":get_actions_for(game,user), "action_result":action_result}) 
 
-def process_action(game,user,action):
+def process_action(user,game,action):
 	g=Game.query.filter_by(name=game).first()
 	u=User.query.filter_by(name=user).first()
 	a = Action.query.filter_by(user_id=u.id, game_id=g.id).first()
@@ -74,7 +77,6 @@ def process_action(game,user,action):
 	s = a.choices.replace(action,'').replace('  ',' ')
 	a.choices = s # '2 3 4 5' #a.choices.split('\W+')
 	db.session.commit()
-
 	agame = Action.query.filter_by(game_id=g.id).all()
 	print([x.toDict() for x in agame])
 	done = True
@@ -85,7 +87,7 @@ def process_action(game,user,action):
 	if done:
 		msg = f'STEP_COMPLETE {g.step}' 
 		print('!!!!!',msg)
-		send(msg, broadcast=True)	
+		socketio.send(msg, broadcast=True)	
 
 	return a.toDict()
 
