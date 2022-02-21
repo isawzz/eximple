@@ -1,5 +1,5 @@
 //#region globals: Session data
-var ColorDi;
+var ColorDi, DA={};
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 

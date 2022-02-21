@@ -34,6 +34,10 @@ function socketinit() {
 			//server=>at this point everyone should get a 'please reload' message 
 			//if I am the user, should update fen and post/reload gameupdated
 			//otherwise just reload the 
+		}else{
+			//just update ui with new action
+			let ao = firstCond(Actions,x=>x.user == a.user && x.game == a.game);
+			a.choic
 		}
 		//let elem = mBy('messages');
 		//mAppend(elem, mCreateFrom(`<li>${x}</li>`))

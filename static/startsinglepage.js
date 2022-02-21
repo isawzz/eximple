@@ -11,9 +11,9 @@ function startsinglepage() {
 	dTable = mBy('dTable');
 	dTable.animate([{ opacity: 0, transform: 'translateY(50px)' }, { opacity: 1, transform: 'translateY(0px)' },], { fill: 'both', duration: 800, easing: 'ease' });
 
-	let useritems = show_users(dTable);
-	let gameitems = show_games(dTable);
-	let actionitems = show_actions(dTable);
+	DA.useritems = show_users(dTable);
+	DA.gameitems = show_games(dTable);
+	DA.actionitems = show_actions(dTable);
 	show_user(); //show_home_logo();
 }
 function onclick_user(name) {
