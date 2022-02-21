@@ -27,9 +27,29 @@ def handle_message(msg):
 
 @socketio.on('action') #custom event
 def handle_action(data):
-	#print(f'....action: {data}', '==>id',request.sid)
-	send({'hallo':1},json=True)
-	#a = process_action(data['user'],data['game'],data['action'])
+	print(f'....action: {data}', '==>id',request.sid)
+	a = process_action(data['user'],data['game'],data['action'])
+	g=Game.query.filter_by(name=data['game']).first()
+	agame = Action.query.filter_by(game_id=g.id).all()
+	print([x.toDict() for x in agame])
+	done = True
+	for rec in agame:
+		if not rec.choice:
+			done = False
+			break
+	if done:
+		msg = f'STEP_COMPLETE {g.step}' 
+		print('!!!!!',msg)
+		data['done']=True
+		emit('action',data,json=True)
+		#send({'done':True},json=True) # 'JA') #{'message':msg,'action':a.toDict(), 'done':True}, broadcast=True)	
+	else:
+		data['done']=False
+		emit('action',data,json=True)
+		#send({'hallo':1},json=True)
+		#socketio.send('hallo') #{'message':f'user {user} moved!','action':a.toDict(), 'done':False}, broadcast=True)	
+		#socketio.send(msg,f'user {user} moved!')
+	#return a.toDict()
 	#print(f'....result: {a}')
 	#x={'k':'val'}
 	#s=jsonify(x)
@@ -87,21 +107,7 @@ def process_action(user,game,action):
 	s = a.choices.replace(action,'').replace('  ',' ')
 	a.choices = s # '2 3 4 5' #a.choices.split('\W+')
 	db.session.commit()
-	agame = Action.query.filter_by(game_id=g.id).all()
-	print([x.toDict() for x in agame])
-	done = True
-	for rec in agame:
-		if not rec.choice:
-			done = False
-			break
-	if done:
-		msg = f'STEP_COMPLETE {g.step}' 
-		print('!!!!!',msg)
-		socketio.send(jsonify({'message':'JA'})) # 'JA') #{'message':msg,'action':a.toDict(), 'done':True}, broadcast=True)	
-	else:
-		socketio.send('hallo') #{'message':f'user {user} moved!','action':a.toDict(), 'done':False}, broadcast=True)	
-		#socketio.send(msg,f'user {user} moved!')
-	return a.toDict()
+	return a
 
 #region test routes
 @app.route('/testsocketio')
@@ -121,7 +127,7 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 
 if __name__ == "__main__":
 	#app.run() #host='0.0.0.0', port=5051, debug=True)
-	socketio.run(app)
+	socketio.run(app, debug=True)
 	
 
 

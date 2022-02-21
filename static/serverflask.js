@@ -11,6 +11,33 @@ function socketinit() {
 		let elem = mBy('messages');
 		mAppend(elem, mCreateFrom(`<li>${x}</li>`))
 	});
+	Socket.on('action', (a) => {
+		console.log('action from server 1:', a);
+		//update action table: in that action need to set choice and update choices
+		if (a.done){
+			//host: update game POST updated
+			//last player updates! no player should be able to move at this point!
+			//current step will be closed at this point!
+			console.log('Tables',Tables)
+			let table = firstCond(Tables,x=>x.name == a.game);
+			let step = table.step;
+			//update game hiere!
+			table.step += 1;
+			table.fen = {state:'some new state'};
+			Socket.send({ user: a.user, game:a.game, step: table.step, message: 'game updated', fen = table.fen });
+			// let players = table.players;
+			// console.log('the players of table',a.game,'are',players)
+			// let host = table.players[0];
+			// if (a.user == host){
+			// 	console.log('host has moved and ')
+			// }
+			//server=>at this point everyone should get a 'please reload' message 
+			//if I am the user, should update fen and post/reload gameupdated
+			//otherwise just reload the 
+		}
+		//let elem = mBy('messages');
+		//mAppend(elem, mCreateFrom(`<li>${x}</li>`))
+	});
 }
 function socketsend() {
 	let elem = mBy('myMessage');
