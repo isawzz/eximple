@@ -1,5 +1,5 @@
 function socketinit() {
-	Socket = io.connect('http://127.0.0.1:5051');
+	Socket = io.connect('http://127.0.0.1:5000');
 	Socket.on('connect', () => {
 		console.log('...........connected!')
 		Socket.send({ user: 'felix', message: 'felix connected' });
@@ -16,7 +16,7 @@ function socketsend() {
 	let elem = mBy('myMessage');
 	let text = elem.value;
 	elem.value = '';
-	Socket.send({ user: User.name, text: text });
+	Socket.send({ user: isdef(User)?User.name:'hallo', text: text });
 	return false;
 }
 

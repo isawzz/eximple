@@ -20,18 +20,28 @@ clients = []
 
 @socketio.on('message') #public event
 def handle_message(msg):
-	print(f'....message from: {msg}', '==>id',request.sid)
-	send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
+	#send('hallo')
+	#print(f'....message from: {msg}', '==>id',request.sid)
+	#send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
+	send({'hallo':1},json=True)
 
 @socketio.on('action') #custom event
 def handle_action(data):
-	print(f'....action: {data}', '==>id',request.sid)
-	a = process_action(data['user'],data['game'],data['action'])
-	print(f'....result: {a}')
+	#print(f'....action: {data}', '==>id',request.sid)
+	send({'hallo':1},json=True)
+	#a = process_action(data['user'],data['game'],data['action'])
+	#print(f'....result: {a}')
+	#x={'k':'val'}
+	#s=jsonify(x)
+	#send(f'hallo, {x}')
 	#emit('login',f'client: {request.sid} connected: {msg}', broadcast=True) #without broadcast, will just send to msg sender
 
 @app.route('/')
 def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')
+
+@app.route('/index')
+def r_index():
+	return render_template('index.html')
 
 @app.route('/singlepage', methods=['GET','POST'])
 @app.route('/singlepage/<user>', methods=['GET','POST'])
@@ -87,8 +97,10 @@ def process_action(user,game,action):
 	if done:
 		msg = f'STEP_COMPLETE {g.step}' 
 		print('!!!!!',msg)
-		socketio.send(msg, broadcast=True)	
-
+		socketio.send(jsonify({'message':'JA'})) # 'JA') #{'message':msg,'action':a.toDict(), 'done':True}, broadcast=True)	
+	else:
+		socketio.send('hallo') #{'message':f'user {user} moved!','action':a.toDict(), 'done':False}, broadcast=True)	
+		#socketio.send(msg,f'user {user} moved!')
 	return a.toDict()
 
 #region test routes
@@ -108,18 +120,8 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 #endregion
 
 if __name__ == "__main__":
-	#app.run(port=5051, debug=True)
-	socketio.run(app, port=5051, debug=True)
-
-
-
-
-
-
-
-
-
-
-
+	#app.run() #host='0.0.0.0', port=5051, debug=True)
+	socketio.run(app)
+	
 
 

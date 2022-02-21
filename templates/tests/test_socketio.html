@@ -14,7 +14,7 @@
 			var Socket;
 
 			function start() {
-				Socket = io.connect('http://127.0.0.1:5051');
+				Socket = io.connect('http://127.0.0.1:5000');
 				Socket.on('connect', () => {
 					Socket.send('user has connected');
 				});
