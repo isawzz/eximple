@@ -1,9 +1,11 @@
 function socketinit() {
-	console.log('... socket client initialized');
-	Socket = io.connect('http://127.0.0.1:5000');
+	console.log('init socket client');
+	console.log('==>SOCKETSERVER:',SOCKETSERVER)
+	Socket = io.connect(SOCKETSERVER);
 	Socket.on('connect', () => {
-		console.log('...........connected!')
-		Socket.emit('message',{ user: 'felix', message: 'felix connected' });
+		console.log('...........connected!');
+		Socket.emit('message','user has connected'); //wie in testsocketio
+		//Socket.emit('message',{ user: 'felix', message: 'felix connected' });
 		//Socket.emit('login', { user: 'felix', message: 'felix connected' });
 		//Socket.send('user has connected');
 	});

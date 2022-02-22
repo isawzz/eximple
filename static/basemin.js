@@ -1,4 +1,6 @@
 //#region globals: Session data
+//var SOCKETSERVER = 'http://127.10.0.1:5000'; //'http://localhost:5000'
+var SOCKETSERVER = 'http://localhost:5000';
 var ColorDi, DA={};
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;

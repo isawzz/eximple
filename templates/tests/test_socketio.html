@@ -4,6 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		{# <link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/microsoft/310/shortcake_1f370.png" /> #}
+		<link rel="icon" href="{{Basepath}}assets/images/icons/firetrans.png" />
 		<title>flask test</title>
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script>
 		<script src="../static/basemin.js"></script>
@@ -13,7 +15,7 @@
 			onload = start;
 			var Socket;
 			function start() {
-				Socket = io.connect('http://127.10.0.1:5000');
+				Socket = io.connect(SOCKETSERVER);
 				Socket.on('connect', () => {
 					Socket.emit('message','user has connected');
 				});

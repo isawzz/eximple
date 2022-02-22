@@ -1,10 +1,12 @@
 onload = startsinglepage;
 
 function socketinit() {
-	Socket = io.connect('http://127.0.0.1:5051');
+	console.log('==>SOCKETSERVER:',SOCKETSERVER)
+	Socket = io.connect(SOCKETSERVER);
 	Socket.on('connect', () => {
 		console.log('...........connected!')
-		Socket.send({ user: 'felix', message: 'felix connected' });
+		Socket.emit('message','user has connected'); //wie in testsocketio
+		//Socket.send({ user: 'felix', message: 'felix connected' });
 		//Socket.emit('login', { user: 'felix', message: 'felix connected' });
 		//Socket.send('user has connected');
 	});
