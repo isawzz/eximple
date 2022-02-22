@@ -1,7 +1,7 @@
 from flask import jsonify, Flask, request, send_from_directory, render_template, redirect
 app = Flask(__name__)
 HEROKUPROD = False #set True for production (need to re-create db on heroku!)
-Basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://localhost:8080/aroot/base/"
+Basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://127.10.0.1:8080/aroot/base/"
 
 from dbutils import *
 db_init(app)

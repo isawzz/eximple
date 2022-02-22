@@ -2,7 +2,7 @@
 from flask import jsonify, Flask, request, send_from_directory, render_template, redirect
 app = Flask(__name__)
 HEROKUPROD = False #set True for production (need to re-create db on heroku!)
-Basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://localhost:8080/aroot/base/"
+Basepath = "https://www.telecave.net/aroot/base/" if HEROKUPROD else "http://127.10.0.1:8080/aroot/base/"
 app.config['SECRET_KEY'] = 'IJustHopeThisWorks!' #do I need this???
 
 from dbutils import *
@@ -20,10 +20,12 @@ clients = []
 
 @socketio.on('message') #public event
 def handle_message(msg):
-	#send('hallo')
+	#send('hallo') #OK
+	#emit('message','hallo1') #OK
+	#emit('message',{'got':msg, 'hallo':1},json=True) #OK
+	send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
 	#print(f'....message from: {msg}', '==>id',request.sid)
-	#send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
-	send({'hallo':1},json=True)
+	#emit('message',{'got':msg, 'hallo':1},json=True)
 
 @socketio.on('action') #custom event
 def handle_action(data):
@@ -127,7 +129,7 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 
 if __name__ == "__main__":
 	#app.run() #host='0.0.0.0', port=5051, debug=True)
-	socketio.run(app, debug=True)
+	socketio.run(app, host='0.0.0.0', debug=True)
 	
 
 

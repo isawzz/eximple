@@ -12,11 +12,10 @@
 		<script>
 			onload = start;
 			var Socket;
-
 			function start() {
-				Socket = io.connect('http://127.0.0.1:5000');
+				Socket = io.connect('http://127.10.0.1:5000');
 				Socket.on('connect', () => {
-					Socket.send('user has connected');
+					Socket.emit('message','user has connected');
 				});
 				Socket.on('message', (x) => {
 					console.log('message from server 1:', x);

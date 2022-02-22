@@ -1,15 +1,16 @@
 function socketinit() {
+	console.log('... socket client initialized');
 	Socket = io.connect('http://127.0.0.1:5000');
 	Socket.on('connect', () => {
 		console.log('...........connected!')
-		Socket.send({ user: 'felix', message: 'felix connected' });
+		Socket.emit('message',{ user: 'felix', message: 'felix connected' });
 		//Socket.emit('login', { user: 'felix', message: 'felix connected' });
 		//Socket.send('user has connected');
 	});
 	Socket.on('message', (x) => {
-		console.log('message from server 1:', x);
+		//console.log('message from server 1:', x);
 		let elem = mBy('messages');
-		mAppend(elem, mCreateFrom(`<li>${x}</li>`))
+		mAppend(elem, mCreateFrom(`<pre>${x}</pre>`))
 	});
 	Socket.on('action', (a) => {
 		console.log('action from server 1:', a);
@@ -19,12 +20,12 @@ function socketinit() {
 			//last player updates! no player should be able to move at this point!
 			//current step will be closed at this point!
 			console.log('Tables',Tables)
-			let table = firstCond(Tables,x=>x.name == a.game);
+			let table = firstCond(Tables, x=>x.name == a.game);
 			let step = table.step;
 			//update game hiere!
 			table.step += 1;
 			table.fen = {state:'some new state'};
-			Socket.send({ user: a.user, game:a.game, step: table.step, message: 'game updated', fen = table.fen });
+			Socket.send({ user: a.user, game:a.game, step: table.step, message: 'game updated', fen: table.fen });
 			// let players = table.players;
 			// console.log('the players of table',a.game,'are',players)
 			// let host = table.players[0];
@@ -37,7 +38,8 @@ function socketinit() {
 		}else{
 			//just update ui with new action
 			let ao = firstCond(Actions,x=>x.user == a.user && x.game == a.game);
-			a.choic
+			console.log('action that was changed:',ao,'index',ao.indexOf(Actions))
+			//a.choic
 		}
 		//let elem = mBy('messages');
 		//mAppend(elem, mCreateFrom(`<li>${x}</li>`))
