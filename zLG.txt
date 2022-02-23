@@ -1,12 +1,19 @@
-copy file singlepage
-test localhost:5000/testsocketio
-copy file singlepage
-=>all die socketio includes sind in _versions/singlepage copy.html
-naechste message stufe testen
-wart wieso ist das vorher gegangen?
-was mach ich bei testsocketio anders als in signelpage?
-repair path to sio socket client
-favicon local!
+Basepath
+_______socket io client code js:
+a) <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script>
+b) <script type="text/javascript" src="{{ url_for('static', filename='lib/sio/socket.io/client-dist/socket.io.js') }}" crossorigin="anonymous"></script>
+c) <script src="../lib/sio/socket.io/client-dist/socket.io.js"></script>
+fazit: nur a geht! leave it now!
+
+SOCKETSERVER
+send('hallo') or emit('message',hallo)
+broadcast=True oder nicht
+send(o) or emit('message',o)
+moeglichkeit context: home (at home local),public (=public local),offline,heroku
+
+_____app.py run:
+a) 	socketio.run(app, host='0.0.0.0', debug=True)
+b) 	socketio.run(app, debug=True)
 
 
 

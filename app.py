@@ -21,12 +21,17 @@ clients = []
 @socketio.on('message') #public event
 def handle_message(msg):
 	#send('hallo') #OK home
-	print(':',msg)
+	print('::::',msg)
 	emit('message','hallo1') #OK
 	#emit('message',{'got':msg, 'hallo':1},json=True) #OK
 	#send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
 	#print(f'....message from: {msg}', '==>id',request.sid)
 	#emit('message',{'got':msg, 'hallo':1},json=True)
+
+@app.route('/testsocketio')
+def testsock():	
+	return render_template('tests/test_socketio.html', Basepath=Basepath)
+
 
 @socketio.on('action') #custom event
 def handle_action(data):
@@ -113,9 +118,6 @@ def process_action(user,game,action):
 	return a
 
 #region test routes
-@app.route('/testsocketio')
-def testsock():	
-	return render_template('tests/test_socketio.html', Basepath=Basepath)
 @app.route('/get_players/<game>')
 def r_get_players(game): return jsonify(get_players(game))
 @app.route('/get_playernames/<game>')
@@ -130,8 +132,9 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 
 if __name__ == "__main__":
 	#app.run() #host='0.0.0.0', port=5051, debug=True)
-	socketio.run(app, host='0.0.0.0', debug=True)
 	#socketio.run(app, host='0.0.0.0', debug=True)
+	#socketio.run(app, host='0.0.0.0', debug=True)
+	socketio.run(app, debug=True)
 	
 
 
