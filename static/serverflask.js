@@ -2,8 +2,8 @@ function socketinit() {
 	console.log('init socket client');
 	console.log('==>SOCKETSERVER:',SOCKETSERVER)
 	Socket = io.connect(SOCKETSERVER);
-	Socket.on('connect', () => {
-		console.log('...........connected!');
+	Socket.on('connect', x => {
+		console.log('...........connected!',x);
 		Socket.emit('message','user has connected'); //wie in testsocketio
 		//Socket.emit('message',{ user: 'felix', message: 'felix connected' });
 		//Socket.emit('login', { user: 'felix', message: 'felix connected' });

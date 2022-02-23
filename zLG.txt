@@ -1,0 +1,26 @@
+copy file singlepage
+test localhost:5000/testsocketio
+copy file singlepage
+=>all die socketio includes sind in _versions/singlepage copy.html
+naechste message stufe testen
+wart wieso ist das vorher gegangen?
+was mach ich bei testsocketio anders als in signelpage?
+repair path to sio socket client
+favicon local!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

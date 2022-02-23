@@ -8,14 +8,19 @@
 		<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}" />
 		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 		<script src="{{Basepath}}alibs/jsyaml.js"></script>
-		<script type="text/javascript" src="{{Basepath}}lib/sio/socket.io/client-dist/socket.io.js"></script> 
 		{# <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script> #}
+		{# <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script> #}
+		<script type="text/javascript" src="{{Basepath}}alibs/socketio/node_modules/socket.io/client-dist/socket.io.js" crossorigin="anonymous"></script> 
+		{# <script src="{{ url_for('static', filename='lib/socket.io.js') }}">	</script> #}
+		{# <script type="text/javascript" src="{{ url_for('static', filename='lib/sio/socket.io/client-dist/socket.io.js" crossorigin="anonymous">
+		//GEHT! NICHT
+		</script>  #}
+		{# <script type="text/javascript" src="{{Basepath}}alibs/socket.io.min.js" crossorigin="anonymous"></script> #}
 		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
 		<script src="{{ url_for('static', filename='baustelle.js') }}"></script>
 		<script src="{{ url_for('static', filename='serverflask.js') }}"></script>
 		<script src="{{ url_for('static', filename='startsinglepage.js') }}"></script>
-		<link rel="icon" href="{{Basepath}}assets/images/icons/firetrans.png" />
-		{# <link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/microsoft/310/shortcake_1f370.png" /> #}
+		<link rel="icon" href="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/microsoft/310/shortcake_1f370.png" />
 		<script>
 			Basepath = "{{Basepath}}";
 			let s = Serverdata = {{Serverdata|tojson}};
