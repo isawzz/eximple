@@ -20,10 +20,10 @@ clients = []
 
 @socketio.on('message') #public event
 def handle_message(msg):
-	#send('hallo') #OK home
 	print('::::',msg)
-	emit('message','hallo1') #OK
-	#emit('message',{'got':msg, 'hallo':1},json=True) #OK
+	#send(msg) #OK if msg string
+	#emit('message','hallo1') #OK
+	emit('message',{'got':msg, 'hallo':1}, json=True) #OK
 	#send(f'client: {request.sid} message: {msg}', broadcast=True) #without broadcast, will just send to msg sender
 	#print(f'....message from: {msg}', '==>id',request.sid)
 	#emit('message',{'got':msg, 'hallo':1},json=True)

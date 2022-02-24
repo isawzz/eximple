@@ -1,4 +1,35 @@
+//var Socket;
 function socketinit() {
+	Socket = isdef(window.io)? io.connect(SOCKETSERVER):null;
+	if (!Socket) {
+		console.log('no sockets!!!!!!!!!!!');
+		mBy('dChat').style.display = 'none';
+		return;
+	}
+	Socket.on('connect', () => {
+		console.log('...........connected!',x);
+		Socket.emit('message', 'user has connected');
+	});
+	Socket.on('message', (x) => {
+		console.log('message from server 1:', x);
+		let elem = mBy('messages');
+		mAppend(elem, mCreateFrom(`<pre>${x.hallo}</pre>`));
+	});
+}
+function socketsend() {
+	if (!Socket) {
+		console.log('no sockets!!!!!!!!!!!')
+		return;
+	}
+	let elem = mBy('myMessage');
+	let text = elem.value;
+	//elem.value = '';
+	//Socket.send(text); //ok
+	Socket.emit('message',{text:text, user:'felix'}); //ok
+	return false;
+}
+
+function socketinit_() {
 	console.log('init socket client');
 	console.log('==>SOCKETSERVER:',SOCKETSERVER)
 	Socket = io.connect(SOCKETSERVER);
@@ -47,13 +78,14 @@ function socketinit() {
 		//mAppend(elem, mCreateFrom(`<li>${x}</li>`))
 	});
 }
-function socketsend() {
+function socketsend_() {
 	let elem = mBy('myMessage');
 	let text = elem.value;
 	elem.value = '';
 	Socket.send({ user: isdef(User)?User.name:'hallo', text: text });
 	return false;
 }
+
 
 
 

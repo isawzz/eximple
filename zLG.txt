@@ -15,9 +15,70 @@ _____app.py run:
 a) 	socketio.run(app, host='0.0.0.0', debug=True)
 b) 	socketio.run(app, debug=True)
 
+__________WORKS!
+1) public+internet (eg. Harborview)
+in html:
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script>
+in app:
+	socketio.run(app, debug=True)
+in js (client):
+			var Socket;
+			function start() {
+				Socket = io.connect(SOCKETSERVER);
+				Socket.on('connect', () => {
+					Socket.emit('message', 'user has connected');
+				});
+				Socket.on('message', (x) => {
+					console.log('message from server 1:', x);
+					let elem = mBy('messages');
+					mAppend(elem, mCreateFrom(`<li>${x}</li>`));
+				});
+			}
+			function socketsend() {
+				let elem = mBy('myMessage');
+				let text = elem.value;
+				//elem.value = '';
+				Socket.send(text);
+				return false;
+			}
+in server:
+@socketio.on('message') #public event
+def handle_message(msg):
+	print('::::',msg)
+	emit('message','hallo1') #OK
 
 
-
+onclick_action()
+- find user, game, action
+MIT SOCKETS:
+- check if this was the last user to perform action
+- if yes:
+  update game state
+	POST action route and new state, and actions and originator
+	server updates db Action, Game
+	server emits gamename to broadcast
+	each player except originator then reloads the page
+	(=same as post but get instead)
+- if no:
+	client broadcast gamename user action choice
+	(or: client emit, server broadcast)
+  all: individual update of ServerData
+  originator or all: individual update of choice in action table
+	=>no reload necessary! 
+  
+OHNE SOCKETS:
+- check if this was the last user to perform action
+- if yes:
+  update game state
+	POST action route and new state, and actions and originator
+	server updates db Action, Game
+	=>other users must reload manually at this point!
+- if no:
+	client broadcast gamename user action choice
+	(or: client emit, server broadcast)
+  all: individual update of ServerData
+  originator or all: individual update of choice in action table
+	=>no reload necessary! 
 
 
 

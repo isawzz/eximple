@@ -15,20 +15,23 @@
 			var Socket;
 			function start() {
 				Socket = io.connect(SOCKETSERVER);
+				
 				Socket.on('connect', () => {
+					console.log('...........connected!',x);
 					Socket.emit('message', 'user has connected');
 				});
 				Socket.on('message', (x) => {
 					console.log('message from server 1:', x);
 					let elem = mBy('messages');
-					mAppend(elem, mCreateFrom(`<li>${x}</li>`));
+					mAppend(elem, mCreateFrom(`<pre>${x.hallo}</pre>`));
 				});
 			}
 			function socketsend() {
 				let elem = mBy('myMessage');
 				let text = elem.value;
 				//elem.value = '';
-				Socket.send(text);
+				//Socket.send(text); //ok
+				Socket.emit('message',{text:text, user:'felix'}); //ok
 				return false;
 			}
 		</script>
