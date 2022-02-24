@@ -12,12 +12,15 @@
 	<body>
 		<script>
 			onload = start;
-			var Socket;
 			function start() {
-				Socket = io.connect(SOCKETSERVER);
-				
+				Socket = isdef(window.io)? io.connect(SOCKETSERVER):null;
+				if (!Socket) {
+					console.log('no sockets!!!!!!!!!!!');
+					mBy('dChat').style.display = 'none';
+					return;
+				}
 				Socket.on('connect', () => {
-					console.log('...........connected!',x);
+					console.log('...........connected!');
 					Socket.emit('message', 'user has connected');
 				});
 				Socket.on('message', (x) => {
@@ -27,6 +30,10 @@
 				});
 			}
 			function socketsend() {
+				if (!Socket) {
+					console.log('no sockets!!!!!!!!!!!')
+					return;
+				}
 				let elem = mBy('myMessage');
 				let text = elem.value;
 				//elem.value = '';

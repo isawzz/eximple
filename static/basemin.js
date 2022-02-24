@@ -1,6 +1,6 @@
 //#region globals: Session data
-//var SOCKETSERVER = 'http://127.10.0.1:5000'; //'http://localhost:5000'
-var SOCKETSERVER = 'http://localhost:5000';
+//var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
+var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
 var ColorDi, DA={};
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
@@ -1612,6 +1612,9 @@ function rColor() {
 	return s;
 }
 function rHue(){return (rNumber(0,36)*10)%360; }
+function rLetters(n){ 
+	return rChoose(toLetters('0123456789abcdefghijklmnopq'),n);
+}
 function rNumber(min = 0, max = 100) {
 	return Math.floor(Math.random() * (max - min + 1)) + min; //min and max inclusive!
 }
