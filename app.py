@@ -11,11 +11,46 @@ db_init(app)
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 import eventlet
+import json
+import logging
 
 CORS(app)
 eventlet.monkey_patch()
 socketio = SocketIO(app, cors_allowed_origins="*")
 clients = []
+
+logging.basicConfig(level=logging.ERROR)
+#logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+for key in logging.Logger.manager.loggerDict:
+	print(key)
+	logging.getLogger(key).setLevel(logging.ERROR)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+log.disabled = True
+
+import click
+def secho(text, file=None, nl=None, err=None, color=None, **styles):
+    pass
+
+def echo(text, file=None, nl=None, err=None, color=None, **styles):
+    pass
+
+click.echo = echo
+click.secho = secho
+
+# logging.getLogger('socketio').setLevel(logging.ERROR)
+# logging.getLogger('engineio').setLevel(logging.ERROR)
+# logging.getLogger("requests").setLevel(logging.ERROR)
+# logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+# import httplib
+# httplib.HTTPConnection.debuglevel = 1
+# logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+# logging.getLogger().setLevel(logging.DEBUG)
+# requests_log = logging.getLogger("requests.packages.urllib3")
+# requests_log.setLevel(logging.DEBUG)
+# requests_log.propagate = True
+# requests.get('http://httpbin.org/headers')	
 #endregion
 
 @socketio.on('message') #public event
@@ -31,7 +66,6 @@ def handle_message(msg):
 @app.route('/testsocketio')
 def testsock():	
 	return render_template('tests/test_socketio.html', Basepath=Basepath)
-
 
 @socketio.on('action') #custom event
 def handle_action(data):
@@ -71,15 +105,22 @@ def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')
 def r_index():
 	return render_template('index.html')
 
+
 @app.route('/singlepage', methods=['GET','POST'])
 @app.route('/singlepage/<user>', methods=['GET','POST'])
 @app.route('/singlepage/<user>/<game>', methods=['GET','POST'])
 @app.route('/singlepage/<user>/<game>/<action>', methods=['GET','POST'])
 def r_singlepage(user=None,game=None,action=None):
+	print('*** /singlepage ***')
 	if not user:
 		user = {'name':'anonymous','color':'blue'}
 	if request.method == 'POST':
-		socketio.send('hallo', broadcast=True)	
+		x = request.form['text']
+		jx = json.loads(x)
+		print(':::',request.form['text'])
+		print(':::',type(request.form['text']))
+		print(':::',jx['user'])
+		#socketio.send('hallo', broadcast=True)	
 	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"user":user,"game":game,"action":action,"users":get_users(),"games":get_games(),"actions":get_actions()})
 
 @app.route('/reset')
@@ -131,10 +172,10 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 #endregion
 
 if __name__ == "__main__":
-	#app.run() #host='0.0.0.0', port=5051, debug=True)
+	app.run(debug=True) #host='0.0.0.0', port=5051, debug=True)
 	#socketio.run(app, host='0.0.0.0', debug=True)
 	#socketio.run(app, host='0.0.0.0', debug=True)
-	socketio.run(app, debug=True)
+	#socketio.run(app, debug=True)
 	
 
 

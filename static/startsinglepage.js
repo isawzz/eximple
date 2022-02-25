@@ -1,7 +1,8 @@
 onload = startsinglepage;
 
 function startsinglepage() {
-	socketinit();
+	//socketinit();
+	Socket = null;
 
 	dTitle = mBy('dTitle');
 	show_title('My Little World');
@@ -72,7 +73,7 @@ function onclick_action(user, game, action) {
 
 
 	console.log('user', user, 'has picked action', action, 'in game', game)
-	Socket.emit('action', { user: user, game: game, action: action });
+	//Socket.emit('action', { user: user, game: game, action: action });
 }
 //#region helpers
 async function ensureAssets() {

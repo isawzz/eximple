@@ -81,8 +81,28 @@ OHNE SOCKETS:
 	=>no reload necessary! 
 
 
-
-
+das wird gepostet: 
+	{gamerec: {…}, gameactions: Array(2), user: 'mimi', game: 'paris', action: '5'}
+	action: "5"
+	game: "paris"
+	gameactions: Array(2)
+	0: {choice: null, choices: 'c n b k d', created: 'Wed, 23 Feb 2022 02:13:33 GMT', done: false, due: 'Wed, 23 Feb 2022 02:13:33 GMT', …}
+	1: {choice: null, choices: '9 3 p 8 d', created: 'Wed, 23 Feb 2022 02:13:33 GMT', done: false, due: 'Wed, 23 Feb 2022 02:13:33 GMT', …}
+	length: 2
+	[[Prototype]]: Array(0)
+	gamerec:
+	created: "Wed, 23 Feb 2022 02:13:33 GMT"
+	fen: "state for step 1"
+	gamename: "aristocracy"
+	host_id: 1
+	id: 1
+	modified: "Wed, 23 Feb 2022 02:13:33 GMT"
+	name: "paris"
+	players: (2) ['mimi', 'felix']
+	status: "start"
+	step: 1
+	[[Prototype]]: Object
+	user: "mimi"
 
 
 
