@@ -104,6 +104,7 @@ das wird gepostet:
 	[[Prototype]]: Object
 	user: "mimi"
 
+fuer actions muss ich choice und choices updaten
 
 
 

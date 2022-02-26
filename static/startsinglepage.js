@@ -1,5 +1,13 @@
 onload = startsinglepage;
 
+function submit_form(fname){
+	if (typeof document.getElementById(fname).submit === "object") {
+		document.getElementById(fname).submit.remove();
+	}
+	document.getElementById(fname).submit();
+
+}
+
 function startsinglepage() {
 	//socketinit();
 	Socket = null;
@@ -32,13 +40,14 @@ function onclick_game(name) {
 function onclick_action(user, game, action) {
 	//update Actions
 	let a = firstCond(Actions, x => x.user == user && x.game == game);
-	console.log('action record is:', a)
+	console.log('action record is:', a);
+	a.choice = action;
 
 	//feststallen ob das die letzte action war
 	let allcomplete = true;
 	let gameActions = Actions.filter(x => x.game == game);
 	for (const a1 of gameActions) {
-		if (nundef(a1.choice)) allcomplete = false;
+		if (isEmpty(a1.choice)) allcomplete = false;
 		//console.log('choices player',a1.user,a1.choices,typeof a1.choices); //choices is ein string!
 	}
 
@@ -51,7 +60,7 @@ function onclick_action(user, game, action) {
 
 		//next action set machen!
 		for (const a1 of gameActions) {
-			a1.choice = null;
+			a1.choice = '';
 			a1.choices = rLetters(5).join(' ');
 			//console.log('a1.choices',a1.choices)
 		}
@@ -59,21 +68,28 @@ function onclick_action(user, game, action) {
 		//package post object
 		// game object, action object + strings: user game action
 		let o = { gamerec: g, gameactions: gameActions, user: user, game: game, action: action };
-		console.log('das wird gepostet:',o)
+		console.log('COMPLETE!!!===>das wird gepostet:', o)
 		let ostring = JSON.stringify(o);
 		mBy('inpost').value = ostring;
 		//console.log('das wird gepostet:',o)
 		// POST UPDATE GAME ROUTE: for 
 
-		// if (typeof document.getElementById('ss-form').submit === "object") {
-		// 	document.getElementById('ss-form').submit.remove();
-		// }
-		// document.getElementById('ss-form').submit();
+		submit_form('fRoute');
+	} else {
+		console.log('user', user, 'has picked action', action, 'in game', game)
+		if (Socket) Socket.emit('action', { user: user, game: game, action: action });
+		else{
+			//nur diesen einen choice setzen
+			let o = { user: user, game: game, action: action };
+			console.log('das wird gepostet:', o)
+			let ostring = JSON.stringify(o);
+			mBy('inpost').value = ostring;
+			submit_form('fRoute');
+	
+		}
 	}
 
 
-	console.log('user', user, 'has picked action', action, 'in game', game)
-	//Socket.emit('action', { user: user, game: game, action: action });
 }
 //#region helpers
 async function ensureAssets() {

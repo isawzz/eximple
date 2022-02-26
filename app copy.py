@@ -13,13 +13,47 @@ from flask_cors import CORS
 import eventlet
 import json
 import logging
-#endregion
 
-#region socketio
 CORS(app)
 eventlet.monkey_patch()
 socketio = SocketIO(app, cors_allowed_origins="*")
 clients = []
+
+#region logging
+logging.basicConfig(level=logging.ERROR)
+#logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+for key in logging.Logger.manager.loggerDict:
+	#print(key)
+	logging.getLogger(key).disabled = True #setLevel(logging.ERROR)
+	#logging.getLogger(key).setLevel(logging.ERROR)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+log.disabled = True
+
+import click
+def secho(text, file=None, nl=None, err=None, color=None, **styles):
+    pass
+
+def echo(text, file=None, nl=None, err=None, color=None, **styles):
+    pass
+
+click.echo = echo
+click.secho = secho
+
+# logging.getLogger('socketio').setLevel(logging.ERROR)
+# logging.getLogger('engineio').setLevel(logging.ERROR)
+# logging.getLogger("requests").setLevel(logging.ERROR)
+# logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+# import httplib
+# httplib.HTTPConnection.debuglevel = 1
+# logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+# logging.getLogger().setLevel(logging.DEBUG)
+# requests_log = logging.getLogger("requests.packages.urllib3")
+# requests_log.setLevel(logging.DEBUG)
+# requests_log.propagate = True
+# requests.get('http://httpbin.org/headers')	
+#endregion
 
 @socketio.on('message') #public event
 def handle_message(msg):
@@ -66,10 +100,18 @@ def handle_action(data):
 	#send(f'hallo, {x}')
 	#emit('login',f'client: {request.sid} connected: {msg}', broadcast=True) #without broadcast, will just send to msg sender
 
-#endregion
+@app.route('/')
+def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')
+
+@app.route('/index')
+def r_index():
+	return render_template('index.html')
 
 
 @app.route('/singlepage', methods=['GET','POST'])
+@app.route('/singlepage/<user>', methods=['GET','POST'])
+@app.route('/singlepage/<user>/<game>', methods=['GET','POST'])
+@app.route('/singlepage/<user>/<game>/<action>', methods=['GET','POST'])
 def r_singlepage(user=None,game=None,action=None):
 	print('*** /singlepage ***')
 	if not user:
@@ -80,51 +122,27 @@ def r_singlepage(user=None,game=None,action=None):
 		print(':::',request.form['text'])
 		print(':::',type(request.form['text']))
 		print(':::',jx['user'])
-
-		user = jx['user']
-		game = jx['game']
-		action = jx['action']
-		u = User.query.filter_by(name=user).first()
-		g = Game.query.filter_by(name=game).first()
-		
-		if 'gamerec' in jx:
-			gnew = jx['gamerec']
-			g.fen = gnew['fen']
-			g.step = gnew['step']
-			db.session.commit()
-
-		if 'gameactions' in jx:
-			
-			actionlistnew = jx['gameactions']
-			for anew in actionlistnew:
-				#a=Action.query.filter_by()
-				a = Action.query.filter_by(user_id=anew['user_id'], game_id=g.id).first()
-				a.choice = anew['choice']
-				#s = a.choices = .replace(action,'').replace('  ',' ')
-				a.choices = anew['choices'] # '2 3 4 5' #a.choices.split('\W+')
-		else:
-			a = Action.query.filter_by(user_id=u.id, game_id=g.id).first()
-			a.choice = action
-			s = a.choices.replace(action,'').replace('  ',' ')
-			a.choices = s # '2 3 4 5' #a.choices.split('\W+')
-
-		db.session.commit()
-		#u=User.query.filter_by(name=user).first()
-		#a = Action.query.filter_by(user_id=u.id, game_id=g.id).first()
 		#socketio.send('hallo', broadcast=True)	
 	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"user":user,"game":game,"action":action,"users":get_users(),"games":get_games(),"actions":get_actions()})
-
-@app.route('/')
-def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')
-
-@app.route('/index')
-def r_index():
-	return render_template('index.html')
 
 @app.route('/reset')
 def r_reset(): 
 	create_random_data()
 	return redirect('/')
+
+@app.route('/info')
+def r_info(): 
+	return render_template('info.html', Basepath=Basepath, Serverdata={"users":get_users(),"games":get_games(),"actions":get_actions()})
+
+@app.route('/loggedin/<user>', methods=['GET','POST'])
+def r_loggedin(user): 
+	return render_template('loggedin.html', Basepath=Basepath, Serverdata={"user":get_user(user),"games":get_games_for(user),"actions":get_user_actions(user)}) 
+
+@app.route('/table/<game>/<user>', methods=['GET','POST'])
+def r_table(game,user): 
+	if user == 'anonymous':
+		return render_template('table.html', Basepath=Basepath, Serverdata={"user":{"name":"anonymous","color":'YELLOW'},"game":get_game(game)}) 
+	return render_template('table.html', Basepath=Basepath, Serverdata={"user":get_user(user),"game":get_game(game),"actions":get_actions_for(game,user)}) 
 
 @app.route('/action/<game>/<user>/<action>', methods=['GET','POST'])
 def r_action(game,user,action): 
