@@ -270,7 +270,7 @@ def add_actions():
 	for game in games:
 		users = _get_players(game.id)
 		for user in users:
-			a = Action(choices=choices,game_id=game.id,user_id=user.id)
+			a = Action(choices=choices,choice='',game_id=game.id,user_id=user.id)
 			db.session.add(a)
 	db.session.commit()
 

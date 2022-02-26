@@ -114,6 +114,7 @@ function hFunc(content, funcname, arg1, arg2, arg3) {
 	return html;
 }
 function show_actions(dParent) {
+	lst=Actions.map(x=>console.log(`${x.game} ${x.user} choices:${x.choices} choice:${x.choice}`));
 	if (nundef(Users) && User.name == 'anonymous') return;
 	if (nundef(Users)) Users = [User];
 	if (nundef(Tables)) Tables = [Table];

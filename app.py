@@ -71,14 +71,10 @@ def handle_action(data):
 
 @app.route('/singlepage', methods=['GET','POST'])
 def r_singlepage(user=None,game=None,action=None):
-	print('*** /singlepage ***')
-	if not user:
-		user = {'name':'anonymous','color':'blue'}
 	if request.method == 'POST':
+		print('*** POST /singlepage ***')
 		x = request.form['text']
 		jx = json.loads(x)
-		print(':::',request.form['text'])
-		print(':::',type(request.form['text']))
 		print(':::',jx['user'])
 
 		user = jx['user']
@@ -102,16 +98,28 @@ def r_singlepage(user=None,game=None,action=None):
 				a.choice = anew['choice']
 				#s = a.choices = .replace(action,'').replace('  ',' ')
 				a.choices = anew['choices'] # '2 3 4 5' #a.choices.split('\W+')
+			db.session.commit()
 		else:
 			a = Action.query.filter_by(user_id=u.id, game_id=g.id).first()
 			a.choice = action
 			s = a.choices.replace(action,'').replace('  ',' ')
 			a.choices = s # '2 3 4 5' #a.choices.split('\W+')
+			#print('==>update action with',action)
+			db.session.commit()
 
-		db.session.commit()
+		actions_now = [x.toDict() for x in Action.query.all()]
+		#print('_____________')
+		#print('new actions',actions_now)
+		# db.session.commit()
 		#u=User.query.filter_by(name=user).first()
 		#a = Action.query.filter_by(user_id=u.id, game_id=g.id).first()
 		#socketio.send('hallo', broadcast=True)	
+	else:
+		print('*** GET /singlepage ***')
+
+	actions_db = get_actions()
+	#print('_____________')
+	#print('new actions',actions_now)
 	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"user":user,"game":game,"action":action,"users":get_users(),"games":get_games(),"actions":get_actions()})
 
 @app.route('/')
