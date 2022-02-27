@@ -68,7 +68,6 @@ def handle_action(data):
 
 #endregion
 
-
 @app.route('/singlepage', methods=['GET','POST'])
 def r_singlepage(user=None,game=None,action=None):
 	if request.method == 'POST':
@@ -164,10 +163,11 @@ def r_get_game_actions(game): return jsonify(get_game_actions(game))
 #endregion
 
 if __name__ == "__main__":
+	#print('hallo')
 	#app.run(debug=True) #host='0.0.0.0', port=5051, debug=True)
 	#socketio.run(app, host='0.0.0.0', debug=True)
 	#socketio.run(app, host='0.0.0.0', debug=True)
-	socketio.run(app, debug=True)
+	socketio.run(app, debug=True, log_output=False)
 	
 
 
