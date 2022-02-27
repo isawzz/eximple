@@ -1,3 +1,48 @@
+TODO:
+- python send print to output instead of terminal vs code
+- wie soll ich es ohne sockets machen?
+- jedesmal wenn action mache aber nicht di eletzte bin, soll er nur db updaten
+- wenn der letzte bin soll er db updaten und reload ueberall machen
+- wenn nicht der letzte bin wird ja gamestate nicht geaendert
+- wie mach ich es dass der choice bei den anderen nicht reflected wird wenn sie reloaden?
+- das geht nur wenn ich die choices nur fuer den jeweiligen user zeige
+- also ist das current interface NUR ZUM TESTEN GEEIGNET
+- beim echten interface, zeigen nur die choices fuer den user falls dieser user noch nicht chosen hat
+- wenn der letzt bin soll auch gamestate updated werden
+- present: gamestate und choices fuer diesen user
+- jetzt ueberlege wie man gamestate beschreiben kann bei einem simplen spiel
+- welches spiel? dixit
+- gamestate die cards die am tisch liegen, die eigenen cards, das wort
+- choices: eine von eigenen cards
+- was kann ich machen mit dem maedi? just observe?
+a) keine fragen stellen?
+b) fragen stellen?
+c) garnicht reden
+d) was erzaehlen
+aber worueber?
+wichtig ist glaub ich, nichts zu assumen
+im moment ist sie uncomfortable aber safe
+was schaff ich jetzt noch?
+eigentlich garnichts
+oder nudeln kochen mit zweibel und kaese
+
+dixit example:
+fen = what do I see?
+hiddenstate = per player like actions
+kann ich nicht die actions erweitern sodass ich irgendeinen hidden state habe: 3 overlapping sets of keys into some kind of dictionary (game dictionary), 
+each of these keys corresponds to an item and/or an action that this player sees
+anstatt actions call it hidden state
+ja doch ich glaub ich schaff es noch so ein essen zu machen
+
+what would kala want me to do in this situation?
+unclutching is the obvious answer
+but action wise? what is the action that would be helpful?
+a) go to the hospital, sit there, be there, quietly
+b) read book to a
+c) 
+
+
+
 Basepath
 _______socket io client code js:
 a) <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script>
