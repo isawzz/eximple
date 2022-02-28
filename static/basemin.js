@@ -3,8 +3,24 @@
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
 var ColorDi, DA = {};
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
-var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
+var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards, Card;
 
+const BLUE = '#4363d8';
+const BLUEGREEN = '#004054';
+const BROWN = '#96613d';
+const GREEN = '#3cb44b';
+const FIREBRICK = '#800000';
+const LIGHTGREEN = '#afff45'; //'#bfef45';
+const LIGHTBLUE = '#42d4f4';
+const OLIVE = '#808000';
+const ORANGE = '#f58231';
+const PURPLE = '#911eb4';
+const RED = '#e6194B';
+const TEAL = '#469990';
+const YELLOW = '#ffe119';
+const YELLOW2 = '#fff620'; //?pink???
+const YELLOW3 = '#ffed01';
+//#endregion
 //#region m prefix (DOM)
 function mAppend(d, child) { d.appendChild(child); return child; }
 function mButton(caption, handler, dParent, styles, classes, id) {
