@@ -1,3 +1,34 @@
+ok also dann ein anderes spiel?
+welches?
+etwas mit c52 cards
+bluff?
+____rules:
+__setup:
+1. each person gets 2 cards
+2. table: just says whose turn it is (random)
+__play:
+1. starting from turn player, bid
+2. when someone call bluff:
+- last player (turn player)'s cards put open on table
+=>depending on 
+
+//fuer die dixit cards brauch ich was?
+//irgendwo am andern comp hab ich ein beispiel! aber weiss nicht wo!
+
+
+dixit:
+fen: turn:mimi
+hidden: hand for each player
+choices: hand for each player
+
+wo soll das gemacht werden?
+how to start a game?
+erstmal lade die dixit cards from base! aber wie?
+
+
+
+
+
 TODO:
 - python send print to output instead of terminal vs code
 - wie soll ich es ohne sockets machen?

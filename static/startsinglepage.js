@@ -99,6 +99,7 @@ async function ensureAssets() {
 		ByGroupSubgroup = await route_path_yaml_dict(`${Basepath}assets/symGSG.yaml`);
 		//KeySets = getKeySets();
 		C52 = await route_path_yaml_dict(`${Basepath}assets/c52.yaml`);
+		ari_create_card_assets('rb');
 	}
 }
 function hRoute(content, route, arg1, arg2, arg3) {

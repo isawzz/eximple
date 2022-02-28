@@ -10,6 +10,7 @@
 		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js" crossorigin="anonymous"></script>
 		<script src="{{Basepath}}alibs/jsyaml.js"></script>
 		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
+		<script src="{{Basepath}}/js/cards.js"></script>
 		<script src="{{ url_for('static', filename='baustelle.js') }}"></script>
 		<script src="{{ url_for('static', filename='serverflask.js') }}"></script>
 		<script src="{{ url_for('static', filename='startsinglepage.js') }}"></script>
@@ -48,7 +49,7 @@
 
 		<div id="dRoute">
 			<h2>route:</h2>
-			<form id="fRoute" action="#" method="POST">
+			<form id="fRoute" action="/singlepost" method="POST">
 				<input id="inpost" type="text" name="text" value="1" placeholder="enter action" />
 				<input type="submit" />
 			</form>

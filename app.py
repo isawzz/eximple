@@ -67,8 +67,62 @@ def handle_action(data):
 	#emit('login',f'client: {request.sid} connected: {msg}', broadcast=True) #without broadcast, will just send to msg sender
 
 #endregion
+@app.route('/singlepage')
+def r_singlepage_get():
+	print('*** GET /singlepage ***')
+	actions_db = get_actions()
+	u = User.query.filter_by(name='mimi').first()
+	g = Game.query.filter_by(name='paris').first()
+	alast = Action.query.filter_by(game=g,user=u).first()
+	print('mimi paris last:',alast.choice)
+	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"users":get_users(),"games":get_games(),"actions":get_actions()})
 
-@app.route('/singlepage', methods=['GET','POST'])
+@app.route('/singlepost', methods=['POST'])
+def r_singlepost():
+	print('*** POST /singlepage ***')
+	x = request.form['text']
+	jx = json.loads(x)
+	print(':::',jx['user'])
+
+	user = jx['user']
+	game = jx['game']
+	action = jx['action']
+	u = User.query.filter_by(name=user).first()
+	g = Game.query.filter_by(name=game).first()
+	
+	if 'gamerec' in jx:
+		gnew = jx['gamerec']
+		g.fen = gnew['fen']
+		g.step = gnew['step']
+		db.session.commit()
+
+	if 'gameactions' in jx:
+		
+		actionlistnew = jx['gameactions']
+		for anew in actionlistnew:
+			#a=Action.query.filter_by()
+			a = Action.query.filter_by(user_id=anew['user_id'], game_id=g.id).first()
+			a.choice = anew['choice']
+			#s = a.choices = .replace(action,'').replace('  ',' ')
+			a.choices = anew['choices'] # '2 3 4 5' #a.choices.split('\W+')
+		db.session.commit()
+	else:
+		a = Action.query.filter_by(user_id=u.id, game_id=g.id).first()
+		a.choice = action
+		s = a.choices.replace(action,'').replace('  ',' ')
+		a.choices = s # '2 3 4 5' #a.choices.split('\W+')
+		#print('==>update action with',action)
+		db.session.commit()
+
+	actions_now = [x.toDict() for x in Action.query.all()]
+	actions_db = get_actions()
+	u = User.query.filter_by(name='mimi').first()
+	g = Game.query.filter_by(name='paris').first()
+	alast = Action.query.filter_by(game=g,user=u).first()
+	print('mimi paris last:',alast.choice)
+	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"user":user,"game":game,"action":action,"users":get_users(),"games":get_games(),"actions":get_actions()})
+
+@app.route('/singlepage_orig', methods=['GET','POST'])
 def r_singlepage(user=None,game=None,action=None):
 	if request.method == 'POST':
 		print('*** POST /singlepage ***')
@@ -89,7 +143,6 @@ def r_singlepage(user=None,game=None,action=None):
 			db.session.commit()
 
 		if 'gameactions' in jx:
-			
 			actionlistnew = jx['gameactions']
 			for anew in actionlistnew:
 				#a=Action.query.filter_by()
@@ -117,6 +170,10 @@ def r_singlepage(user=None,game=None,action=None):
 		print('*** GET /singlepage ***')
 
 	actions_db = get_actions()
+	u = User.query.filter_by(name='mimi').first()
+	g = Game.query.filter_by(name='paris').first()
+	alast = Action.query.filter_by(game=g,user=u).first()
+	print('mimi paris last:',alast.choice)
 	#print('_____________')
 	#print('new actions',actions_now)
 	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"user":user,"game":game,"action":action,"users":get_users(),"games":get_games(),"actions":get_actions()})

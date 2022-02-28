@@ -1,7 +1,7 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-var ColorDi, DA={};
+var ColorDi, DA = {};
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
@@ -701,8 +701,8 @@ function colorsFromBFA(bg, fg, alpha) {
 	}
 	return [bg, fg];
 }
-function colorFromHSL(hue, sat = 100, lum = 50) { 
-	return hslToHex(valf(hue,rHue()), sat, lum);
+function colorFromHSL(hue, sat = 100, lum = 50) {
+	return hslToHex(valf(hue, rHue()), sat, lum);
 	//return colorFrom(colorHSLBuild(valf(hue,rHue()), sat, lum)); 
 }
 function colorHex(cAny) {
@@ -736,7 +736,7 @@ function colorLight(c, zero1 = .3, log = true) {
 		//console.log('HAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLOOOOOOO')
 		let hue = rHue();
 
-		return colorFromHSL(rHue(),100,85);
+		return colorFromHSL(rHue(), 100, 85);
 	}
 	// if (nundef(c)) c = colorFrom(rChoose(['yellow', 'skyblue', 'orange', 'violet', 'pink', 'GREEN', 'lime']));//rPrimaryColor();
 	return pSBC(zero1, c, undefined, !log);
@@ -1163,14 +1163,14 @@ function hexToHSL(H) {
 	}
 } //ok
 function hslToHex(h, s, l) {
-  l /= 100;
-  const a = s * Math.min(l, 1 - l) / 100;
-  const f = n => {
-    const k = (n + h / 30) % 12;
-    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
-  };
-  return `#${f(0)}${f(8)}${f(4)}`;
+	l /= 100;
+	const a = s * Math.min(l, 1 - l) / 100;
+	const f = n => {
+		const k = (n + h / 30) % 12;
+		const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+		return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+	};
+	return `#${f(0)}${f(8)}${f(4)}`;
 }
 function hexAToHSLA(H) {
 	let ex = /^#([\da-f]{4}){1,2}$/i;
@@ -1611,9 +1611,10 @@ function rColor() {
 	}
 	return s;
 }
-function rHue(){return (rNumber(0,36)*10)%360; }
-function rLetters(n){ 
-	return rChoose(toLetters('0123456789abcdefghijklmnopq'),n);
+function randomColor() { return rColor(); }
+function rHue() { return (rNumber(0, 36) * 10) % 360; }
+function rLetters(n) {
+	return rChoose(toLetters('0123456789abcdefghijklmnopq'), n);
 }
 function rNumber(min = 0, max = 100) {
 	return Math.floor(Math.random() * (max - min + 1)) + min; //min and max inclusive!
@@ -1635,6 +1636,17 @@ function capitalize(s) {
 }
 function contains(s, sSub) { return s.toLowerCase().includes(sSub.toLowerCase()); }
 function endsWith(s, sSub) { let i = s.indexOf(sSub); return i >= 0 && i == s.length - sSub.length; }
+function firstNumber(s) {
+	// returns first number in string s
+	if (s) {
+		let m = s.match(/-?\d+/);
+		if (m) {
+			let sh = m.shift();
+			if (sh) { return Number(sh); }
+		}
+	}
+	return null;
+}
 function startsWith(s, sSub) {
 	//console.log('s',s,'sSub',sSub)
 	//testHelpers('startWith: s='+s+', sSub='+sSub,typeof(s),typeof(sSub));
