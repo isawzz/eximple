@@ -1,13 +1,5 @@
 onload = startsinglepage;
 
-function submit_form(fname){
-	if (typeof document.getElementById(fname).submit === "object") {
-		document.getElementById(fname).submit.remove();
-	}
-	document.getElementById(fname).submit();
-
-}
-
 function startsinglepage() {
 	//socketinit();
 	Socket = null;
@@ -20,9 +12,10 @@ function startsinglepage() {
 	dTable = mBy('dTable');
 	dTable.animate([{ opacity: 0, transform: 'translateY(50px)' }, { opacity: 1, transform: 'translateY(0px)' },], { fill: 'both', duration: 800, easing: 'ease' });
 
-	DA.useritems = show_users(dTable);
-	DA.gameitems = show_games(dTable);
+	//DA.useritems = show_users(dTable);
+	//DA.gameitems = show_games(dTable);
 	DA.actionitems = show_actions(dTable);
+	show_card(dTable);
 	show_user(); //show_home_logo();
 }
 function onclick_user(name) {
@@ -205,6 +198,14 @@ function show_users(dParent) {
 	});
 	return rowitems;
 }
+function submit_form(fname){
+	if (typeof document.getElementById(fname).submit === "object") {
+		document.getElementById(fname).submit.remove();
+	}
+	document.getElementById(fname).submit();
+
+}
+
 
 
 
