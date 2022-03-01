@@ -1,4 +1,4 @@
-/* resets */
+/* #region resets */
 html,
 body,
 h1 {
@@ -19,9 +19,9 @@ a:hover {
 a,button,input[type=submit]{
 	cursor: pointer;
 }
+/* #endregion  */
 
-
-/* classes for page parts */
+/* #region classes for page parts */
 .myheader {
 	background: blue;
 	color: white;
@@ -46,8 +46,9 @@ a,button,input[type=submit]{
 	flex:5;
 	padding:10px;
 }
+/* #endregion  */
 
-/* classes for elements */
+/* #region classes for elements */
 .button,
 .input,
 .textarea,
@@ -139,3 +140,34 @@ a,button,input[type=submit]{
 .hidden{
 	flex: 0;
 }
+/* #endregion  */
+
+/* #region classes for cards */
+.card {
+	filter: drop-shadow(4px 5px 2px #111);
+}
+.hoverScale {
+	cursor: pointer;
+}
+.hoverScale:hover {
+	transform-origin: bottom right;
+	transform: scale(1.05);
+}
+.card_selected{
+	transform-origin: bottom right;
+	transform: scale(1.05);
+}
+
+/* #endregion */
+
+
+
+
+
+
+
+
+
+
+
+

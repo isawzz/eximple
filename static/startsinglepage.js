@@ -1,6 +1,7 @@
 onload = startsinglepage;
 
-function startsinglepage() {
+async function startsinglepage() {
+	await ensureAssets();
 	//socketinit();
 	Socket = null;
 
@@ -15,7 +16,9 @@ function startsinglepage() {
 	//DA.useritems = show_users(dTable);
 	//DA.gameitems = show_games(dTable);
 	DA.actionitems = show_actions(dTable);
-	show_card(dTable);
+	
+	show_card(dTable); //OK!
+
 	show_user(); //show_home_logo();
 }
 function onclick_user(name) {
@@ -157,7 +160,6 @@ function show_games(dParent) {
 async function show_home_logo() {
 	//erstmal muss ich home logo machen in obere ecke!
 	//let d = mSym
-	await ensureAssets();
 	//console.log('Syms', Syms);
 	//mSym('airplane',mBy('dTitleLeft'),{padding:3,fz:30,bg:'darkviolet',rounding:'50%'});
 	let bg = colorLight();

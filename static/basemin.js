@@ -1,9 +1,9 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-var ColorDi, DA = {};
+var ColorDi, DA = {}, Card = {};
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
-var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards, Card;
+var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
 const BLUE = '#4363d8';
 const BLUEGREEN = '#004054';
@@ -137,6 +137,7 @@ function mGetStyle(elem, prop) {
 	if (nundef(val)) val = elem.style[prop];
 	if (val.endsWith('px')) return firstNumber(val); else return val;
 }
+function mSize(d, w, h, unit = 'px', sizing) { if (nundef(h)) h = w; mStyle(d, { width: w, height: h }, unit); if (isdef(sizing)) setRect(d, sizing); }
 function mStyle(elem, styles, unit = 'px') {
 
 	if (isdef(styles.vmargin)) { styles.mabottom = styles.matop = styles.vmargin; }
@@ -400,6 +401,11 @@ function mTableCommandifyList(rowitem, val, func) {
 	}
 	return html;
 }
+//#endregion
+
+//#region i prefix
+function iDiv(i) { return isdef(i.live) ? i.live.div : isdef(i.div) ? i.div : i; }
+
 //#endregion
 
 //#region arr dict

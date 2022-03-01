@@ -1,5 +1,5 @@
 function show_card(dParent){
-	console.log('cards',Aristo)
+	console.log('cards',Aristocards)
 }
 
 function set_card_constants(w, h, ranks, suits, deckletters, numjokers = 0, ovdeck = .25, ovw = '20%', ovh = '20%') {
