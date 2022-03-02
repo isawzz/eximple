@@ -10,6 +10,7 @@
 		<script src="{{Basepath}}alibs/jsyaml.js"></script>
 		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
 		<script src="{{Basepath}}js/cards.js"></script>
+		<script src="{{Basepath}}js/bluff.js"></script>
 		{# <script src="{{ url_for('static', filename='cards.js') }}"></script> #}
 		<script src="{{ url_for('static', filename='baustelle.js') }}"></script>
 		<script src="{{ url_for('static', filename='serverflask.js') }}"></script>
@@ -29,7 +30,7 @@
 	<body>
 		<div class="topmenu" style="background: silver; padding-left: 10px">
 			<a href="/singlepage">home</a>
-			<a href="/singlepage/mimi">mimi</a>
+			<a href="javascript:startgame('bluff');">bluff</a>
 			<a href="/singlepage/mimi/paris">paris</a>
 			<a href="/reset" style="color: red">dbinit!</a>
 		</div>

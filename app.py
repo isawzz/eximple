@@ -223,9 +223,11 @@ if __name__ == "__main__":
 	#print('hallo')
 	#app.run()
 	#app.run(debug=True) #host='0.0.0.0', port=5051, debug=True)
+	#socketio.run(app, debug=True)
 	#socketio.run(app, host='0.0.0.0', debug=True)
-	socketio.run(app, debug=True)
+	#socketio.run(app, debug=True)
 	#socketio.run(app, debug=True, log_output=False)
+	socketio.run(app, log_output=False)
 	
 
 

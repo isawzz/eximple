@@ -1,5 +1,19 @@
 onload = startsinglepage;
 
+function startgame(game) {
+	let players = prompt('enter players, separated by commas');
+	players = players.split(',').map(x => x.trim());
+	console.log('players', players);
+	let fen = bluff_setup(players);
+	console.log('fen',fen);
+	//ich brauch die choices
+	for(const pl of players){
+		if (fen.plturn == pl){
+
+		}
+	}
+}
+
 async function startsinglepage() {
 	await ensureAssets();
 	//socketinit();
@@ -16,7 +30,7 @@ async function startsinglepage() {
 	//DA.useritems = show_users(dTable);
 	//DA.gameitems = show_games(dTable);
 	DA.actionitems = show_actions(dTable);
-	
+
 	show_card(dTable); //OK!
 
 	show_user(); //show_home_logo();
@@ -74,14 +88,14 @@ function onclick_action(user, game, action) {
 	} else {
 		console.log('user', user, 'has picked action', action, 'in game', game)
 		if (Socket) Socket.emit('action', { user: user, game: game, action: action });
-		else{
+		else {
 			//nur diesen einen choice setzen
 			let o = { user: user, game: game, action: action };
 			console.log('das wird gepostet:', o)
 			let ostring = JSON.stringify(o);
 			mBy('inpost').value = ostring;
 			submit_form('fRoute');
-	
+
 		}
 	}
 
@@ -111,7 +125,7 @@ function hFunc(content, funcname, arg1, arg2, arg3) {
 	return html;
 }
 function show_actions(dParent) {
-	lst=Actions.map(x=>console.log(`${x.game} ${x.user} choices:${x.choices} choice:${x.choice}`));
+	lst = Actions.map(x => console.log(`${x.game} ${x.user} choices:${x.choices} choice:${x.choice}`));
 	if (nundef(Users) && User.name == 'anonymous') return;
 	if (nundef(Users)) Users = [User];
 	if (nundef(Tables)) Tables = [Table];
@@ -144,7 +158,7 @@ function show_actions(dParent) {
 	return items;
 }
 function show_games(dParent) {
-	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
+		let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
 	if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
 	// mTableCommandify(
 	// 	items, {
@@ -200,7 +214,7 @@ function show_users(dParent) {
 	});
 	return rowitems;
 }
-function submit_form(fname){
+function submit_form(fname) {
 	if (typeof document.getElementById(fname).submit === "object") {
 		document.getElementById(fname).submit.remove();
 	}

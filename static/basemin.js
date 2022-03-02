@@ -566,6 +566,35 @@ function lookupAddIfToList(dict, keys, val) {
 	if (isList(lst) && lst.includes(val)) return;
 	lookupAddToList(dict, keys, val);
 }
+function sameList(l1, l2) {
+	// compares 2 lists of strings if have same strings in it
+	if (l1.length != l2.length) return false;
+	for (const s of l1) {
+		if (!l2.includes(s)) return false;
+	}
+	return true;
+}
+function shuffle(arr) { if (isEmpty(arr)) return []; else return fisherYates(arr); }
+function shuffle_children(d) {
+	let arr = Array.from(d.children);
+	// arr.map(x => x.remove()); //not needed
+	shuffle(arr);
+	for (const ch of arr) { mAppend(d, ch); }
+}
+function shuffleChildren(dParent) { shuffle_children(dParent); }
+function sortBy(arr, key) { arr.sort((a, b) => (a[key] < b[key] ? -1 : 1)); return arr; }
+function sortByDescending(arr, key) { arr.sort((a, b) => (a[key] > b[key] ? -1 : 1)); return arr; }
+function sortByFunc(arr, func) { arr.sort((a, b) => (func(a) < func(b) ? -1 : 1)); return arr; }
+function sortByFuncDescending(arr, func) { arr.sort((a, b) => (func(a) > func(b) ? -1 : 1)); return arr; }
+function sortNumbers(ilist) { ilist.sort(function (a, b) { return a - b }); return ilist; }
+function stripToKeys(o,di){
+	//return new object with only the keys in keys list
+	let res={};
+	for(const k in o){
+		if (isdef(di[k])) res[k]=o[k];
+	}
+	return res;
+}
 //#endregion
 
 //#region color

@@ -1,3 +1,8 @@
+game hat: name gamename players fen step
+user hat: name 
+action hat: game user choices choice
+
+
 ok also dann ein anderes spiel?
 welches?
 etwas mit c52 cards
