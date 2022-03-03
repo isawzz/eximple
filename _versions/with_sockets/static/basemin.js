@@ -2,7 +2,7 @@
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
 var ColorDi, DA = {}, Card = {};
-var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket=null, dTable, dTitle;
+var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
 const BLUE = '#4363d8';
