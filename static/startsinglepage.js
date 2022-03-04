@@ -14,17 +14,19 @@ async function startsinglepage() {
 
 	show_user(); //show_home_logo();
 
+	console.log('Table',Table, 'Serverdata.game',Serverdata.game)
+	if (isdef(Table)) {
+		let game = Table.gamename;
+		let players = Table.players;
+		console.log('game',game,'players',players);
+	}
+
 	//show_card(dTable); //OK!
 	//if (Serverdata.games.length<4) startgame('dixit');
 
 }
 
 function present_table() {
-
-	//console.assert(isdef(Table) && isdef(User), 'table or user missing! cannot present table!');
-
-	//just present a bunch of dixit cards
-	//img0.jpg ... img435.jpg
 	dTable = mBy('dTable')
 	mCenterFlex(dTable, true, true);
 	let sample = rChoose(range(0, 435), 10);
@@ -35,8 +37,6 @@ function present_table() {
 		let html = `<img src='${filename}' height='250' style='clip-path:inset(0px 0px ${clip}px 0px)'></img>`;
 		let d = mDiv(dTable, { margin: 10, h:200, overflow:'hidden' }, null, html, 'magnify_on_hover');
 	}
-
-
 }
 
 //#region helpers
@@ -63,25 +63,14 @@ function hFunc(content, funcname, arg1, arg2, arg3) {
 	return html;
 }
 function show_actions(dParent) {
-	//lst = Actions.map(x => console.log(`${x.game} ${x.user} choices:${x.choices} choice:${x.choice}`));
 	if (nundef(Users) && User.name == 'anonymous') return;
 	if (nundef(Users)) Users = [User];
 	if (nundef(Tables)) Tables = [Table];
-
-	//console.log('Users', Users, 'Tables', Tables);
-	// console.assert(isdef(Tables) || isdef(Table) , 'no user records!!!!!!!!!!!!!!!!');
 	let usersById = list2dict(Users);
-	//console.log('usersByid', usersById);
 	let gamesById = list2dict(Tables);
-	//console.log('gamesByid', gamesById);
-
 	for (const rec of Actions) {
 		rec.user = usersById[rec.user_id].name;
 		rec.game = gamesById[rec.game_id].name;
-		// console.log('liste?',rec.choices,typeof rec.choices)
-		// let choices = toWords(rec.choices);
-		// removeInPlace(choices,rec.choice);
-		// rec.choice = 
 	}
 	let items = mDataTable(Actions, dParent, null, ['game', 'user', 'choices', 'choice']);
 	mTableCommandify(items, {
@@ -92,17 +81,11 @@ function show_actions(dParent) {
 			return isEmpty(item.choice) ? mTableCommandifyList(item, val, (x, p) => hFunc(p, 'onclick_action', x.o.user, x.o.game, p)) : val; //`<a href="/singlepage/${x.o.user}/${x.o.game}/${p}">${p}</a>`) : val;
 		}
 	});
-
 	return items;
 }
 function show_games(dParent) {
-		let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
+	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
 	if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
-	// mTableCommandify(
-	// 	items, {
-	// 	//0: (item, val) => `<a href="/singlepage/${User.name}/${item.o.name}">${val}</a>`,
-	// 	2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
-	// });
 	mTableCommandify(items, {
 		0: (item, val) => hFunc(val, 'onclick_game', val), //`<a href="/singlepage/${val}">${val}</a>`, 
 		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, 'onclick_user', valpart)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)

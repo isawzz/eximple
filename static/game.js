@@ -9,7 +9,8 @@ function startgame(game) {
 	let gamerec = f(players);
 
 	//POST game to /startgame
-	let ostring = JSON.stringify(gamerec);
+	let o = {data:gamerec,type:'startgame'};
+	let ostring = JSON.stringify(o);
 	mBy('inpost').value = ostring;
 	submit_form('fRoute');
 

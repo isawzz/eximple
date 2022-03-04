@@ -30,6 +30,11 @@ def db_reset():
 	add_game('neuilly','catan',['mimi','gul','amanda','felix'])
 	add_game('avignon','chess',['gul','amanda'])
 
+from faker import Faker
+import random
+fake = Faker()
+
+
 
 #endregion
 
@@ -111,9 +116,6 @@ class Proposal(db.Model):
 	author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 #endregion
-
-
-
 
 #region API
 def add_user(name,color):
@@ -206,10 +208,6 @@ def _get_user_games(user_id=1):
 
 #region big database generation
 
-from faker import Faker
-import random
-fake = Faker()
-
 def get_unique_usernames(n=100):
 	usernames = set()
 	while len(usernames) < n: usernames.add(fake.first_name().lower())
@@ -225,6 +223,7 @@ def get_unique_gamenames(n=100):
 	gamenames = list(gamenames)
 	return gamenames
 
+gamenames = get_unique_gamenames()
 N = 3
 def add_users():
 	usernames = get_unique_usernames()
@@ -240,6 +239,32 @@ def random_players(users,min,max): #ok
 	for i in indices:
 		res.append(users[i].name)
 	return res
+
+def get_unique_gamename():
+	games = Game.query.all() #[x.toDict() for x in Game.query.all()]
+	names = [x.name for x in games]
+	print('_____names',names)
+	#print('___gamenames')
+	while True:
+		name=fake.city().lower()
+		print('name',name)
+		if not name in names: return name
+
+def get_fantasyname():
+	return fake.name
+
+def startgame(gamename,players,fen):
+	users = []
+	for uname in players:
+		u=User.query.filter_by(name = uname).first()
+		users.append(u)
+	key=get_unique_gamename()
+	print('...key',key)
+	print('...gamename',gamename)
+	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=fen)
+	db.session.add(g)
+	db.session.commit()
+	return g.toDict()
 
 def add_games():
 	users = User.query.all()

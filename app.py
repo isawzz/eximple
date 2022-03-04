@@ -23,9 +23,16 @@ def r_singlepost():
 	print('*** POST /singlepage ***')
 	x = request.form['text']
 	jx = json.loads(x)
-	print(':::',jx['gamename'],jx['players'],jx['fen']['players'])
+	print(':::received',jx['type'],jx['data']['players'])
+	reqtype = jx['type']
+	data = jx['data']
+	if reqtype == 'startgame':
+		#add game from data
+		g=startgame(data['gamename'],data['players'],json.dumps(data['fen']))
+
+	#print(':::',jx['gamename'],jx['players'],jx['fen']['players'])
 	
-	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"users":get_users(),"games":get_games()})
+	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"game":g, "users":get_users(),"games":get_games()})
 
 @app.route('/')
 def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')

@@ -29,7 +29,7 @@
 			let s = Serverdata = {{Serverdata|tojson}};
 			[ActionResult,Users,Tables,Actions]=[s.action_result,s.users,s.games,s.actions];
 			User = firstCond(Users,x=>x.name == s.user);
-			Table = firstCond(Tables,x=>x.name == s.game);
+			Table = valf(firstCond(Tables,x=>x.name == s.game),Serverdata.game);
 			Action = s.action;
 			console.log('Serverdata', Serverdata);
 		</script>
