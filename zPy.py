@@ -1,4 +1,18 @@
 
+@app.route('/singlepage')
+def r_singlepage_get():
+	print('*** GET /singlepage ***')
+	Serverdata = {"users":get_users(),"games":get_games()}
+	if 'game' in request.args:
+		Serverdata['game'] = get_game(request.args['game'])
+
+	data = request.args['game'] if 'game' in request.args else None
+	Serverdata = {"users":get_users(),"games":get_games(),"game":data}
+	#data = request.args['Serverdata'] if 'Serverdata' in request.args else {"users":get_users(),"games":get_games()}
+	#Serverdata = {"users":get_users(),"games":get_games()} if data == None else data
+	#return render_template('singlepage.html', Basepath=Basepath, Serverdata={"users":get_users(),"games":get_games()})
+	return render_template('singlepage.html', Basepath=Basepath, Serverdata=Serverdata)
+
 #gevent_server = eventlet.pywsgi.WSGIServer(("0.0.0.0", 8080), app,log = None)
 
 #region logging

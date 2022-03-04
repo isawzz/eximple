@@ -190,6 +190,7 @@ def get_gamenames_for(name):
 	u = User.query.filter_by(name=name).first()
 	games =  _get_user_games(u.id)
 	return [x.name for x in games]
+def get_game(name): return _get_game(name).toDict()
 
 #region internal: only uses for queries
 def _get_user(name):	return User.query.filter_by(name=name).first()

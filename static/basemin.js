@@ -84,6 +84,30 @@ function mDiv(dParent, styles, id, inner, classes, sizing) {
 
 	return d;
 }
+function mDover(dParent, styles = {}, sizing = true) {
+	// let d = mDiv(dParent, styles); 
+	// mIfNotRelative(dParent); 
+	// mStyle(d, { position: 'absolute', w: '100%', h: '100%' }); 
+	// setRect(d, sizing); 
+
+	let d = mDiv(dParent, styles);
+	mIfNotRelative(dParent);
+	//let s = dMain.style.position.toString(); console.log('isdef', isdef(dMain.style.position), s, s == '')
+	mStyle(d, { position: 'absolute', left: 0, top: 0, w: '100%', h: '100%' });
+	setRect(d, sizing);
+
+
+	return d;
+}
+function mFlexWrap(d) { mFlex(d, 'w'); }
+function mFlex(d, or = 'h') {
+	d.style.display = 'flex';
+	d.style.flexFlow = (or == 'v' ? 'column' : 'row') + ' ' + (or == 'w' ? 'wrap' : 'nowrap');
+	// d.style.alignItems = 'stretch';
+	// d.style.alignContent = 'stretch';
+	// d.style.justiifyItems = 'stretch';
+	// d.style.justifyContent = 'stretch';
+}
 function mLinebreak(dParent, gap) {
 	if (isString(dParent)) dParent = mBy(dParent);
 	let d = mDiv(dParent);
@@ -137,6 +161,7 @@ function mGetStyle(elem, prop) {
 	if (nundef(val)) val = elem.style[prop];
 	if (val.endsWith('px')) return firstNumber(val); else return val;
 }
+function mIfNotRelative(d) { if (isEmpty(d.style.position)) d.style.position = 'relative'; }
 function mSize(d, w, h, unit = 'px', sizing) { if (nundef(h)) h = w; mStyle(d, { width: w, height: h }, unit); if (isdef(sizing)) setRect(d, sizing); }
 function mStyle(elem, styles, unit = 'px') {
 
@@ -1764,6 +1789,11 @@ function getRect(elem, relto) {
 	addKeys({ l: r.x, t: r.y, r: r.x + r.w, b: r.t + r.h }, r);
 	return r;
 }
+var UIDCounter = 0;
+function getUID(pref = '') {
+	UIDCounter += 1;
+	return pref + '_' + UIDCounter;
+}
 function jsCopy(o) { return JSON.parse(JSON.stringify(o)); }
 function jsCopySafe(o) { return JSON.parse(JSON.stringify(jsClean(o))); }
 function jsClean(o) {
@@ -1818,6 +1848,21 @@ function range(f, t, st = 1) {
 		arr.push(i);
 	}
 	return arr;
+}
+function setRect(elem, options) {
+	let r = getRect(elem);
+	elem.rect = r;
+	elem.setAttribute('rect', `${r.w} ${r.h} ${r.t} ${r.l} ${r.b} ${r.r}`); //damit ich es sehen kann!!!
+
+	if (isDict(options)) {
+		if (options.hgrow) mStyle(elem, { hmin: r.h });
+		else if (options.hfix) mStyle(elem, { h: r.h });
+		else if (options.hshrink) mStyle(elem, { hmax: r.h });
+		if (options.wgrow) mStyle(elem, { wmin: r.w });
+		else if (options.wfix) mStyle(elem, { w: r.w });
+		else if (options.wshrink) mStyle(elem, { wmax: r.w });
+	}
+	return r;
 }
 function valf(val, def) { return isdef(val) ? val : def; }
 

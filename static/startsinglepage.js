@@ -16,9 +16,7 @@ async function startsinglepage() {
 
 	console.log('Table',Table, 'Serverdata.game',Serverdata.game)
 	if (isdef(Table)) {
-		let game = Table.gamename;
-		let players = Table.players;
-		console.log('game',game,'players',players);
+		presentgame(Table);
 	}
 
 	//show_card(dTable); //OK!

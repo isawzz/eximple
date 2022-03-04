@@ -1,5 +1,5 @@
 #region init
-from flask import jsonify, Flask, request, send_from_directory, render_template, redirect
+from flask import jsonify, Flask, request, send_from_directory, render_template, redirect, url_for
 app = Flask(__name__)
 BUILD = 'home' # public | heroku   False #set True for production (need to re-create db on heroku!)
 Basepath = "https://www.telecave.net/aroot/base/" if BUILD == 'heroku' else "http://127.10.0.1:8080/aroot/base/" if BUILD == 'public' else "http://localhost:8080/aroot/base/"
@@ -16,7 +16,10 @@ import logging
 @app.route('/singlepage')
 def r_singlepage_get():
 	print('*** GET /singlepage ***')
-	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"users":get_users(),"games":get_games()})
+	Serverdata = {"users":get_users(),"games":get_games()}
+	if 'game' in request.args:
+		Serverdata['game'] = get_game(request.args['game'])
+	return render_template('singlepage.html', Basepath=Basepath, Serverdata=Serverdata)
 
 @app.route('/singlepost', methods=['POST'])
 def r_singlepost():
@@ -29,13 +32,11 @@ def r_singlepost():
 	if reqtype == 'startgame':
 		#add game from data
 		g=startgame(data['gamename'],data['players'],json.dumps(data['fen']))
-
-	#print(':::',jx['gamename'],jx['players'],jx['fen']['players'])
-	
-	return render_template('singlepage.html', Basepath=Basepath, Serverdata={"game":g, "users":get_users(),"games":get_games()})
+		return redirect(url_for('.r_singlepage_get',game=g['name']))
+	return redirect(url_for('.r_singlepage_get'))
 
 @app.route('/')
-def base_route():	return redirect ('/singlepage'); # ('/game/paris/felix')
+def base_route():	return redirect ('/singlepage'); 
 
 @app.route('/index')
 def r_index():
