@@ -116,6 +116,14 @@ function mLinebreak(dParent, gap) {
 	if (isdef(gap)) { d.style.minHeight = gap + 'px'; d.innerHTML = ' &nbsp; '; d.style.opacity = .2; }//return mLinebreak(dParent);}
 	return d;
 }
+function mMagnifyOnHoverControl(elem){
+	elem.onmouseenter = ev=>{if (ev.ctrlKey) mClass(elem,'magnify_on_hover');}
+	elem.onmouseleave = ev=>mClassRemove(elem,'magnify_on_hover');
+}
+function mMagnifyOnHoverControlRemove(elem){
+	elem.onmouseenter = elem.onmouseleave = null;
+	mClassRemove(elem,'magnify_on_hover');
+}
 function mPlace(elem, pos, offx, offy) {
 	// pos is: tl, tb, bl, br or cl, cr, tc, bc, cc
 
@@ -129,7 +137,7 @@ function mPlace(elem, pos, offx, offy) {
 		let [wParent, hParent] = [rParent.w, rParent.h];
 		let rElem = getRect(elem);
 		let [wElem, hElem] = [rElem.w, rElem.h];
-		console.log('_____________\nelem', rElem, '\nparent', rParent)
+		//console.log('_____________\nelem', rElem, '\nparent', rParent)
 		switch (pos) {
 			case 'cc': mStyle(elem, { position: 'absolute', left: hor + (wParent - wElem) / 2, top: vert + (hParent - hElem) / 2 }); break;
 			case 'tc': mStyle(elem, { position: 'absolute', left: hor + (wParent - wElem) / 2, top: vert }); break;

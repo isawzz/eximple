@@ -1,14 +1,27 @@
 //#region feb 23
+function dixit_present(fen,d_table){
+	//let i=0;let items = fen.deck.map(x=>{i++;return dixit_get_card(x,i)}); //convert all dixit cards into items
+	//console.log('items',items);
+	G={};
+	G.deck = ui_generic_deck(d_table,fen.deck);
+	// for(const item of items){ //.slice(0,10)){
+	// 	let d=iDiv(item);
+	// 	mAppend(d_table,d);
+	// 	setRect(d);
+	// 	//mStyle(d,{position:'absolute',left:item.index/2,top:item.index/2});
+	// 	//face_down(item);
+	// }
+	//let deck = ui_deck(items, d_table);
+}
+function turnfacedown(c){
+	let d=iDiv(c);
+	mDiv100(d,{bg:'orange'});
+}
 function onclick_action(user, game, action) {
 	//socketsend
 	console.log('user',user,'has picked action',action,'in game',game)
 	Socket.emit('action',{user:user,game:game,action:action});
 }
-
-
-
-
-
 function socketinit_() {
 	console.log('init socket client');
 	console.log('==>SOCKETSERVER:',SOCKETSERVER)

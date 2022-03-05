@@ -14,7 +14,7 @@ async function startsinglepage() {
 
 	show_user(); //show_home_logo();
 
-	console.log('Table',Table, 'Serverdata.game',Serverdata.game)
+	//console.log('Table',Table, 'Serverdata.game',Serverdata.game)
 	if (isdef(Table)) {
 		presentgame(Table);
 	}
@@ -28,7 +28,7 @@ function present_table() {
 	dTable = mBy('dTable')
 	mCenterFlex(dTable, true, true);
 	let sample = rChoose(range(0, 435), 10);
-	console.log('sample', sample);
+	//console.log('sample', sample);
 	for (const i of sample) {
 		let filename = `${Basepath}assets/games/dixit/img${i}.jpg`;
 		let clip = 50;
