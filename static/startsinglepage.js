@@ -57,13 +57,15 @@ function hRoute(content, route, arg1, arg2, arg3) {
 	return html;
 }
 function hFunc(content, funcname, arg1, arg2, arg3) {
+	console.log('arg2',arg2,typeof arg2)
 	let html = `<a href="javascript:${funcname}('${arg1}','${arg2}','${arg3}');">${content}</a>`;
 	return html;
 }
 function show_actions(dParent) {
-	if (nundef(Users) && User.name == 'anonymous') return;
-	if (nundef(Users)) Users = [User];
-	if (nundef(Tables)) Tables = [Table];
+	//if (nundef(Users) && User.name == 'anonymous') return;
+	console.assert(isdef(Users) && isdef(Tables),'Users or Tables MISSING!!!')
+	//if (nundef(Users)) Users = [User];
+	//if (nundef(Tables)) Tables = [Table];
 	let usersById = list2dict(Users);
 	let gamesById = list2dict(Tables);
 	for (const rec of Actions) {
@@ -83,10 +85,10 @@ function show_actions(dParent) {
 }
 function show_games(dParent) {
 	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
-	if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
+	//if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
 	mTableCommandify(items, {
 		0: (item, val) => hFunc(val, 'onclick_game', val), //`<a href="/singlepage/${val}">${val}</a>`, 
-		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, 'onclick_user', valpart)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
+		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, 'onclick_user', valpart, rowitem.o.name)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
 	});
 	return items;
 }

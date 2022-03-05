@@ -190,7 +190,9 @@ def get_gamenames_for(name):
 	u = User.query.filter_by(name=name).first()
 	games =  _get_user_games(u.id)
 	return [x.name for x in games]
-def get_game(name): return _get_game(name).toDict()
+def get_game(name): 
+	print('name',name)
+	return _get_game(name).toDict()
 
 #region internal: only uses for queries
 def _get_user(name):	return User.query.filter_by(name=name).first()
@@ -264,6 +266,13 @@ def startgame(gamename,players,fen):
 	print('...gamename',gamename)
 	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=fen)
 	db.session.add(g)
+	db.session.commit()
+	return g.toDict()
+
+def updategame(game,step,fen):
+	g=_get_game(game)
+	g.fen = fen
+	g.step = step
 	db.session.commit()
 	return g.toDict()
 

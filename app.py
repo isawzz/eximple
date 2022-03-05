@@ -18,7 +18,9 @@ def r_singlepage_get():
 	print('*** GET /singlepage ***')
 	Serverdata = {"users":get_users(),"games":get_games()}
 	if 'game' in request.args:
-		Serverdata['game'] = get_game(request.args['game'])
+		Serverdata['game'] = request.args['game'] #get_game(request.args['game'])
+	if 'user' in request.args:
+		Serverdata['user'] = request.args['user'] #get_user(request.args['user'])
 	return render_template('singlepage.html', Basepath=Basepath, Serverdata=Serverdata)
 
 @app.route('/singlepost', methods=['POST'])
@@ -26,13 +28,20 @@ def r_singlepost():
 	print('*** POST /singlepage ***')
 	x = request.form['text']
 	jx = json.loads(x)
-	print(':::received',jx['type'],jx['data']['players'])
+	print(':::received',jx['type']) #,jx['data']['players'])
+	print(':::data',jx['data']) #,jx['data']['players'])
 	reqtype = jx['type']
 	data = jx['data']
 	if reqtype == 'startgame':
 		#add game from data
 		g=startgame(data['gamename'],data['players'],json.dumps(data['fen']))
 		return redirect(url_for('.r_singlepage_get',game=g['name']))
+	elif reqtype == 'initgame':
+		g=updategame(data['name'],data['step'],json.dumps(data['fen']))
+		return redirect(url_for('.r_singlepage_get',game=g['name'],user=data['user']))
+	elif reqtype == 'selectgame':
+		#print(data['game'])
+		return redirect(url_for('.r_singlepage_get',game=data['game'],user=data['user']))
 	return redirect(url_for('.r_singlepage_get'))
 
 @app.route('/')

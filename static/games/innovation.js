@@ -1,4 +1,4 @@
-function dixit_setup(players){
+function innovation_setup(players){
 	
 	let fen = {};
 
@@ -20,7 +20,7 @@ function dixit_setup(players){
 	//console.log('fen',fen);
 	return fen;
 }
-function dixit_present(fen,d_table){
+function innovation_present(fen,d_table){
 	G={};
 	G.deck = ui_generic_deck(d_table,fen.deck);
 
@@ -36,10 +36,10 @@ function dixit_present(fen,d_table){
 
 		let d = mDiv(d_table,{bg:user.color},null,uname); mFlexWrap(d)
 		pl.div = d;
-		let i=0;let items = pl.hand = fpl.hand.map(x=>{i++;return dixit_get_card(x,i)}); //convert all dixit cards into items		let hand = pl.hand.map(x=>)
+		let i=0;let items = pl.hand = fpl.hand.map(x=>{i++;return innovation_get_card(x,i)}); //convert all innovation cards into items		let hand = pl.hand.map(x=>)
 		for(const item of items) mAppend(d,iDiv(item));
 	}
-	//let i=0;let items = fen.deck.map(x=>{i++;return dixit_get_card(x,i)}); //convert all dixit cards into items
+	//let i=0;let items = fen.deck.map(x=>{i++;return innovation_get_card(x,i)}); //convert all innovation cards into items
 	//console.log('items',items);
 	// for(const item of items){ //.slice(0,10)){
 	// 	let d=iDiv(item);
@@ -50,8 +50,8 @@ function dixit_present(fen,d_table){
 	// }
 	//let deck = ui_deck(items, d_table);
 }
-function dixit_get_card(ckey,index, h=200) {
-	let filename = `${Basepath}assets/games/dixit/img${ckey}.jpg`;
+function innovation_get_card(ckey,index, h=200) {
+	let filename = `${Basepath}assets/games/innovation/img${ckey}.jpg`;
 	let clip = 50;
 	let html = `<img src='${filename}' height='${h+clip}' style='clip-path:inset(0px 0px ${clip}px 0px)'></img>`;
 	let d = mDiv(null, { rounding:8,bg:'blue',margin: 10, h:h,w:h*141/200, overflow:'hidden' }, null, html, 'card');
@@ -60,26 +60,4 @@ function dixit_get_card(ckey,index, h=200) {
 	d.onclick = ()=>{face_up(item);}; 
 	return item; 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

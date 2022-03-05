@@ -1,10 +1,10 @@
 
 
-function onclick_user(name) {
-	User = firstCond(Users, x => x.name == name);
-	show_user();
-	//should I filter tables for this user only? at least actions table?
-	//should I sort tables by this user name?
+function onclick_user(name, game) {
+	console.log('game',game)
+	selectgame(game,name);
+	//User = firstCond(Users, x => x.name == name);
+	//show_user();
 }
 function onclick_game(name) {
 	Table = firstCond(Tables, x => x.name == name);

@@ -29,6 +29,29 @@ function ui_make_deck(n, dParent, styles = { bg: 'random', padding: 10 }) {
 
 	return d;
 }
+function ui_generic_deck(dParent,deck){
+	//show one card backside and name of deck
+	//wie soll ein generic deck ausschauen?
+	//einfach eine backflipped card
+	//when clicking on that card it represents the topmost card really
+	//auf der card ist die anzahl der cards in the deck
+	let c = dixit_get_card(0);
+	// let svgCode = C52.card_2B; //C52 is cached asset loaded in _start
+	// item.div.innerHTML = svgCode;
+	let d = iDiv(c);
+	d.innerHTML = C52.card_2B;
+	mAppend(dParent,d);
+	let d1=mDiv(d,{w:'100%',align:'center',weight:'bold',fz:24},null,`deck ${deck.length}`);
+	mPlace(d1,'cc');
+
+	return{
+		keys: deck,
+		div: d,
+		faceUp: false,
+
+	}
+
+}
 
 
 
