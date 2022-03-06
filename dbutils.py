@@ -34,11 +34,7 @@ from faker import Faker
 import random
 fake = Faker()
 
-
-
-#endregion
-
-#region models
+#db models
 
 #many to many: association game
 plays_at_game = db.Table('plays_at_game', 
@@ -115,9 +111,7 @@ class Proposal(db.Model):
 	modified = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-#endregion
-
-#region API
+#old API
 def add_user(name,color):
 	u=User(name=name,color=color)
 	db.session.add(u)
@@ -149,10 +143,6 @@ def get_actions_for(game,user):
 def get_user(name):	return User.query.filter_by(name=name).first().toDict()
 def get_game(name):	return Game.query.filter_by(name=name).first().toDict()
 
-#??def get_last_action(game,user): return Action.query.filter_by(game=game,user=user).last().toDict()
-
-
-
 def delete_user(name):
 	db.session.delete(_get_user(name))
 	db.commit()
@@ -171,8 +161,6 @@ def update_game(name,o):
 	for k in o:
 		rec[k]=o[k]
 	db.session.commit()
-
-#endregion
 
 def get_players(game):
 	g = Game.query.filter_by(name=game).first()
@@ -213,8 +201,6 @@ def updategame(game,step,fen):
 	db.session.commit()
 	return g.toDict()
 
-
-#region internal: only uses for queries
 def _get_user(name):	return User.query.filter_by(name=name).first()
 def _get_game(name):	return Game.query.filter_by(name=name).first()
 def _get_action(game,user): return Action.query.filter_by(game=game,user=user).last()
@@ -225,11 +211,7 @@ def _get_user_games(user_id=1):
 	games = db.session.query(Game).join(plays_at_game).filter_by(user_id=user_id).all()
 	return games
 
-
-
-#endregion
-
-#region big database generation
+#big database generation
 
 def get_unique_usernames(n=100):
 	usernames = set()
@@ -321,23 +303,30 @@ def create_random_data():
 	add_actions()
 
 
-#fake.first_name(), last_name, color_name, street_address, city, postcode, email
-#fake.date_time_this_year,date_time_betweeen
-
-# random.choice(list) >returns 1 random choice
-
-# random.choices(list,percentages) >example:
-# Return a list with 14 items.
-# The list should contain a randomly selection of the values from a specified list, and there should be 10 times higher possibility to select "apple" than the other two:
-# import random
-# mylist = ["apple", "banana", "cherry"]
-# print(random.choices(mylist, weights = [10, 1, 1], k = 14))
-
-#return n different numbers in a range:
-#print random.sample(range(numLow, numHigh), 3)
-#or
-# data = [0,1,2,3,4]
-# random.shuffle(data)
-# return data[:n]
-
 #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

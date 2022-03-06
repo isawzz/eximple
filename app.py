@@ -9,12 +9,56 @@ from dbutils import *
 db_init(app)
 
 from flask_cors import CORS
+CORS(app)
 import json
 import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 #endregion
 
 turn={}
 
+@app.route('/simple', methods=['GET','POST'])
+def r_simple():
+	if request.method == 'GET':
+		Serverdata = {"users":get_users(),"games":get_games()}
+		return render_template('simple.html', Basepath=Basepath, Serverdata=Serverdata)
+	else:
+		x = request.form['text']
+		print('*** POST /singlepage ***',x)
+		return x
+		# x = request.form['text']
+		# jx = json.loads(x)
+		# print(':::received',jx['type']) #,jx['data']['players'])
+		# print(':::data',jx['data']) #,jx['data']['players'])
+		# reqtype = jx['type']
+		# data = jx['data']
+		# if reqtype == 'startgame':
+		# 	#add game from data
+		# 	g=startgame(data['gamename'],data['players'],json.dumps(data['fen']))
+		# 	return redirect(url_for('.r_singlepage_get',game=g['name']))
+		# elif reqtype == 'initgame':
+		# 	g=updategame(data['name'],data['step'],json.dumps(data['fen']))
+		# 	return redirect(url_for('.r_singlepage_get',game=g['name'],user=data['user']))
+		# elif reqtype == 'selectgame':
+		# 	#print(data['game'])
+		# 	return redirect(url_for('.r_singlepage_get',game=data['game'],user=data['user']))
+		# elif reqtype == 'updategame':
+		# 	if 'game' in data and 'turn' in data:
+		# 		turn[data['game']] = data['turn']
+		# 		print('==>turn',data['game'],turn[data['game']])
+		# 	if 'game' in data and 'fen' in data:
+		# 		g=updategame(data['game'],data['step'],json.dumps(data['fen']))
+		# 	if 'game' in data and 'user' in data and data['game'] in turn:
+		# 		print('==>turn',data['game'],turn[data['game']])
+		# 		if data['user'] in turn[data['game']]:
+		# 			return redirect(url_for('.r_singlepage_get',game=g['name'],user=data['user']))
+		# 		else: 
+		# 			return {"msg":"not your turn","data":data}
+		# return redirect(url_for('.r_singlepage_get'))
+
+
+#region other routes
 @app.route('/singlepage')
 def r_singlepage_get():
 	print('*** GET /singlepage ***')
@@ -62,10 +106,12 @@ def r_singlepost():
 			print('==>turn',data['game'],turn[data['game']])
 			if data['user'] in turn[data['game']]:
 				return redirect(url_for('.r_singlepage_get',game=g['name'],user=data['user']))
-	#return redirect(url_for('.r_singlepage_get'))
+			else: 
+				return {"msg":"not your turn","data":data}
+	return redirect(url_for('.r_singlepage_get'))
 
 @app.route('/')
-def base_route():	return redirect ('/singlepage'); 
+def base_route():	return redirect ('/simple'); 
 
 @app.route('/index')
 def r_index():
@@ -75,8 +121,7 @@ def r_index():
 def r_reset(): 
 	create_random_data()
 	return redirect('/')
-
-#region test routes
+#test routes
 @app.route('/get_players/<game>')
 def r_get_players(game): return jsonify(get_players(game))
 @app.route('/get_playernames/<game>')
