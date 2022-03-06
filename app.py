@@ -13,6 +13,8 @@ import json
 import logging
 #endregion
 
+turn={}
+
 @app.route('/singlepage')
 def r_singlepage_get():
 	print('*** GET /singlepage ***')
@@ -22,6 +24,14 @@ def r_singlepage_get():
 	if 'user' in request.args:
 		Serverdata['user'] = request.args['user'] #get_user(request.args['user'])
 	return render_template('singlepage.html', Basepath=Basepath, Serverdata=Serverdata)
+
+@app.route('/update', methods=['POST'])
+def r_update_get(user):
+	print('*** update ***')
+	x = request.form['text']
+	jx = json.loads(x)
+	print(':::received',jx['user']) #,jx['data']['players'])
+	print(':::data',jx['game']) #,jx['data']['players'])
 
 @app.route('/singlepost', methods=['POST'])
 def r_singlepost():
@@ -42,7 +52,17 @@ def r_singlepost():
 	elif reqtype == 'selectgame':
 		#print(data['game'])
 		return redirect(url_for('.r_singlepage_get',game=data['game'],user=data['user']))
-	return redirect(url_for('.r_singlepage_get'))
+	elif reqtype == 'updategame':
+		if 'game' in data and 'turn' in data:
+			turn[data['game']] = data['turn']
+			print('==>turn',data['game'],turn[data['game']])
+		if 'game' in data and 'fen' in data:
+			g=updategame(data['game'],data['step'],json.dumps(data['fen']))
+		if 'game' in data and 'user' in data and data['game'] in turn:
+			print('==>turn',data['game'],turn[data['game']])
+			if data['user'] in turn[data['game']]:
+				return redirect(url_for('.r_singlepage_get',game=g['name'],user=data['user']))
+	#return redirect(url_for('.r_singlepage_get'))
 
 @app.route('/')
 def base_route():	return redirect ('/singlepage'); 

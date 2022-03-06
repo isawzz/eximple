@@ -1,7 +1,7 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-var ColorDi, DA = {}, Card = {};
+var ColorDi, DA = {}, Card = {}, TO = {};
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket=null, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
@@ -108,6 +108,7 @@ function mFlex(d, or = 'h') {
 	// d.style.justiifyItems = 'stretch';
 	// d.style.justifyContent = 'stretch';
 }
+function mIfNotRelative(d) { if (isEmpty(d.style.position)) d.style.position = 'relative'; }
 function mLinebreak(dParent, gap) {
 	if (isString(dParent)) dParent = mBy(dParent);
 	let d = mDiv(dParent);
@@ -169,7 +170,6 @@ function mGetStyle(elem, prop) {
 	if (nundef(val)) val = elem.style[prop];
 	if (val.endsWith('px')) return firstNumber(val); else return val;
 }
-function mIfNotRelative(d) { if (isEmpty(d.style.position)) d.style.position = 'relative'; }
 function mSize(d, w, h, unit = 'px', sizing) { if (nundef(h)) h = w; mStyle(d, { width: w, height: h }, unit); if (isdef(sizing)) setRect(d, sizing); }
 function mStyle(elem, styles, unit = 'px') {
 

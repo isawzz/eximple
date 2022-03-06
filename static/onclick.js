@@ -1,7 +1,7 @@
 
 
 function onclick_user(name, game) {
-	console.log('game',game)
+	//console.log('game',game)
 	selectgame(game,name);
 	//User = firstCond(Users, x => x.name == name);
 	//show_user();

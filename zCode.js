@@ -1,3 +1,82 @@
+function present_table() {
+	dTable = mBy('dTable')
+	mCenterFlex(dTable, true, true);
+	let sample = rChoose(range(0, 435), 10);
+	//console.log('sample', sample);
+	for (const i of sample) {
+		let filename = `${Basepath}assets/games/dixit/img${i}.jpg`;
+		let clip = 50;
+		let html = `<img src='${filename}' height='250' style='clip-path:inset(0px 0px ${clip}px 0px)'></img>`;
+		let d = mDiv(dTable, { margin: 10, h:200, overflow:'hidden' }, null, html, 'magnify_on_hover');
+	}
+}
+function dixit_present(fen, d_table, plname) {
+	G = {};
+	//G.deck = ui_generic_deck(d_table, fen.deck);
+
+	if (isdef(fen.story)) {
+		G.story = ui_message(d_table, fen.story);
+	}
+	if (isdef(fen.instruction) && isdef(plname) && fen.plturn == plname) {
+
+		
+
+		let elem = mCreateFrom(`
+		<div id="dTempForm">
+			<h2>${fen.instruction}</h2>
+			<form id="fTemp" action="javascript:void(0);" method="POST">
+				<input id="inptemp" type="text" name="text"  />
+				<input type="submit" />
+			</form>
+		</div>
+		`);
+		mAppend(d_table,elem);
+		console.log('elem',elem)
+		//elem.children[2].onsubmit = ()=>console.log('haaaaaaaaaaaaaaaaaaaaallllllllllo');
+
+		// G.instruction = ui_message(d_table, fen.instruction);
+		// G.input = ui_input(d_table)
+	}
+	if (isdef(fen.tablecards)) {
+		let d = mDiv(d_table, { fg: 'white', bg: user.color, w: '100%' }, null, 'table'); mFlexWrap(d);
+		pl.div = d;
+		mLinebreak(d)
+		let i = 0; let items = G.tablecards = fen.tablecards.map(x => { i++; return dixit_get_card(x, i) }); //convert all dixit cards into items		let hand = pl.hand.map(x=>)
+		for (const item of items) mAppend(d, iDiv(item));
+	}
+
+	let pls = G.players = {};
+	for (const uname in fen.players) {
+		let pl = pls[uname] = {};
+		let fpl = fen.players[uname];
+
+		let user = firstCond(Users, x => x.name == uname);
+		//copyKeys(fpl,pl);
+		copyKeys(user, pl)
+		console.log('pl', uname, pl);
+
+		if (isdef(plname) && uname != plname) continue;
+
+		let d = mDiv(d_table, { fg: 'white', bg: user.color, w: '100%' }, null, uname); mFlexWrap(d);
+		pl.div = d;
+		mLinebreak(d)
+
+		let i = 0; let items = pl.hand = fpl.hand.map(x => { i++; return dixit_get_card(x, i) }); //convert all dixit cards into items		let hand = pl.hand.map(x=>)
+		for (const item of items) mAppend(d, iDiv(item));
+
+	}
+	//let i=0;let items = fen.deck.map(x=>{i++;return dixit_get_card(x,i)}); //convert all dixit cards into items
+	//console.log('items',items);
+	// for(const item of items){ //.slice(0,10)){
+	// 	let d=iDiv(item);
+	// 	mAppend(d_table,d);
+	// 	setRect(d);
+	// 	//mStyle(d,{position:'absolute',left:item.index/2,top:item.index/2});
+	// 	//face_down(item);
+	// }
+	//let deck = ui_deck(items, d_table);
+}
+
 //#region feb 23
 function dixit_present(fen,d_table){
 	//let i=0;let items = fen.deck.map(x=>{i++;return dixit_get_card(x,i)}); //convert all dixit cards into items

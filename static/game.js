@@ -1,3 +1,5 @@
+
+
 function startgame(game, players) {
 
 	//if (nundef(players)) players = prompt('enter players, separated by commas');	players = players.split(',').map(x => x.trim());
@@ -17,10 +19,13 @@ function startgame(game, players) {
 function selectgame(game, uname) {
 	//if uname is not the host, nothing should happen if there is no fen!
 	let g = firstCond(Tables, x => x.name == game);
+	console.log('select game', game, 'for', uname, 'g', g);
+
+	//return;
 	if (!g.fen) {
 		if (uname == g.players[0]) {
 			let fen = window[`${g.gamename}_setup`](g.players);
-			let gamerec = { name: game, user:uname, fen: fen, step: 0 };
+			let gamerec = { name: game, user: uname, fen: fen, step: 0 };
 			//POST game to /initgame
 			let o = { data: gamerec, type: 'initgame' };
 			let ostring = JSON.stringify(o);
@@ -41,18 +46,23 @@ function selectgame(game, uname) {
 
 
 }
-function presentgame(g, dParent) {
+function presentgame(g, dParent, uname) {
 	console.log('g', g)
-	if (!g.fen) g.fen =
-		fen = JSON.parse(g.fen)
+	console.assert(isdef(g.fen), 'game needs to be initialized!!!')
+	g.fen = JSON.parse(g.fen)
 
-	let d_table = mDiv(dTable, { position: 'relative', bg: '#ffffff40', padding: 10 }); mCenterFlex(d_table);
+	let d_table = mDiv(dParent, { bg: GREEN, fg: 'white', position: 'relative', padding: 10 }); mCenterFlex(d_table);
+	//soll ich hier schon die players mit users enrichen?
+	//fen soll eigentlich keine additional zeug dabei haben!
 
 	let f = window[`${g.gamename}_present`]; //dixit_present
-	f(fen, d_table); // dixit bluff aristo...
+	f(g.fen, d_table, uname); // dixit bluff aristo...
+
 
 }
-
+function activategame(g, uname) {
+	console.log('activate game for', uname)
+}
 
 
 

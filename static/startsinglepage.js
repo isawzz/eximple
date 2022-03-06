@@ -1,4 +1,5 @@
 onload = startsinglepage;
+
 async function startsinglepage() {
 	await ensureAssets();
 
@@ -8,6 +9,7 @@ async function startsinglepage() {
 
 	dTable = mBy('dTable');
 	dTable.animate([{ opacity: 0, transform: 'translateY(50px)' }, { opacity: 1, transform: 'translateY(0px)' },], { fill: 'both', duration: 800, easing: 'ease' });
+	
 
 	//DA.useritems = show_users(dTable);
 	DA.gameitems = show_games(dTable);
@@ -16,7 +18,8 @@ async function startsinglepage() {
 
 	//console.log('Table',Table, 'Serverdata.game',Serverdata.game)
 	if (isdef(Table)) {
-		presentgame(Table);
+		presentgame(Table,dTable,User.name);
+		activategame(Table,User.name);
 	}
 
 	//show_card(dTable); //OK!
@@ -24,16 +27,14 @@ async function startsinglepage() {
 
 }
 
-function present_table() {
-	dTable = mBy('dTable')
-	mCenterFlex(dTable, true, true);
-	let sample = rChoose(range(0, 435), 10);
-	//console.log('sample', sample);
-	for (const i of sample) {
-		let filename = `${Basepath}assets/games/dixit/img${i}.jpg`;
-		let clip = 50;
-		let html = `<img src='${filename}' height='250' style='clip-path:inset(0px 0px ${clip}px 0px)'></img>`;
-		let d = mDiv(dTable, { margin: 10, h:200, overflow:'hidden' }, null, html, 'magnify_on_hover');
+function regular_poll(){
+
+	if (isdef(TO.poll) && isdef(User) && isdef(Table) && Table.fen.plturn != User.name){
+		TO.poll = setTimeout(()=>{
+			let d=mBy('dUpdateInput');
+			d.value = JSON.stringify({user:User.name,game:Table.name});
+			submit_form('dUpdateForm');
+		})
 	}
 }
 
@@ -57,7 +58,7 @@ function hRoute(content, route, arg1, arg2, arg3) {
 	return html;
 }
 function hFunc(content, funcname, arg1, arg2, arg3) {
-	console.log('arg2',arg2,typeof arg2)
+	//console.log('arg2',arg2,typeof arg2)
 	let html = `<a href="javascript:${funcname}('${arg1}','${arg2}','${arg3}');">${content}</a>`;
 	return html;
 }

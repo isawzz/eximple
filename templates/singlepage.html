@@ -23,6 +23,7 @@
 		<script src="{{ url_for('static', filename='onclick.js') }}"></script>
 		<script src="{{ url_for('static', filename='serverflask.js') }}"></script>
 		<script src="{{ url_for('static', filename='startsinglepage.js') }}"></script>
+		<script src="{{ url_for('static', filename='tests.js') }}"></script>
 		<link rel="icon" href="{{Basepath}}assets/images/icons/firetrans.png" />
 		<script>
 			// var randomName = Faker.name.findName(); // Caitlyn Kerluke
@@ -57,6 +58,8 @@
 		</div>
 		{% block content %} {% endblock %}
 
+		<button onclick='testsendupdate()' class='button'>UPDATE</button>
+
 		<div id="dRoute">
 			<h2>route:</h2>
 			<form id="fRoute" action="/singlepost" method="POST">
@@ -71,6 +74,21 @@
 			<form action="javascript:void(0);" onsubmit="socketsend()">
 				<input type="text" id="myMessage" />
 				<input type="submit" id="sendbutton" />
+			</form>
+		</div>
+
+		<div id="dTemp" style='display:none;margin:12px'>
+			<form id='dTempForm' action="javascript:void(0);">
+				<label id='dTempTitle'></label>
+				<input id='dTempInput' type="text" id="myMessage" />
+				<input id='dTempSubmit' type="submit" id="sendbutton" />
+			</form>
+		</div>
+		<div id="dUpdate" style='margin:12px'>
+			Polling
+			<form id='dUpdateForm' action="/update" method="POST">
+				<input id='dUpdateInput' type="text" id="myMessage" />
+				<input id='dUpdateSubmit' type="submit" id="sendbutton" />
 			</form>
 		</div>
 	</body>

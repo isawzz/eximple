@@ -1,3 +1,22 @@
+function ui_input(dParent,instruction,funcname){
+	let html = `
+	<div id="dRoute">
+		<h2>${instruction}</h2>
+		<form id="fTemp" action="javascript:void(0);" onsubmit="${funcname}()" method="POST">
+			<input id="inptemp" type="text" name="text" value="1" placeholder="" />
+			<input type="submit" />
+		</form>
+	</div>
+	`;
+	let d=mDiv(dParent,{},null,html);
+
+	return {div:d};
+}
+
+function ui_message(dParent,msg){
+	let d=mDiv(dParent,{},null,msg);
+	return {div:d,content:msg};
+}
 function ui_deck(items, dParent) {
 	let n = items.length;
 	console.log('n',n)

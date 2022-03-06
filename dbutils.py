@@ -193,6 +193,26 @@ def get_gamenames_for(name):
 def get_game(name): 
 	print('name',name)
 	return _get_game(name).toDict()
+def startgame(gamename,players,fen):
+	users = []
+	for uname in players:
+		u=User.query.filter_by(name = uname).first()
+		users.append(u)
+	key=get_unique_gamename()
+	print('...key',key)
+	print('...gamename',gamename)
+	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=fen)
+	db.session.add(g)
+	db.session.commit()
+	return g.toDict()
+
+def updategame(game,step,fen):
+	g=_get_game(game)
+	g.fen = fen
+	g.step = step
+	db.session.commit()
+	return g.toDict()
+
 
 #region internal: only uses for queries
 def _get_user(name):	return User.query.filter_by(name=name).first()
@@ -256,29 +276,9 @@ def get_unique_gamename():
 def get_fantasyname():
 	return fake.name
 
-def startgame(gamename,players,fen):
-	users = []
-	for uname in players:
-		u=User.query.filter_by(name = uname).first()
-		users.append(u)
-	key=get_unique_gamename()
-	print('...key',key)
-	print('...gamename',gamename)
-	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=fen)
-	db.session.add(g)
-	db.session.commit()
-	return g.toDict()
-
-def updategame(game,step,fen):
-	g=_get_game(game)
-	g.fen = fen
-	g.step = step
-	db.session.commit()
-	return g.toDict()
-
 def add_games():
 	users = User.query.all()
-	games = ['aristocracy','innovation','catan','powergrid','puerto rico','ferrocarril','dixit','mysterium','dialogue']
+	games = ['dixit'] #'aristocracy','innovation','catan','powergrid','puerto rico','ferrocarril','dixit','mysterium','dialogue']
 	gamenames = get_unique_gamenames()
 	for i in range(2):
 		#players = random_players(users,2,5)
@@ -315,7 +315,7 @@ def create_random_data():
 	add_user('mimi','skyblue')	
 	add_user('felix','BLUE')	
 	add_users()
-	add_game('paris','aristocracy',['mimi','felix'])
+	add_game('paris','dixit',['mimi','felix'])
 	add_games()
 	add_game_players()
 	add_actions()
