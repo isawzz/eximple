@@ -109,6 +109,10 @@ function mFlex(d, or = 'h') {
 	// d.style.justifyContent = 'stretch';
 }
 function mIfNotRelative(d) { if (isEmpty(d.style.position)) d.style.position = 'relative'; }
+function mInsertAt(dParent, el, index = 0) { mInsert(dParent, el, index); }
+function mInsertFirst(dParent, el) { mInsert(dParent, el, 0); }
+function mInsert(dParent, el, index = 0) { dParent.insertBefore(el, dParent.childNodes[index]); }
+function mInsertAfter(dParent, el, index = 0) { dParent.insertAfter(el, dParent.childNodes[index]); }
 function mLinebreak(dParent, gap) {
 	if (isString(dParent)) dParent = mBy(dParent);
 	let d = mDiv(dParent);
@@ -124,6 +128,29 @@ function mMagnifyOnHoverControl(elem){
 function mMagnifyOnHoverControlRemove(elem){
 	elem.onmouseenter = elem.onmouseleave = null;
 	mClassRemove(elem,'magnify_on_hover');
+}
+function recConvertLists(o,maxlen=25){
+	for(const k in o){
+		let val = o[k];
+		if (isList(val)) {
+			if (val.length > maxlen) val=val.slice(0,maxlen).toString()+'...';
+			else val = val.toString();
+			o[k]=val;
+		}else if (isDict(val)) recConvertLists(val);
+	}
+}
+function mNode(o, dParent, title) {
+	recConvertLists(o);
+	console.log('mNode o',o);
+	let d = mCreate('div');
+	mYaml(d, o);
+	let pre = d.getElementsByTagName('pre')[0];
+	pre.style.fontFamily = 'inherit';
+	if (isdef(title)) mInsert(d, mText(title));
+	if (isdef(dParent)) mAppend(dParent, d);
+	if (isDict(o)) d.style.textAlign = 'left';
+
+	return d;
 }
 function mPlace(elem, pos, offx, offy) {
 	// pos is: tl, tb, bl, br or cl, cr, tc, bc, cc
@@ -433,6 +460,19 @@ function mTableCommandifyList(rowitem, val, func) {
 		html += func(rowitem, name); //`<a href="/table/${rowitem.o.name}/${name}">${name}</a>`
 	}
 	return html;
+}
+function mText(text, dParent, styles, classes) {
+	if (!isString(text)) text = text.toString();
+	let d = mDiv(dParent);
+	if (!isEmpty(text)) { d.innerHTML = text; }
+	//console.log('text',text,typeof(text),isString(text),isEmpty(text),d);
+	if (isdef(styles)) mStyle(d, styles);
+	if (isdef(classes)) mClass(d, classes);
+	return d;
+}
+function mYaml(d, js) {
+	d.innerHTML = '<pre>' + jsonToYaml(js) + '</pre>';
+	// d.innerHTML = '<pre class="info">' + jsonToYaml(js) + '</pre>'; 
 }
 //#endregion
 
@@ -1819,6 +1859,7 @@ function jsClean(o) {
 		return onew;
 	}
 }
+function jsonToYaml(o) {	let y = jsyaml.dump(o);	return y;}
 function isdef(x) { return x !== null && x !== undefined; }
 function nundef(x) { return x === null || x === undefined; }
 function isDOM(x) { let c = lookup(x, ['constructor', 'name']); return c ? startsWith(c, 'HTML') || startsWith(c, 'SVG') : false; }

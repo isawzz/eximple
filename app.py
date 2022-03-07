@@ -24,9 +24,14 @@ def r_simple():
 		Serverdata = {"users":get_users(),"games":get_games()}
 		return render_template('simple.html', Basepath=Basepath, Serverdata=Serverdata)
 	else:
-		x = request.form['text']
-		print('*** POST /singlepage ***',x)
-		return x
+		fen = request.form['text']
+		sender = request.form['user']
+		table = request.form['table']
+		game = request.form['game']
+		msgtype = request.form['type']
+		
+		print('*** POST /singlepage ***',sender,game,table if table else 'no table',msgtype)
+		return fen
 		# x = request.form['text']
 		# jx = json.loads(x)
 		# print(':::received',jx['type']) #,jx['data']['players'])

@@ -34,7 +34,6 @@
 <body>
 	<div id='dMain' style="background:skyblue;min-height:400px;width:100%;"></div>
 
-	<pre id="inpre" name="text1" style="margin-top:10px;font-size:11px">hallo</pre>
 
 	<div id="dRoute" style="text-align:center">
 		<h2>post data:</h2>
@@ -48,7 +47,8 @@
 			<input type='text' id="intable" name="table" value="" >
 			<label>type:</label>
 			<input type='text' id="intype" name="type" value="startgame" >
-			<textarea rows=16 cols=150 id="inpost" name="text" style="margin-top:10px;font-size:11px">hallo</textarea>
+			<div id="inpre" style="margin-top:10px;font-size:9px">hallo</div>
+			<textarea rows=16 cols=150 id="inpost" name="text" style="display:none;margin-top:10px;font-size:11px">hallo</textarea>
 		</form>
 		<button onclick='test1()' class='button'>text</button>
 		<button onclick='test2()' class='button'>json</button>
