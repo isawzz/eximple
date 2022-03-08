@@ -2,7 +2,7 @@
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
 var ColorDi, DA = {}, Card = {}, TO = {};
-var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket=null, dTable, dTitle;
+var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket = null, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
 const BLUE = '#4363d8';
@@ -121,27 +121,27 @@ function mLinebreak(dParent, gap) {
 	if (isdef(gap)) { d.style.minHeight = gap + 'px'; d.innerHTML = ' &nbsp; '; d.style.opacity = .2; }//return mLinebreak(dParent);}
 	return d;
 }
-function mMagnifyOnHoverControl(elem){
-	elem.onmouseenter = ev=>{if (ev.ctrlKey) mClass(elem,'magnify_on_hover');}
-	elem.onmouseleave = ev=>mClassRemove(elem,'magnify_on_hover');
+function mMagnifyOnHoverControl(elem) {
+	elem.onmouseenter = ev => { if (ev.ctrlKey) mClass(elem, 'magnify_on_hover'); }
+	elem.onmouseleave = ev => mClassRemove(elem, 'magnify_on_hover');
 }
-function mMagnifyOnHoverControlRemove(elem){
+function mMagnifyOnHoverControlRemove(elem) {
 	elem.onmouseenter = elem.onmouseleave = null;
-	mClassRemove(elem,'magnify_on_hover');
+	mClassRemove(elem, 'magnify_on_hover');
 }
-function recConvertLists(o,maxlen=25){
-	for(const k in o){
+function recConvertLists(o, maxlen = 25) {
+	for (const k in o) {
 		let val = o[k];
 		if (isList(val)) {
-			if (val.length > maxlen) val=val.slice(0,maxlen).toString()+'...';
+			if (val.length > maxlen) val = val.slice(0, maxlen).toString() + '...';
 			else val = val.toString();
-			o[k]=val;
-		}else if (isDict(val)) recConvertLists(val);
+			o[k] = val;
+		} else if (isDict(val)) recConvertLists(val);
 	}
 }
 function mNode(o, dParent, title) {
 	recConvertLists(o);
-	console.log('mNode o',o);
+	console.log('mNode o', o);
 	let d = mCreate('div');
 	mYaml(d, o);
 	let pre = d.getElementsByTagName('pre')[0];
@@ -196,6 +196,73 @@ function mGetStyle(elem, prop) {
 	}
 	if (nundef(val)) val = elem.style[prop];
 	if (val.endsWith('px')) return firstNumber(val); else return val;
+}
+function mRadioToggle(label, val, dParent, styles = {}, is_on = true) {
+	let cursor = styles.cursor; delete styles.cursor;
+
+	let d = mDiv(dParent, styles);
+	let id = getUID();
+	let inp = mCreateFrom(`<input class='radio' id='${id}' type="checkbox" checked="${is_on}" value="${val}" >`);
+	let text = mCreateFrom(`<label for='${id}'>${label}</label>`);
+	if (isdef(cursor)) { inp.style.cursor = text.style.cursor = cursor; }
+
+	mAppend(d, inp);
+	mAppend(d, text);
+	//if (isdef(handler)) inp.onclick = ev => {ev.cancelBubble=true;handler(val);}
+	return d;
+}
+function mRadio1(label, val, dParent, styles = {}, handler, group_id) {
+	let cursor = styles.cursor; delete styles.cursor;
+
+	let d = mDiv(dParent, styles, group_id + '_' + val);
+	let inp = mCreateFrom(`<input class='radio' id='i_${group_id}_${val}' type="radio" name="${group_id}" value="${val}" >`);
+	let text = mCreateFrom(`<label for='${inp.id}'>${label}</label>`);
+	if (isdef(cursor)) { inp.style.cursor = text.style.cursor = cursor; }
+	mAppend(d, inp);
+	mAppend(d, text);
+	if (isdef(handler)) d.onclick = () => handler(val);
+
+	return d;
+}
+function mRadio(label, val, name, dParent, styles = {}, handler, group_id, is_on) {
+	let cursor = styles.cursor; delete styles.cursor;
+
+	let d = mDiv(dParent, styles, group_id + '_' + val);
+	let id = isdef(group_id) ? `i_${group_id}_${val}` : getUID();
+	//let name = isdef(group_id)?group_id: val;
+	let type = isdef(group_id) ? 'radio' : 'checkbox';
+	let checked = isdef(is_on) ? is_on : false;
+	// let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}">`); // checked="${checked}" >`);
+	let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}" checked="${checked}" >`);
+	let text = mCreateFrom(`<label for='${inp.id}'>${label}</label>`);
+	if (isdef(cursor)) { inp.style.cursor = text.style.cursor = cursor; }
+	mAppend(d, inp);
+	mAppend(d, text);
+
+	if (isdef(handler)) {
+		inp.onclick = ev => {
+			ev.cancelBubble = true;
+			//console.log('inp',inp);
+			if (handler == 'toggle') {
+				//console.log('hallo!!!!!!',inp.checked)
+				//inp.checked = ev.target.checked == true ? false : true;
+			} else if (isdef(handler)) {
+				inp.handler(val);
+			}
+		};
+	}
+
+	return d;
+}
+function mRadioGroup(dParent, styles, id, legend) {
+	let f = mCreate('fieldset');
+	f.id = id;
+	if (isdef(styles)) mStyle(f, styles);
+	let l = mCreate('legend');
+	l.innerHTML = legend;
+	mAppend(f, l);
+	mAppend(dParent, f);
+	return f;
 }
 function mSize(d, w, h, unit = 'px', sizing) { if (nundef(h)) h = w; mStyle(d, { width: w, height: h }, unit); if (isdef(sizing)) setRect(d, sizing); }
 function mStyle(elem, styles, unit = 'px') {
@@ -660,11 +727,11 @@ function sortByDescending(arr, key) { arr.sort((a, b) => (a[key] > b[key] ? -1 :
 function sortByFunc(arr, func) { arr.sort((a, b) => (func(a) < func(b) ? -1 : 1)); return arr; }
 function sortByFuncDescending(arr, func) { arr.sort((a, b) => (func(a) > func(b) ? -1 : 1)); return arr; }
 function sortNumbers(ilist) { ilist.sort(function (a, b) { return a - b }); return ilist; }
-function stripToKeys(o,di){
+function stripToKeys(o, di) {
 	//return new object with only the keys in keys list
-	let res={};
-	for(const k in o){
-		if (isdef(di[k])) res[k]=o[k];
+	let res = {};
+	for (const k in o) {
+		if (isdef(di[k])) res[k] = o[k];
 	}
 	return res;
 }
@@ -1812,6 +1879,15 @@ function toLetters(s) { return [...s]; }
 //#endregion
 
 //#region misc
+function clearElement(elem) {
+	//console.log(elem);
+	if (isString(elem)) elem = document.getElementById(elem);
+	if (window.jQuery == undefined) { elem.innerHTML = ''; return elem; }
+	while (elem.firstChild) {
+		$(elem.firstChild).remove();
+	}
+	return elem;
+}
 function getRect(elem, relto) {
 
 	if (isString(elem)) elem = document.getElementById(elem);
@@ -1859,7 +1935,7 @@ function jsClean(o) {
 		return onew;
 	}
 }
-function jsonToYaml(o) {	let y = jsyaml.dump(o);	return y;}
+function jsonToYaml(o) { let y = jsyaml.dump(o); return y; }
 function isdef(x) { return x !== null && x !== undefined; }
 function nundef(x) { return x === null || x === undefined; }
 function isDOM(x) { let c = lookup(x, ['constructor', 'name']); return c ? startsWith(c, 'HTML') || startsWith(c, 'SVG') : false; }
@@ -1897,6 +1973,24 @@ function range(f, t, st = 1) {
 		arr.push(i);
 	}
 	return arr;
+}
+function show(elem, isInline = false) {
+	if (isString(elem)) elem = document.getElementById(elem);
+	if (isSvg(elem)) {
+		elem.setAttribute('style', 'visibility:visible');
+	} else {
+		elem.style.display = isInline ? 'inline-block' : null;
+	}
+	return elem;
+}
+function hide(elem) {
+	if (isString(elem)) elem = document.getElementById(elem);
+	if (nundef(elem)) return;
+	if (isSvg(elem)) {
+		elem.setAttribute('style', 'visibility:hidden;display:none');
+	} else {
+		elem.style.display = 'none';
+	}
 }
 function setRect(elem, options) {
 	let r = getRect(elem);

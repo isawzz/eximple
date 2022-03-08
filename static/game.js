@@ -1,6 +1,16 @@
 
+async function startgame(game,players) {
+	if (nundef(game)) game = 'dixit';
+	if (nundef(players)) players = rChoose(Serverdata.users,2).map(x=>x.name);
+	console.log('players',players);
+	let fen = dixit_setup(players);
+	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
+	let gamerec = await post_test2(o, '/post'); //post_test1(o); post_test0();
+	add_game_to_table(gamerec);
+}
 
-function startgame(game, players) {
+//#region old api
+function startgame_old(game, players) {
 
 	//if (nundef(players)) players = prompt('enter players, separated by commas');	players = players.split(',').map(x => x.trim());
 	if (nundef(players)) players = ['mimi', 'felix'];
@@ -16,7 +26,7 @@ function startgame(game, players) {
 	submit_form('fRoute');
 
 }
-function selectgame(game, uname) {
+function selectgame_old(game, uname) {
 	//if uname is not the host, nothing should happen if there is no fen!
 	let g = firstCond(Tables, x => x.name == game);
 	console.log('select game', game, 'for', uname, 'g', g);
@@ -46,7 +56,7 @@ function selectgame(game, uname) {
 
 
 }
-function presentgame(g, dParent, uname) {
+function presentgame_old(g, dParent, uname) {
 	console.log('g', g)
 	console.assert(isdef(g.fen), 'game needs to be initialized!!!')
 	g.fen = JSON.parse(g.fen)
@@ -60,10 +70,10 @@ function presentgame(g, dParent, uname) {
 
 
 }
-function activategame(g, uname) {
+function activategame_old(g, uname) {
 	console.log('activate game for', uname)
 }
-
+//#endregion
 
 
 

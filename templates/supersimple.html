@@ -33,37 +33,28 @@
 	</head>
 <body>
 	<div class="topmenu" style="background: silver; padding-left: 10px">
-		<a href="/simple">home</a>
+		<a href="/">home</a>
+		<a href="javascript:onclick_startgame()">startgame</a>
 		<a href="/reset" style="color: red">dbinit!</a>
 	</div>
+
 	<div id="dMain">
 		<div id="dTitle" style="opacity: 0; box-sizing: border-box; position: relative; height: 44px; text-align: center">
 			<h1 id="dTitleCenter">HALLO, it's ok!</h1>
 			<h1 id="dTitleLeft" style="display: inline-block; top: 0; left: 8px; position: absolute"></h1>
 			<h1 id="dTitleRight" style="display: inline; position: absolute; top: 0; right: 8px"></h1>
 		</div>
-		<div id="dTable" style="opacity: 0; min-height: 440px"></div>
-	</div>
+		<div id="dTable" style="opacity: 0; min-height: 440px">
+			<div id='dMenu' style='width:100%;display:none'>
+				<form id="fMenuInput" style="text-align:center" action="javascript:void(0);">
+					<div id="dMenuInput">hallo</div>
+					<div style="width:100%">
+					<input type="submit" class='button' />
+					</div>
 
-	<div id="dRoute" style="text-align:center">
-		<h2>post data:</h2>
-		<form id="fRoute" action="javascript:void(0);" >
-			<style>label{margin-left:10px;}*{font-family:opensans;font-size:14px;}</style>
-			<label>user:</label>
-			<input type='text' id="inuser" name="user" value="felix" >
-			<label>game:</label>
-			<input type='text' id="ingame" name="game" value="dixit" >
-			<label>players:</label>
-			<input type='text' id="inplayers" name="players">
-			<label>table:</label>
-			<input type='text' id="intable" name="table">
-			<label>turn:</label>
-			<input type='text' id="inturn" name="turn" value="" >
-			<label>type:</label>
-			<input type='text' id="intype" name="type" value="startgame" >
-			<div id="inpre" style="margin-top:10px;font-size:9px">hallo</div>
-			<textarea rows=16 cols=150 id="inpost" name="text" style="display:none;margin-top:10px;font-size:11px">hallo</textarea>
-		</form>
+				</form>
+			</div>
+		</div>
 	</div>
 
 	<div id="dButtons" style="text-align:center">
@@ -72,8 +63,6 @@
 		<button onclick='test4()' class='button'>dixit</button>
 		<button onclick='test3()' class='button'>post</button>
 		<button onclick='test6()' class='button'>TEST 6</button>
-		<br><br>
-		<button onclick='onclick_startgame()' class='button'>startgame</button>
 		<br><br>
 		<button onclick='onclick_poll()' class='button'>poll</button>
 		<button onclick='onclick_startpolling()' class='button'>start polling</button>

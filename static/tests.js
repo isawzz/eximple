@@ -1,61 +1,3 @@
-function test6() {
-	let game = 'dixit';
-	let players = rChoose(Serverdata.users,2).map(x=>x.name);
-	console.log('players',players);
-	let fen = dixit_setup(players);
-	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
-	post_test2(o, '/post'); //post_test1(o); post_test0();
-}
-async function test5() {
-	//post some json data
-	let o = { k1: 'hallo', k2: 25 }; // dixit_setup(['felix','amanda']);
-	post_test2(o, '/simple'); //post_test1(o); post_test0();
-}
-async function post_test2(o, route) {
-	let res = await fetch(SOCKETSERVER + route, {
-		method: 'POST',
-		headers: {
-			'Accept': 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify(o)
-	});
-	let res1 = await res.json();
-	console.log(res1);
-
-	//let res = await route_post_callback('/simple',o);
-}
-async function post_test1(o) {
-	let res = await fetch('https://httpbin.org/post', {
-		method: 'POST',
-		headers: {
-			'Accept': 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify(o)
-	});
-	let res1 = await res.json();
-	console.log(res1);
-
-	//let res = await route_post_callback('/simple',o);
-}
-
-async function post_test0() {
-	let res = await fetch('https://httpbin.org/post', {
-		method: 'POST',
-		headers: {
-			'Accept': 'application/json, text/plain, */*',
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ a: 7, str: 'Some string: &=&' })
-	});
-	let res1 = await res.json();
-	console.log(res1);
-
-	//let res = await route_post_callback('/simple',o);
-}
-
-//#region rest
 onload = test0;
 async function test0() {
 	await ensureAssets();
@@ -67,11 +9,27 @@ async function test0() {
 	dTable = mBy('dTable');
 	dTable.animate([{ opacity: 0, transform: 'translateY(50px)' }, { opacity: 1, transform: 'translateY(0px)' },], { fill: 'both', duration: 800, easing: 'ease' });
 
-	DA.gameitems = show_games(dTable);
+	DA.gameItems = show_games(dTable);
+	//console.log('gameItems',DA.gameItems)
+	show_user(); 
 }
 
 
 
+async function test6() {
+	let game = 'dixit';
+	let players = rChoose(Serverdata.users,2).map(x=>x.name);
+	console.log('players',players);
+	let fen = dixit_setup(players);
+	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
+	let gamerec = await post_test2(o, '/post'); //post_test1(o); post_test0();
+	add_game_to_table(gamerec);
+}
+async function test5() {
+	//post some json data
+	let o = { k1: 'hallo', k2: 25 }; // dixit_setup(['felix','amanda']);
+	post_test2(o, '/simple'); //post_test1(o); post_test0();
+}
 function test4() {
 	let o = DA.fen = dixit_setup(['mimi', 'felix']);
 	mBy('inpost').value = o; // JSON.stringify(o);
@@ -85,7 +43,6 @@ function test4() {
 
 	//mBy('inpre').innerHTML = JSON.stringify(o, null, 2);; 
 }
-
 async function test3() {
 	//send whatever is in textarea to flask
 	let res = await route_post_callback('/simple', DA.fen);
@@ -122,10 +79,6 @@ function test_mNode0() {
 	mNode(o, mBy('inpre'), 'setup');
 	inpost.innerHTML = jsonToYaml(o)
 }
-
-
-
-//#endregion
 
 
 

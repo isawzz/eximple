@@ -1,3 +1,50 @@
+async function post_test2(o, route) {
+	let res = await fetch(SOCKETSERVER + route, {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(o)
+	});
+	let res1 = await res.json();
+	console.log(res1);
+	return res1;
+	//let res = await route_post_callback('/simple',o);
+}
+async function post_test1(o) {
+	let res = await fetch('https://httpbin.org/post', {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(o)
+	});
+	let res1 = await res.json();
+	console.log(res1);
+
+	//let res = await route_post_callback('/simple',o);
+}
+
+async function post_test0() {
+	let res = await fetch('https://httpbin.org/post', {
+		method: 'POST',
+		headers: {
+			'Accept': 'application/json, text/plain, */*',
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ a: 7, str: 'Some string: &=&' })
+	});
+	let res1 = await res.json();
+	console.log(res1);
+
+	//let res = await route_post_callback('/simple',o);
+}
+
+
+
+
 function socketinit() {
 	Socket = isdef(window.io)? io.connect(SOCKETSERVER):null;
 	if (!Socket) {

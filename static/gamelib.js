@@ -21,7 +21,7 @@ function ui_deck(items, dParent) {
 	let n = items.length;
 	console.log('n',n)
 	console.log('parent',dParent)
-	let cont = mDiv(dParent,{ bg:'red',w:200,h:300,maleft: 25, padding: 14 }); // ui_make_deck(n, dParent, { bg:'red',w:200,h:300,maleft: 25, padding: 14 });
+	let cont = mDiv(dParent,{ bg:'red',w:200,h:300,maleft: 25, padding: 14 }); 
 	let topmost = ui_add_cards_to_deck(cont, items);
 	return {
 		type: 'deck',

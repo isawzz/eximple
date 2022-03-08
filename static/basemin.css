@@ -19,6 +19,32 @@ a:hover {
 a,button,input[type=submit]{
 	cursor: pointer;
 }
+label,input{
+	font-size: 14px;
+	font-family: opensans;
+}
+legend {
+	border: 1px solid green;
+	color: green;
+	font-size: 75%;
+	margin-left: 16px;
+	text-align: left;
+}
+fieldset {
+	font-size: 90%;
+	border: none;
+	margin-top: 2%;
+	height: 96%;
+	/* float: left; */
+	position: relative;
+	text-align: left;
+	color: dimgray;
+}
+fieldset .disabled{
+	color: #404b56;
+	opacity: 0.3;
+	cursor: default;
+}
 /* #endregion  */
 
 /* #region classes for page parts */
@@ -139,7 +165,36 @@ a,button,input[type=submit]{
 .hidden{
 	flex: 0;
 }
+
 /* #endregion  */
+
+/* #region .radio */
+.radio {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	border-radius: 50%;
+	width: 12px;
+	height: 12px;
+	border: 1px solid #999;
+	color: silver;
+	transition: 0.2s all linear;
+	margin: 5px;
+	padding: 0px;
+	position: relative;
+	top: 5px;
+	left: 0px;
+}
+.radio:focus {
+	outline-width: 0px;
+	outline-style: solid;
+	outline-color: transparent;
+	/* outline-color: Highlight; */
+}
+.radio:checked {
+	border: 6px solid green;
+}
+/* #endregion .radio */
 
 /* #region classes for cards */
 .card {

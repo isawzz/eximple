@@ -1,6 +1,40 @@
 
-function onclick_startgame() { test6(); }
-
+function onclick_player_in_gametable(uname, tablename) {
+	console.log('param1', uname, 'param2', tablename);
+	User = firstCond(Serverdata.users, x => x.name == uname);
+	Table = firstCond(Serverdata.games, x => x.name == tablename);
+	console.log('User', User, 'Table', Table);
+	show_title();
+	show_user();
+}
+function onclick_startgame() {
+	show('dMenu');
+	let form = mBy('fMenuInput');
+	let d = mBy('dMenuInput'); clearElement(d);
+	mCenterFlex(d);
+	let fsPlayers = mRadioGroup(d, {}, null, 'players');
+	for (const user of Serverdata.users) {
+		mRadio(user.name, user.name, 'uname', fsPlayers, {}, 'toggle', null, true);
+	}
+	let fsGames = mRadioGroup(d, {}, null, 'games');
+	for (const game of ['dixit','aristo','inno']) {
+		mRadio(game, game, 'game', fsGames, {}, null, 'gamename', true);
+	}
+	form.onsubmit = () => {
+		let players = get_checked_radios(fsPlayers);
+		//console.log('players',players);
+		let game = get_checked_radios(fsGames)[0];
+		//console.log('game',game); 
+		startgame(game,players);
+		hide('dMenu');
+	};
+}
+function onclick_game(name) {
+	Table = firstCond(Tables, x => x.name == name);
+	show_title();
+	//should I filter tables for this user only? at least actions table?
+	//should I sort tables by this user name?
+}
 var POLLING = false;
 function onclick_startpolling() {
 	if (POLLING) return;
@@ -27,12 +61,7 @@ function onclick_user(name, game) {
 	//User = firstCond(Users, x => x.name == name);
 	//show_user();
 }
-function onclick_game(name) {
-	Table = firstCond(Tables, x => x.name == name);
-	show_title();
-	//should I filter tables for this user only? at least actions table?
-	//should I sort tables by this user name?
-}
+
 function onclick_action(user, game, action) {
 	//update Actions
 	let a = firstCond(Actions, x => x.user == user && x.game == game);

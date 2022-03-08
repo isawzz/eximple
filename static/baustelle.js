@@ -1,3 +1,69 @@
+
+function get_checked_radios(rg){
+	let inputs = rg.getElementsByTagName('INPUT');
+	let list = [];
+	for(const ch of inputs){
+		//console.log('child',ch)
+		let checked = ch.getAttribute('checked');
+		//console.log('is',checked);
+		//console.log('?',ch.checked); 
+		if (ch.checked) list.push(ch.value);
+	}
+	//console.log('list',list)
+	return list;
+}
+
+function collect_formdata() {
+	var myform = mBy("fMenuInput");
+	var inputs = myform.getElementsByTagName("INPUT");
+	var data = {};
+	for (var i = inputs.length - 1; i >= 0; i--) {
+		var key = inputs[i].name;
+		switch (key) {
+			case "username":
+			case "name":
+				let uname = inputs[i].value;
+				console.log(`${key} in input is`, uname);
+				uname = replaceAllSpecialChars(uname, ' ', '_');
+				uname = replaceAllSpecialChars(uname, '&', '_');
+				uname = replaceAllSpecialChars(uname, '+', '_');
+				uname = replaceAllSpecialChars(uname, '?', '_');
+				uname = replaceAllSpecialChars(uname, '=', '_');
+				uname = replaceAllSpecialChars(uname, '+', '_');
+				uname = replaceAllSpecialChars(uname, '/', '_');
+				uname = replaceAllSpecialChars(uname, '\\', '_');
+				data[key] = uname.toLowerCase();
+				break;
+			case "motto":
+				data[key] = inputs[i].value.toLowerCase();
+		}
+	}
+	if (DA.imageChanged) {
+		//do the same as I did before!
+		sendHtml('imgPreview', Session.cur_user);
+		//DA.imageChanged = false;
+	} else {
+		let udata = get_current_userdata();
+		let changed = false;
+		if (DA.colorChanged) { udata.color = DA.newColor; changed = true; }// DA.colorChanged = false;}
+		if (data.motto != udata.motto) {
+			changed = true;
+			udata.motto = data.motto;
+			mBy('motto').innerHTML = udata.motto;
+		}
+		if (changed) {
+			//console.log('changed!');
+			DA.next = get_login;
+			db_save(); //save_users();
+
+		}
+
+	}
+
+
+}
+
+
 //#region helpers
 async function ensureAssets() {
 	if (nundef(Syms)) {
@@ -24,7 +90,7 @@ function hFunc(content, funcname, arg1, arg2, arg3) {
 }
 function show_actions(dParent) {
 	//if (nundef(Users) && User.name == 'anonymous') return;
-	console.assert(isdef(Users) && isdef(Tables),'Users or Tables MISSING!!!')
+	console.assert(isdef(Users) && isdef(Tables), 'Users or Tables MISSING!!!')
 	//if (nundef(Users)) Users = [User];
 	//if (nundef(Tables)) Tables = [Table];
 	let usersById = list2dict(Users);
@@ -44,16 +110,28 @@ function show_actions(dParent) {
 	});
 	return items;
 }
-function add_game_to_table(){
+function add_game_to_table(gamerec,clickplayer='onclick_player_in_gametable',clickgame='onclick_game') {
+	let headers = ['name', 'gamename', 'players', 'step', 'fen'];
 	let items = DA.gameItems;
-	//let t = 
+	console.log('gamerec', gamerec);
+	console.log('items', items);
+	let t = items[0].div.parentNode;
+	r = mTableRow(t, gamerec, headers);
+	//if (isdef(rowstylefunc)) mStyle(r.div, rowstylefunc(u));
+	let newItem = { div: r.div, colitems: r.colitems, o: gamerec };
+	DA.gameItems.push(newItem);
+	mTableCommandify([newItem], {
+		0: (item, val) => hFunc(val, clickgame, val),
+		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, clickplayer, valpart, rowitem.o.name)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
+	});
+
 }
-function show_games(dParent) {
+function show_games(dParent,clickplayer='onclick_player_in_gametable',clickgame='onclick_game') {
 	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
 	//if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
 	mTableCommandify(items, {
-		0: (item, val) => hFunc(val, 'onclick_game', val), //`<a href="/singlepage/${val}">${val}</a>`, 
-		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, 'onclick_user', valpart, rowitem.o.name)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
+		0: (item, val) => hFunc(val, clickgame, val), //`<a href="/singlepage/${val}">${val}</a>`, 
+		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, clickplayer, valpart, rowitem.o.name)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
 	});
 	return items;
 }
