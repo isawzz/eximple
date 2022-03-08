@@ -1,8 +1,29 @@
 
+function onclick_startgame() { test6(); }
+
+var POLLING = false;
+function onclick_startpolling() {
+	if (POLLING) return;
+	POLLING = true;
+	poll();
+}
+function onclick_stoppolling() {
+	if (!POLLING) return;
+	POLLING = false;
+
+}
+async function onclick_poll() {
+	//was macht polling?
+	//post user,game,table,fen,turn
+	//get: user,table,fen,turn or users,tables or nothing
+	let res = await route_post_form_callback('/simple', 'fRoute');
+	console.log('server answer:', res)
+}
+
 
 function onclick_user(name, game) {
 	//console.log('game',game)
-	selectgame(game,name);
+	selectgame(game, name);
 	//User = firstCond(Users, x => x.name == name);
 	//show_user();
 }

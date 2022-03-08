@@ -48,10 +48,11 @@ async function route_js_callback(url,callback){
 async function route_post_callback(url,data,callback){
 	let res = await fetch(SOCKETSERVER + url,{method:'POST',body:data});
 	let o = await res.json();
-	callback(o);
+	if (isdef(callback)) callback(o);
 }
 async function route_post_form_callback(url,formname,callback){
 	let formdata = new FormData(mBy(formname));
+	formdata.fen = DA.fen;
 	let res = await fetch(SOCKETSERVER + url,{method:'POST',body:formdata});
 	let o = await res.text();
 	if (isdef(callback)) callback(o); 

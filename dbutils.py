@@ -2,6 +2,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import inspect
 from datetime import datetime, timedelta
+import json
+
 
 db = SQLAlchemy()
 
@@ -181,19 +183,6 @@ def get_gamenames_for(name):
 def get_game(name): 
 	print('name',name)
 	return _get_game(name).toDict()
-def startgame(gamename,players,fen):
-	users = []
-	for uname in players:
-		u=User.query.filter_by(name = uname).first()
-		users.append(u)
-	key=get_unique_gamename()
-	print('...key',key)
-	print('...gamename',gamename)
-	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=fen)
-	db.session.add(g)
-	db.session.commit()
-	return g.toDict()
-
 def updategame(game,step,fen):
 	g=_get_game(game)
 	g.fen = fen
@@ -304,6 +293,25 @@ def create_random_data():
 
 
 #endregion
+
+def startgame(gamename,players,fen):
+	users = []
+	#print('fen',fen)
+	print('players',players)
+	for uname in players:
+		#print('uname',uname)
+		u=User.query.filter_by(name = uname).first()
+		#print('u',u)
+		users.append(u)
+	# return {'h':1}
+	key=get_unique_gamename()
+	print('...key',key)
+	print('...gamename',gamename)
+	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=json.dumps(fen))
+	db.session.add(g)
+	db.session.commit()
+	#print('g',g.toDict())
+	return g.toDict()
 
 
 

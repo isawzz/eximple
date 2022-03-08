@@ -14,7 +14,7 @@ function dixit_setup(players) {
 	}
 
 	//random player starts, his choices: his hand, phase: create
-	let plturn = fen.plturn = rChoose(players);
+	let turn = fen.turn = [rChoose(players)];
 	let phase = fen.phase = 'create';
 	fen.instruction = 'write your story';
 

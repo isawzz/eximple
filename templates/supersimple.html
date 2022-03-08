@@ -32,8 +32,18 @@
 		<title>simple</title>
 	</head>
 <body>
-	<div id='dMain' style="background:skyblue;min-height:400px;width:100%;"></div>
-
+	<div class="topmenu" style="background: silver; padding-left: 10px">
+		<a href="/simple">home</a>
+		<a href="/reset" style="color: red">dbinit!</a>
+	</div>
+	<div id="dMain">
+		<div id="dTitle" style="opacity: 0; box-sizing: border-box; position: relative; height: 44px; text-align: center">
+			<h1 id="dTitleCenter">HALLO, it's ok!</h1>
+			<h1 id="dTitleLeft" style="display: inline-block; top: 0; left: 8px; position: absolute"></h1>
+			<h1 id="dTitleRight" style="display: inline; position: absolute; top: 0; right: 8px"></h1>
+		</div>
+		<div id="dTable" style="opacity: 0; min-height: 440px"></div>
+	</div>
 
 	<div id="dRoute" style="text-align:center">
 		<h2>post data:</h2>
@@ -61,7 +71,9 @@
 		<button onclick='test2()' class='button'>json</button>
 		<button onclick='test4()' class='button'>dixit</button>
 		<button onclick='test3()' class='button'>post</button>
-		<button onclick='test5()' class='button'>post json</button>
+		<button onclick='test6()' class='button'>TEST 6</button>
+		<br><br>
+		<button onclick='onclick_startgame()' class='button'>startgame</button>
 		<br><br>
 		<button onclick='onclick_poll()' class='button'>poll</button>
 		<button onclick='onclick_startpolling()' class='button'>start polling</button>
