@@ -1,13 +1,4 @@
 
-async function startgame(game,players) {
-	if (nundef(game)) game = 'dixit';
-	if (nundef(players)) players = rChoose(Serverdata.users,2).map(x=>x.name);
-	console.log('players',players);
-	let fen = dixit_setup(players);
-	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
-	let gamerec = await post_test2(o, '/post'); //post_test1(o); post_test0();
-	add_game_to_table(gamerec);
-}
 
 //#region old api
 function startgame_old(game, players) {

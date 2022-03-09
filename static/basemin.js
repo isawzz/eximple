@@ -232,8 +232,10 @@ function mRadio(label, val, name, dParent, styles = {}, handler, group_id, is_on
 	//let name = isdef(group_id)?group_id: val;
 	let type = isdef(group_id) ? 'radio' : 'checkbox';
 	let checked = isdef(is_on) ? is_on : false;
-	// let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}">`); // checked="${checked}" >`);
-	let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}" checked="${checked}" >`);
+	console.log('player',val,is_on)
+	let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}">`); // checked="${checked}" >`);
+	if (checked) inp.checked = true;
+	//let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}" checked="${checked}" >`);
 	let text = mCreateFrom(`<label for='${inp.id}'>${label}</label>`);
 	if (isdef(cursor)) { inp.style.cursor = text.style.cursor = cursor; }
 	mAppend(d, inp);

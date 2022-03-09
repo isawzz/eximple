@@ -51,6 +51,7 @@ function dixit_present(fen, d_table, plname) {
 		let pl = pls[uname] = {};
 		let fpl = fen.players[uname];
 
+		console.log('dixit_present',user);
 		let user = firstCond(Users, x => x.name == uname);
 		//copyKeys(fpl,pl);
 		copyKeys(user, pl)

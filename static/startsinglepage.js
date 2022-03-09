@@ -12,7 +12,7 @@ async function startsinglepage() {
 	
 
 	//DA.useritems = show_users(dTable);
-	DA.gameitems = show_games(dTable);
+	DA.gameitems = show_gametable(dTable);
 
 	show_user(); //show_home_logo();
 

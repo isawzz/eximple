@@ -286,10 +286,10 @@ def create_random_data():
 	add_user('mimi','skyblue')	
 	add_user('felix','BLUE')	
 	add_users()
-	add_game('paris','dixit',['mimi','felix'])
-	add_games()
-	add_game_players()
-	add_actions()
+	#add_game('paris','dixit',['mimi','felix'])
+	#add_games()
+	#add_game_players()
+	#add_actions()
 
 
 #endregion

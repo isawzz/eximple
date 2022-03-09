@@ -31,6 +31,10 @@ def rpost():
 	msgtype = data['type']
 	if msgtype == 'startgame':
 		g=startgame(data['game'],data['players'],data['fen'])
+		fen=data['fen']
+		name=g['name']
+		print('created game',name,fen['turn'])
+		turn[name]=fen['turn']
 		return g
 	return data
 

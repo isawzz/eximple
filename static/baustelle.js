@@ -1,17 +1,4 @@
 
-function get_checked_radios(rg){
-	let inputs = rg.getElementsByTagName('INPUT');
-	let list = [];
-	for(const ch of inputs){
-		//console.log('child',ch)
-		let checked = ch.getAttribute('checked');
-		//console.log('is',checked);
-		//console.log('?',ch.checked); 
-		if (ch.checked) list.push(ch.value);
-	}
-	//console.log('list',list)
-	return list;
-}
 
 function collect_formdata() {
 	var myform = mBy("fMenuInput");
@@ -65,29 +52,6 @@ function collect_formdata() {
 
 
 //#region helpers
-async function ensureAssets() {
-	if (nundef(Syms)) {
-		Syms = await route_path_yaml_dict(`${Basepath}assets/allSyms.yaml`);
-		SymKeys = get_keys(Syms);
-		ByGroupSubgroup = await route_path_yaml_dict(`${Basepath}assets/symGSG.yaml`);
-		//KeySets = getKeySets();
-		C52 = await route_path_yaml_dict(`${Basepath}assets/c52.yaml`);
-		ari_create_card_assets('rb');
-	}
-}
-function hRoute(content, route, arg1, arg2, arg3) {
-	let html = `<a href="/${route}"`;
-	if (isdef(arg1)) html += `/${arg1}`;
-	if (isdef(arg2)) html += `/${arg2}`;
-	if (isdef(arg3)) html += `/${arg3}`;
-	html += `">${content}</a>`;
-	return html;
-}
-function hFunc(content, funcname, arg1, arg2, arg3) {
-	//console.log('arg2',arg2,typeof arg2)
-	let html = `<a href="javascript:${funcname}('${arg1}','${arg2}','${arg3}');">${content}</a>`;
-	return html;
-}
 function show_actions(dParent) {
 	//if (nundef(Users) && User.name == 'anonymous') return;
 	console.assert(isdef(Users) && isdef(Tables), 'Users or Tables MISSING!!!')
@@ -110,7 +74,7 @@ function show_actions(dParent) {
 	});
 	return items;
 }
-function add_game_to_table(gamerec,clickplayer='onclick_player_in_gametable',clickgame='onclick_game') {
+function add_game_to_table(gamerec, clickplayer = 'onclick_player_in_gametable', clickgame = 'onclick_game') {
 	let headers = ['name', 'gamename', 'players', 'step', 'fen'];
 	let items = DA.gameItems;
 	console.log('gamerec', gamerec);
@@ -126,17 +90,9 @@ function add_game_to_table(gamerec,clickplayer='onclick_player_in_gametable',cli
 	});
 
 }
-function show_games(dParent,clickplayer='onclick_player_in_gametable',clickgame='onclick_game') {
-	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step', 'fen']);
-	//if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
-	mTableCommandify(items, {
-		0: (item, val) => hFunc(val, clickgame, val), //`<a href="/singlepage/${val}">${val}</a>`, 
-		2: (item, val) => mTableCommandifyList(item, val, (rowitem, valpart) => hFunc(valpart, clickplayer, valpart, rowitem.o.name)),// `<a href="/singlepage/${valpart}/${rowitem.o.name}">${valpart}</a>`)
-	});
-	return items;
-}
 function show_home_logo() {
 	let bg = colorLight();
+	clearElement('dTitleLeft');
 	let d = miPic('airplane', mBy('dTitleLeft'), { fz: 28, padding: 6, h: 40, box: true, matop: 2, bg: bg, rounding: '50%' });
 }
 function show_title(s, styles = {}, funnyLetters = true) {
@@ -176,6 +132,94 @@ function submit_form(fname) {
 }
 
 
+
+function onclick_game(name) {
+	Table = firstCond(Tables, x => x.name == name);
+	show_title();
+	//should I filter tables for this user only? at least actions table?
+	//should I sort tables by this user name?
+}
+var POLLING = false;
+function onclick_startpolling() {
+	if (POLLING) return;
+	POLLING = true;
+	poll();
+}
+function onclick_stoppolling() {
+	if (!POLLING) return;
+	POLLING = false;
+
+}
+async function onclick_poll() {
+	//was macht polling?
+	//post user,game,table,fen,turn
+	//get: user,table,fen,turn or users,tables or nothing
+	let res = await route_post_form_callback('/simple', 'fRoute');
+	console.log('server answer:', res)
+}
+
+
+function onclick_user(name, game) {
+	//console.log('game',game)
+	selectgame(game, name);
+	//User = firstCond(Users, x => x.name == name);
+	//show_user();
+}
+
+function onclick_action(user, game, action) {
+	//update Actions
+	let a = firstCond(Actions, x => x.user == user && x.game == game);
+	console.log('action record is:', a);
+	a.choice = action;
+
+	//feststallen ob das die letzte action war
+	let allcomplete = true;
+	let gameActions = Actions.filter(x => x.game == game);
+	for (const a1 of gameActions) {
+		if (isEmpty(a1.choice)) allcomplete = false;
+		//console.log('choices player',a1.user,a1.choices,typeof a1.choices); //choices is ein string!
+	}
+
+	//wenn alles fertig mach das game irgendwie anders: step erhoehen, fen veraendern!
+	if (allcomplete) {
+		//game step and state update
+		let g = firstCond(Tables, x => x.name == game);
+		g.step += 1;
+		g.fen = "state for step " + g.step;
+
+		//next action set machen!
+		for (const a1 of gameActions) {
+			a1.choice = '';
+			a1.choices = rLetters(5).join(' ');
+			//console.log('a1.choices',a1.choices)
+		}
+
+		//package post object
+		// game object, action object + strings: user game action
+		let o = { gamerec: g, gameactions: gameActions, user: user, game: game, action: action };
+		console.log('COMPLETE!!!===>das wird gepostet:', o)
+		let ostring = JSON.stringify(o);
+		mBy('inpost').value = ostring;
+		//console.log('das wird gepostet:',o)
+		// POST UPDATE GAME ROUTE: for 
+
+		submit_form('fRoute');
+	} else {
+		console.log('user', user, 'has picked action', action, 'in game', game)
+		if (Socket) Socket.emit('action', { user: user, game: game, action: action });
+		else {
+			//nur diesen einen choice setzen
+			let o = { user: user, game: game, action: action };
+			console.log('das wird gepostet:', o)
+			let ostring = JSON.stringify(o);
+			mBy('inpost').value = ostring;
+			submit_form('fRoute');
+
+		}
+	}
+
+
+}
 
 
 
