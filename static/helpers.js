@@ -63,6 +63,7 @@ function show_table_for(g, dParent, uname) {
 
 	console.assert(isdef(g.fen),`game ${g.name} does not have a fen!`)
 	if (isString(g.fen)) g.fen = JSON.parse(g.fen);
+	DA.fen=g.fen;
 
 	console.assert(isDict(g.fen), "fen is NOT an object!!! " + g.name)
 
