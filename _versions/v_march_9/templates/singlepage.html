@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="{{Basepath}}assets/fonts/fonts.css" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}" />
+		<script src="{{Basepath}}alibs/jsyaml.js"></script>
+		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
+		<script src="{{Basepath}}js/cards.js"></script>
+		<script src="{{Basepath}}js/bluff.js"></script>
+		<script src="{{Basepath}}js/ui_helpers.js"></script>
+		<script src="{{ url_for('static', filename='baustelle.js') }}"></script>
+		<script src="{{ url_for('static', filename='game.js') }}"></script>
+		<script src="{{ url_for('static', filename='gamelib.js') }}"></script>
+		<script src="{{ url_for('static', filename='games/aristocracy.js') }}"></script>
+		<script src="{{ url_for('static', filename='games/bluff.js') }}"></script>
+		<script src="{{ url_for('static', filename='games/dixit.js') }}"></script>
+		<script src="{{ url_for('static', filename='games/innovation.js') }}"></script>
+		<script src="{{ url_for('static', filename='games/mysterium.js') }}"></script>
+		<script src="{{ url_for('static', filename='games/wise.js') }}"></script>
+		<script src="{{ url_for('static', filename='onclick.js') }}"></script>
+		<script src="{{ url_for('static', filename='serverflask.js') }}"></script>
+		<script src="{{ url_for('static', filename='startsinglepage.js') }}"></script>
+		<script src="{{ url_for('static', filename='tests.js') }}"></script>
+		<link rel="icon" href="{{Basepath}}assets/images/icons/firetrans.png" />
+		<script>
+			// var randomName = Faker.name.findName(); // Caitlyn Kerluke
+			// console.log('name is',randomName); 
+			Basepath = "{{Basepath}}";
+			let s = Serverdata = {{Serverdata|tojson}};
+			[ActionResult,Users,Tables,Actions]=[s.action_result,s.users,s.games,s.actions];
+			User = firstCond(Users,x=>x.name == s.user);
+			Table = valf(firstCond(Tables,x=>x.name == s.game),Serverdata.game);
+			Action = s.action;
+			console.log('Serverdata', jsCopy(Serverdata));
+		</script>
+		<title>simple</title>
+	</head>
+	<body>
+		<div class="topmenu" style="background: silver; padding-left: 10px">
+			<a href="/singlepage">home</a>
+			<a href="javascript:startgame('dixit');">dixit</a>
+			<a href="/reset" style="color: red">dbinit!</a>
+		</div>
+		{% if Serverdata.message %}
+		<div id="dMessage">{{ Serverdata.message}}</div>
+		{% endif %}
+
+		<div id="dMain">
+			<div id="dTitle" style="opacity: 0; box-sizing: border-box; position: relative; height: 44px; text-align: center">
+				<h1 id="dTitleCenter">HALLO, it's ok!</h1>
+				<h1 id="dTitleLeft" style="display: inline-block; top: 0; left: 8px; position: absolute"></h1>
+				<h1 id="dTitleRight" style="display: inline; position: absolute; top: 0; right: 8px"></h1>
+			</div>
+			<div id="dTable" style="opacity: 0; min-height: 440px"></div>
+		</div>
+		{% block content %} {% endblock %}
+
+		<button onclick='testsendupdate()' class='button'>UPDATE</button>
+
+		<div id="dRoute">
+			<h2>route:</h2>
+			<form id="fRoute" action="/singlepost" method="POST">
+				<input id="inpost" type="text" name="text" value="1" placeholder="enter action" />
+				<input type="submit" />
+			</form>
+		</div>
+
+		<div id="dChat">
+			<h2>socket</h2>
+			<ul id="messages"></ul>
+			<form action="javascript:void(0);" onsubmit="socketsend()">
+				<input type="text" id="myMessage" />
+				<input type="submit" id="sendbutton" />
+			</form>
+		</div>
+
+		<div id="dTemp" style='display:none;margin:12px'>
+			<form id='dTempForm' action="javascript:void(0);">
+				<label id='dTempTitle'></label>
+				<input id='dTempInput' type="text" id="myMessage" />
+				<input id='dTempSubmit' type="submit" id="sendbutton" />
+			</form>
+		</div>
+		<div id="dUpdate" style='margin:12px'>
+			Polling
+			<form id='dUpdateForm' action="/update" method="POST">
+				<input id='dUpdateInput' type="text" id="myMessage" />
+				<input id='dUpdateSubmit' type="submit" id="sendbutton" />
+			</form>
+		</div>
+	</body>
+</html>

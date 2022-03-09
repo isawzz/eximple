@@ -14,11 +14,8 @@ function dixit_setup(players) {
 	}
 
 	//random player starts, his choices: his hand, phase: create
-	fen.plorder = rPlayerOrder(players);
-	fen.turn = [fen.plorder[0]];
-	fen.round = [];
-	fen.iturn = 0;
-	fen.phase = 'create';
+	let turn = fen.turn = [rChoose(players)];
+	let phase = fen.phase = 'create';
 	fen.instruction = 'write your story';
 
 	//console.log('fen',fen);
@@ -27,22 +24,22 @@ function dixit_setup(players) {
 function dixit_submit_story(x,ev){
 	console.log('x',x,'ev',ev)
 }
-function dixit_present(fen, dParent, plname) {
+function dixit_present(fen, d_table, plname) {
 	G = {};
 	//G.deck = ui_generic_deck(d_table, fen.deck);
 
 	if (isdef(fen.story)) {
-		G.story = ui_message(dParent, fen.story);
+		G.story = ui_message(d_table, fen.story);
 	}
 	if (isdef(fen.instruction) && isdef(plname) && fen.plturn == plname) {
 		let dTemp = mBy('dTemp');
 		dTemp.style.display = 'block';
-		mAppend(dParent,dTemp);
+		mAppend(d_table,dTemp);
 		dTempTitle.innerHTML = 'Write a story';
 		dTempForm.onsubmit = ev=>dixit_submit_story(mBy('dTempInput').value,ev); //()=>console.log('haaaaaaaaaaaaaaaaaaaaaaaaaa');
 	}
 	if (isdef(fen.tablecards)) {
-		let d = mDiv(dParent, { fg: 'white', bg: user.color, w: '100%' }, null, 'table'); mFlexWrap(d);
+		let d = mDiv(d_table, { fg: 'white', bg: user.color, w: '100%' }, null, 'table'); mFlexWrap(d);
 		pl.div = d;
 		mLinebreak(d)
 		let i = 0; let items = G.tablecards = fen.tablecards.map(x => { i++; return dixit_get_card(x, i) }); //convert all dixit cards into items		let hand = pl.hand.map(x=>)
@@ -62,7 +59,7 @@ function dixit_present(fen, dParent, plname) {
 
 		if (isdef(plname) && uname != plname) continue;
 
-		let d = mDiv(dParent, { fg: 'white', bg: user.color, w: '100%' }, null, uname); mFlexWrap(d);
+		let d = mDiv(d_table, { fg: 'white', bg: user.color, w: '100%' }, null, uname); mFlexWrap(d);
 		pl.div = d;
 		mLinebreak(d)
 

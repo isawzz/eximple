@@ -14,7 +14,7 @@ function onclick_startgame() {
 		i++;
 	}
 	let fsGames = mRadioGroup(d, {}, null, 'games');
-	for (const game of ['dixit', 'aristocracy', 'bluff', 'stadtland']) {
+	for (const game of ['dixit', 'aristo', 'inno']) {
 		mRadio(game, game, 'game', fsGames, {}, null, 'gamename', true);
 	}
 	form.onsubmit = () => {

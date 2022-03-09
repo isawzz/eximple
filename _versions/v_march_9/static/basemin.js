@@ -232,7 +232,7 @@ function mRadio(label, val, name, dParent, styles = {}, handler, group_id, is_on
 	//let name = isdef(group_id)?group_id: val;
 	let type = isdef(group_id) ? 'radio' : 'checkbox';
 	let checked = isdef(is_on) ? is_on : false;
-	console.log('player', val, is_on)
+	console.log('player',val,is_on)
 	let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}">`); // checked="${checked}" >`);
 	if (checked) inp.checked = true;
 	//let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}" checked="${checked}" >`);
@@ -1776,7 +1776,6 @@ function pSBC(p, c0, c1, l) {
 //#endregion
 
 //#region random
-function rAlphanums(n) { return rChoose(toLetters('0123456789abcdefghijklmnopq'), n); }
 function rCoin(percent = 50) {
 	let r = Math.random();
 	//r ist jetzt zahl zwischen 0 und 1
@@ -1807,8 +1806,9 @@ function rColor() {
 }
 function randomColor() { return rColor(); }
 function rHue() { return (rNumber(0, 36) * 10) % 360; }
-function rLetter() { return rLetters(1)[0]; }
-function rLetters(n) { return rChoose(toLetters('abcdefghijklmnopq'), n); }
+function rLetters(n) {
+	return rChoose(toLetters('0123456789abcdefghijklmnopq'), n);
+}
 function rNumber(min = 0, max = 100) {
 	return Math.floor(Math.random() * (max - min + 1)) + min; //min and max inclusive!
 }

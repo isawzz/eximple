@@ -69,15 +69,13 @@ function show_table_for(g, dParent, uname) {
 	if (nundef(uname)) uname = g.fen.turn[0]; // default user is first user on turn!
 	User = firstCond(Serverdata.users, x => x.name == uname);
 	Table = g;
-	//console.log('User', User, 'Table', Table);
+	console.log('User', User, 'Table', Table);
 	show_title();
 	show_user();
 
-	if (isdef(mBy('dGameTable'))) mBy('dGameTable').remove();
-	let d_table = mDiv(dParent, { bg: GREEN, fg: 'white', position: 'relative', padding: 10 },'dGameTable'); mCenterFlex(d_table);
-	//console.log('')
+	let d_table = mDiv(dParent, { bg: GREEN, fg: 'white', position: 'relative', padding: 10 }); mCenterFlex(d_table);
 	let f = window[`${g.gamename}_present`]; //dixit_present
-	f(g.fen, d_table, uname); // dixit bluff aristocracy stadtland ...
+	f(g.fen, d_table, uname); // dixit bluff aristo...
 
 }
 function show_title(s, styles = {}, funnyLetters = true) {
@@ -101,9 +99,10 @@ function show_user() {
 }
 async function startgame(game, players) {
 	if (nundef(game)) game = 'dixit';
+	game = 'dixit'; //temp!
 	if (nundef(players)) players = rChoose(Serverdata.users, 2).map(x => x.name);
 	//console.log('players', players);
-	let fen = window[`${game}_setup`](players);
+	let fen = dixit_setup(players);
 	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
 	let gamerec = await post_test2(o, '/post'); //post_test1(o); post_test0();
 	
@@ -116,12 +115,6 @@ async function startgame(game, players) {
 	//console.log('fen', gamerec.fen)
 
 	show_table_for(gamerec, dTable)
-}
-function submit_form(fname) {
-	if (typeof document.getElementById(fname).submit === "object") {
-		document.getElementById(fname).submit.remove();
-	}
-	document.getElementById(fname).submit();
 }
 
 
