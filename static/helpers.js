@@ -1,4 +1,4 @@
-function clear_gametable(){
+function clear_gametable() {
 	if (!isEmpty(DA.gameItems)) {
 		//console.log(DA.gameItems)
 		let t = iDiv(DA.gameItems[0]).parentNode; //document.getElementsByTagName('table')[0];
@@ -41,8 +41,8 @@ function hFunc(content, funcname, arg1, arg2, arg3) {
 	let html = `<a href="javascript:${funcname}('${arg1}','${arg2}','${arg3}');">${content}</a>`;
 	return html;
 }
-function processServerdata(){
-	for(const g of Serverdata.games){
+function processServerdata() {
+	for (const g of Serverdata.games) {
 		g.ofen = JSON.parse(g.fen);
 		g.turn = g.ofen.turn;
 		g.round = g.ofen.round;
@@ -52,10 +52,6 @@ function show_gametable(dParent, clickplayer = 'onclick_player_in_gametable', cl
 	clear_gametable();
 
 	if (isEmpty(Serverdata.games)) return [];
-
-	processServerdata();
-	//hier ist die fen ein string
-	//?echt/
 
 	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'turn', 'players', 'step', 'round']);
 	//if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
@@ -70,32 +66,33 @@ function show_home_logo() {
 	clearElement('dTitleLeft');
 	let d = miPic('airplane', mBy('dTitleLeft'), { fz: 28, padding: 6, h: 40, box: true, matop: 2, bg: bg, rounding: '50%' });
 }
+function show_instruction(msg=''){	let d=mBy('dInstruction');	d.innerHTML = msg;}
+function show_message(msg=''){	let d=mBy('dMessage');	d.innerHTML = msg;}
 function show_table_for(g, dParent, uname) {
 
-	console.assert(isdef(g.fen),`game ${g.name} does not have a fen!`)
-	//if (isString(g.fen)) g.fen = JSON.parse(g.fen);
+	console.log('show table', g.name, 'for user', uname);
+	console.assert(isdef(g.fen), `game ${g.name} does not have a fen!`)
+	console.assert(isDict(g.ofen), "fen is NOT an object!!! " + g.name)
+
 	G = g;
-
-	console.log('table',G)
-	console.assert(isDict(G.ofen), "fen is NOT an object!!! " + g.name)
-
-	if (nundef(uname)) uname = G.turn[0]; // default user is first user on turn!
-	User = firstCond(Serverdata.users, x => x.name == uname);
-	Table = G;
-	//console.log('User', User, 'Table', Table);
+	if (nundef(uname)) uname = isdef(U) ? U.name : G.turn[0]; // default user is session user or first user on turn!
+	U = firstCond(Serverdata.users, x => x.name == uname);
+	let ismyturn = G.turn.includes(U.name);
+	console.log('U', U, 'G', G);
 	show_title();
 	show_user();
 
-	if (isdef(mBy('dGameTable'))) mBy('dGameTable').remove();
-	let d_table = mDiv(dParent, { bg: GREEN, fg: 'white', position: 'relative', padding: 10 },'dGameTable'); mCenterFlex(d_table);
-	//console.log('')
-	let f = window[`${G.gamename}_present`](G.ofen,d_table,uname); //dixit_present
-
-	if (G.turn.includes(uname)) window[`${G.gamename}_activate`](G.ofen,uname);
+	clearElement(dTable);
+	show_message(G.ofen.message);
+	show_instruction(ismyturn?G.ofen.instruction:'NOT YOUR TURN');
+	show_status(G.ofen.status);
+	window[`${G.gamename}_present`](G.ofen, dTable, uname); //dixit_present
+	if (!ismyturn) mShield(dTable);
+	// if (G.turn.includes(uname)) window[`${G.gamename}_activate`](G.ofen,uname);
 }
 function show_title(s, styles = {}, funnyLetters = true) {
 	let d = mBy('dTitleCenter');
-	d.innerHTML = isdef(Table) ? `Battle of ${mColorLetters(capitalize(Table.name))}` : `${funnyLetters ? mColorLetters(s) : s}`;
+	d.innerHTML = isdef(G) ? `Battle of ${mColorLetters(capitalize(G.name))}` : `${funnyLetters ? mColorLetters(s) : s}`;
 	if (isdef(styles)) mStyle(d, { fg: 'grey' });
 }
 function show_title_left(s, styles, funnyLetters = false) {
@@ -108,8 +105,9 @@ function show_title_right(s, styles, funnyLetters = false) {
 	d.innerHTML = `${funnyLetters ? mColorLetters(s) : s}`;
 	if (isdef(styles)) mStyle(d, styles);
 }
+function show_status(msg=''){	let d=mBy('dStatus');	d.innerHTML = msg;}
 function show_user() {
-	if (isdef(User) && User.name != 'anonymous') show_title_left(User.name, { fg: User.color });
+	if (isdef(U) && U.name != 'anonymous') show_title_left(U.name, { fg: U.color });
 	else show_home_logo();
 }
 function submit_form(fname) {

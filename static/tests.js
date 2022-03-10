@@ -41,7 +41,7 @@ function test1() { mBy('inpost').value = 'HALLO DAS IST EIN NEUER TEXT'; }
 async function testsendupdate() {
 	//in das inpost was reinschreiben
 	let data = {
-		user: isdef(User) ? User.name : 'felix',
+		user: isdef(U) ? U.name : 'felix',
 		game: 'paris',
 		fen: dixit_setup(['mimi', 'felix']),
 		turn: ['felix'],

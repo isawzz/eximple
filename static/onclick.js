@@ -18,10 +18,8 @@ function onclick_startgame() {
 		mRadio(game, game, 'game', fsGames, {}, null, 'gamename', true);
 	}
 	form.onsubmit = () => {
-		let players = get_checked_radios(fsPlayers);
-		//console.log('players',players);
-		let game = get_checked_radios(fsGames)[0];
-		//console.log('game',game); 
+		let players = get_checked_radios(fsPlayers);	//console.log('players',players);
+		let game = get_checked_radios(fsGames)[0];	//console.log('game',game); 
 		startgame(game, players);
 		hide('dMenu');
 	};

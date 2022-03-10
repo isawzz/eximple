@@ -30,47 +30,47 @@
 		<script>
 			Basepath = "{{Basepath}}";
 			Serverdata = {{Serverdata|tojson}};
+			processServerdata();
 			console.log('Serverdata', jsCopy(Serverdata));
 		</script>
 		<title>simple</title>
 	</head>
-<body>
-	<div class="topmenu" style="background: silver; padding-left: 10px">
-		<a href="/">home</a>
-		<a href="javascript:onclick_startgame()">startgame</a>
-		<a href="/reset" style="color: red">dbinit!</a>
-	</div>
-
-	<div id="dMain">
+	<body>
+		<div class="topmenu" style="background: silver; padding-left: 10px">
+			<a href="/">home</a>
+			<a href="javascript:onclick_startgame()">startgame</a>
+			<a href="/reset" style="color: red">dbinit!</a>
+		</div>
+		<div id="dMenu" style="padding: 10px; width: 100%; background: skyblue; display: none">
+			<form id="fMenuInput" style="text-align: center" action="javascript:void(0);">
+				<div id="dMenuInput">hallo</div>
+				<div style="width: 100%">
+					<input type="submit" class="button" />
+					<input type="button" onclick="onclick_cancelmenu()" class="button" value="cancel" />
+				</div>
+			</form>
+		</div>
 		<div id="dTitle" style="opacity: 0; box-sizing: border-box; position: relative; height: 44px; text-align: center">
 			<h1 id="dTitleCenter">HALLO, it's ok!</h1>
 			<h1 id="dTitleLeft" style="display: inline-block; top: 0; left: 8px; position: absolute"></h1>
 			<h1 id="dTitleRight" style="display: inline; position: absolute; top: 0; right: 8px"></h1>
 		</div>
-		<div id="dTable" style="opacity: 0; min-height: 440px">
-			<div id='dMenu' style='padding:10px;width:100%;background:skyblue;display:none'>
-				<form id="fMenuInput" style="text-align:center" action="javascript:void(0);">
-					<div id="dMenuInput">hallo</div>
-					<div style="width:100%;">
-						<input type="submit" class='button' />
-						<input type="button" onclick='onclick_cancelmenu()' class='button' value='cancel'/>
-					</div>
-				</form>
-			</div>
+		<div id="dAllTables"></div>
+		<div id="dMessage"></div>
+		<div id="dInstruction"></div>
+		<div id="dTable" style="opacity: 0; min-height: 440px"></div>
+		<div id="dStatus"></div>
+		<div id="dButtons" style="text-align: center">
+			<button onclick="test1()" class="button">text</button>
+			<button onclick="test2()" class="button">json</button>
+			<button onclick="test4()" class="button">dixit</button>
+			<button onclick="test3()" class="button">post</button>
+			<button onclick="test6()" class="button">TEST 6</button>
+			<br />
+			<br />
+			<button onclick="onclick_poll()" class="button">poll</button>
+			<button onclick="onclick_startpolling()" class="button">start polling</button>
+			<button onclick="onclick_stoppolling()" class="button">stop polling</button>
 		</div>
-	</div>
-
-	<div id="dButtons" style="text-align:center">
-		<button onclick='test1()' class='button'>text</button>
-		<button onclick='test2()' class='button'>json</button>
-		<button onclick='test4()' class='button'>dixit</button>
-		<button onclick='test3()' class='button'>post</button>
-		<button onclick='test6()' class='button'>TEST 6</button>
-		<br><br>
-		<button onclick='onclick_poll()' class='button'>poll</button>
-		<button onclick='onclick_startpolling()' class='button'>start polling</button>
-		<button onclick='onclick_stoppolling()' class='button'>stop polling</button>
-	</div>
-
-</body>
+	</body>
 </html>

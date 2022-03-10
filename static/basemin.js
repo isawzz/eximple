@@ -1,8 +1,9 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-var ColorDi, DA = {}, Card = {}, TO = {}, G;
-var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket = null, dTable, dTitle;
+var ColorDi, DA = {}, Card = {}, TO = {}, Socket = null;
+var uiActivated = false;
+var U, G, F, Users, Tables, Basepath, Serverdata, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
 const BLUE = '#4363d8';
@@ -85,18 +86,10 @@ function mDiv(dParent, styles, id, inner, classes, sizing) {
 	return d;
 }
 function mDover(dParent, styles = {}, sizing = true) {
-	// let d = mDiv(dParent, styles); 
-	// mIfNotRelative(dParent); 
-	// mStyle(d, { position: 'absolute', w: '100%', h: '100%' }); 
-	// setRect(d, sizing); 
-
 	let d = mDiv(dParent, styles);
 	mIfNotRelative(dParent);
-	//let s = dMain.style.position.toString(); console.log('isdef', isdef(dMain.style.position), s, s == '')
 	mStyle(d, { position: 'absolute', left: 0, top: 0, w: '100%', h: '100%' });
 	setRect(d, sizing);
-
-
 	return d;
 }
 function mFlexWrap(d) { mFlex(d, 'w'); }
@@ -232,7 +225,7 @@ function mRadio(label, val, name, dParent, styles = {}, handler, group_id, is_on
 	//let name = isdef(group_id)?group_id: val;
 	let type = isdef(group_id) ? 'radio' : 'checkbox';
 	let checked = isdef(is_on) ? is_on : false;
-	console.log('player', val, is_on)
+	//console.log('player', val, is_on)
 	let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}">`); // checked="${checked}" >`);
 	if (checked) inp.checked = true;
 	//let inp = mCreateFrom(`<input class='radio' id='${id}' type="${type}" name="${name}" value="${val}" checked="${checked}" >`);
@@ -265,6 +258,13 @@ function mRadioGroup(dParent, styles, id, legend) {
 	mAppend(f, l);
 	mAppend(dParent, f);
 	return f;
+}
+function mShield(dParent, styles={bg:'#00000050'}, id='dShield', classnames=null, hideonclick=false) {
+	let d = mDiv(dParent, styles, id, classnames);
+	mIfNotRelative(dParent);
+	mStyle(d, { position: 'absolute', left: 0, top: 0, w: '100%', h: '100%' });
+	if (hideonclick) d.onclick = ev => { ev.cancelBubble = true; d.remove(); };
+	return d;
 }
 function mSize(d, w, h, unit = 'px', sizing) { if (nundef(h)) h = w; mStyle(d, { width: w, height: h }, unit); if (isdef(sizing)) setRect(d, sizing); }
 function mStyle(elem, styles, unit = 'px') {
@@ -1807,8 +1807,13 @@ function rColor() {
 }
 function randomColor() { return rColor(); }
 function rHue() { return (rNumber(0, 36) * 10) % 360; }
-function rLetter() { return rLetters(1)[0]; }
-function rLetters(n) { return rChoose(toLetters('abcdefghijklmnopq'), n); }
+function rLetter(except) { return rLetters(1,except)[0]; }
+function rLetters(n,except=[]) { 
+	let all='abcdefghijklmnopqrstuvwxyz';
+	for(const l of except) all = all.replace(l,'');
+	console.log('all',all,except)
+	return rChoose(toLetters(all), n); 
+}
 function rNumber(min = 0, max = 100) {
 	return Math.floor(Math.random() * (max - min + 1)) + min; //min and max inclusive!
 }

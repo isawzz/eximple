@@ -8,7 +8,7 @@ async function post_test2(o, route) {
 		body: JSON.stringify(o)
 	});
 	let res1 = await res.json();
-	console.log(res1);
+	//console.log(res1);
 	return res1;
 	//let res = await route_post_callback('/simple',o);
 }

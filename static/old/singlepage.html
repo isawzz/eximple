@@ -31,8 +31,8 @@
 			Basepath = "{{Basepath}}";
 			let s = Serverdata = {{Serverdata|tojson}};
 			[ActionResult,Users,Tables,Actions]=[s.action_result,s.users,s.games,s.actions];
-			User = firstCond(Users,x=>x.name == s.user);
-			Table = valf(firstCond(Tables,x=>x.name == s.game),Serverdata.game);
+			U = firstCond(Users,x=>x.name == s.user);
+			G = valf(firstCond(Tables,x=>x.name == s.game),Serverdata.game);
 			Action = s.action;
 			console.log('Serverdata', jsCopy(Serverdata));
 		</script>

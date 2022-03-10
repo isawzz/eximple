@@ -28,11 +28,10 @@ function dixit_submit_story(x,ev){
 	console.log('x',x,'ev',ev)
 }
 function dixit_present(fen, dParent, plname) {
-	G = {};
-	//G.deck = ui_generic_deck(d_table, fen.deck);
+	F = {};
 
 	if (isdef(fen.story)) {
-		G.story = ui_message(dParent, fen.story);
+		F.story = ui_message(dParent, fen.story);
 	}
 	if (isdef(fen.instruction) && isdef(plname) && fen.plturn == plname) {
 		let dTemp = mBy('dTemp');
@@ -45,11 +44,11 @@ function dixit_present(fen, dParent, plname) {
 		let d = mDiv(dParent, { fg: 'white', bg: user.color, w: '100%' }, null, 'table'); mFlexWrap(d);
 		pl.div = d;
 		mLinebreak(d)
-		let i = 0; let items = G.tablecards = fen.tablecards.map(x => { i++; return dixit_get_card(x, i) }); //convert all dixit cards into items		let hand = pl.hand.map(x=>)
+		let i = 0; let items = F.tablecards = fen.tablecards.map(x => { i++; return dixit_get_card(x, i) }); //convert all dixit cards into items		let hand = pl.hand.map(x=>)
 		for (const item of items) mAppend(d, iDiv(item));
 	}
 
-	let pls = G.players = {};
+	let pls = F.players = {};
 	for (const uname in fen.players) {
 		let pl = pls[uname] = {};
 		let fpl = fen.players[uname];

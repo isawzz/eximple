@@ -16,10 +16,10 @@ async function startsinglepage() {
 
 	show_user(); //show_home_logo();
 
-	//console.log('Table',Table, 'Serverdata.game',Serverdata.game)
-	if (isdef(Table)) {
-		presentgame(Table,dTable,User.name);
-		activategame(Table,User.name);
+	//console.log('G',G, 'Serverdata.game',Serverdata.game)
+	if (isdef(G)) {
+		presentgame(G,dTable,U.name);
+		activategame(G,U.name);
 	}
 
 	//show_card(dTable); //OK!
@@ -29,10 +29,10 @@ async function startsinglepage() {
 
 function regular_poll(){
 
-	if (isdef(TO.poll) && isdef(User) && isdef(Table) && Table.fen.plturn != User.name){
+	if (isdef(TO.poll) && isdef(U) && isdef(G) && G.fen.plturn != U.name){
 		TO.poll = setTimeout(()=>{
 			let d=mBy('dUpdateInput');
-			d.value = JSON.stringify({user:User.name,game:Table.name});
+			d.value = JSON.stringify({user:U.name,game:G.name});
 			submit_form('dUpdateForm');
 		})
 	}
