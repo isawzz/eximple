@@ -36,6 +36,12 @@ def rpost():
 		print('created game',name,fen['turn'])
 		turn[name]=fen['turn']
 		return g
+	if msgtype == 'move':
+		name = data['game']
+		g=update_game(name,data['fen']) #{'fen':data['fen']})
+		print('updated game',g['fen'])
+		turn[name]=data['fen']['turn']
+		return g
 	return data
 
 #region other routes

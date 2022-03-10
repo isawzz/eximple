@@ -1,7 +1,7 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-var ColorDi, DA = {}, Card = {}, TO = {};
+var ColorDi, DA = {}, Card = {}, TO = {}, G;
 var Users, User, Tables, Table, Actions, Action, ActionResult, Basepath, Serverdata, Socket = null, dTable, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
@@ -553,7 +553,7 @@ function iDiv(i) { return isdef(i.live) ? i.live.div : isdef(i.div) ? i.div : i;
 //#region arr dict
 function arrRemovip(arr, el) {
 	let i = arr.indexOf(el);
-	if (i > -0) arr.splice(i, 1);
+	if (i > -1) arr.splice(i, 1);
 	return i;
 }
 function arrShufflip(arr) { if (isEmpty(arr)) return []; else return fisherYates(arr); }

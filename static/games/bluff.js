@@ -26,4 +26,7 @@ function bluff_setup(players) {
 function bluff_present(fen, dParent, plname) {
 	console.log('fen',fen);
 }
+function bluff_activate(fen,plname){
+	console.log('activating for',plname)
+}
 

@@ -41,12 +41,23 @@ function hFunc(content, funcname, arg1, arg2, arg3) {
 	let html = `<a href="javascript:${funcname}('${arg1}','${arg2}','${arg3}');">${content}</a>`;
 	return html;
 }
+function processServerdata(){
+	for(const g of Serverdata.games){
+		g.ofen = JSON.parse(g.fen);
+		g.turn = g.ofen.turn;
+		g.round = g.ofen.round;
+	}
+}
 function show_gametable(dParent, clickplayer = 'onclick_player_in_gametable', clickgame = 'onclick_game') {
 	clear_gametable();
 
 	if (isEmpty(Serverdata.games)) return [];
 
-	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'players', 'step']);
+	processServerdata();
+	//hier ist die fen ein string
+	//?echt/
+
+	let items = mDataTable(Serverdata.games, dParent, null, ['name', 'gamename', 'turn', 'players', 'step', 'round']);
 	//if (nundef(Serverdata.user)) Serverdata.user = { name: 'anonymous' };
 	mTableCommandify(items, {
 		0: (item, val) => hFunc(val, clickgame, val), //`<a href="/singlepage/${val}">${val}</a>`, 
@@ -62,14 +73,15 @@ function show_home_logo() {
 function show_table_for(g, dParent, uname) {
 
 	console.assert(isdef(g.fen),`game ${g.name} does not have a fen!`)
-	if (isString(g.fen)) g.fen = JSON.parse(g.fen);
-	DA.fen=g.fen;
+	//if (isString(g.fen)) g.fen = JSON.parse(g.fen);
+	G = g;
 
-	console.assert(isDict(g.fen), "fen is NOT an object!!! " + g.name)
+	console.log('table',G)
+	console.assert(isDict(G.ofen), "fen is NOT an object!!! " + g.name)
 
-	if (nundef(uname)) uname = g.fen.turn[0]; // default user is first user on turn!
+	if (nundef(uname)) uname = G.turn[0]; // default user is first user on turn!
 	User = firstCond(Serverdata.users, x => x.name == uname);
-	Table = g;
+	Table = G;
 	//console.log('User', User, 'Table', Table);
 	show_title();
 	show_user();
@@ -77,9 +89,9 @@ function show_table_for(g, dParent, uname) {
 	if (isdef(mBy('dGameTable'))) mBy('dGameTable').remove();
 	let d_table = mDiv(dParent, { bg: GREEN, fg: 'white', position: 'relative', padding: 10 },'dGameTable'); mCenterFlex(d_table);
 	//console.log('')
-	let f = window[`${g.gamename}_present`]; //dixit_present
-	f(g.fen, d_table, uname); // dixit bluff aristocracy stadtland ...
+	let f = window[`${G.gamename}_present`](G.ofen,d_table,uname); //dixit_present
 
+	if (G.turn.includes(uname)) window[`${G.gamename}_activate`](G.ofen,uname);
 }
 function show_title(s, styles = {}, funnyLetters = true) {
 	let d = mBy('dTitleCenter');
@@ -99,24 +111,6 @@ function show_title_right(s, styles, funnyLetters = false) {
 function show_user() {
 	if (isdef(User) && User.name != 'anonymous') show_title_left(User.name, { fg: User.color });
 	else show_home_logo();
-}
-async function startgame(game, players) {
-	if (nundef(game)) game = 'dixit';
-	if (nundef(players)) players = rChoose(Serverdata.users, 2).map(x => x.name);
-	//console.log('players', players);
-	let fen = window[`${game}_setup`](players);
-	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
-	let gamerec = await post_test2(o, '/post'); //post_test1(o); post_test0();
-	
-	Serverdata.games.push(gamerec);
-	console.log('Serverdata',Serverdata);
-	DA.gameItems = show_gametable(dTable);
-	//add_game_to_table(gamerec);
-
-	//console.log('gamerec', gamerec);
-	//console.log('fen', gamerec.fen)
-
-	show_table_for(gamerec, dTable)
 }
 function submit_form(fname) {
 	if (typeof document.getElementById(fname).submit === "object") {

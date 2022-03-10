@@ -158,12 +158,6 @@ def update_user(name,o):
 		rec[k]=o[k]
 	db.session.commit()
 
-def update_game(name,o):
-	rec = _get_game(name)
-	for k in o:
-		rec[k]=o[k]
-	db.session.commit()
-
 def get_players(game):
 	g = Game.query.filter_by(name=game).first()
 	players = _get_players(g.id)
@@ -312,6 +306,14 @@ def startgame(gamename,players,fen):
 	db.session.commit()
 	#print('g',g.toDict())
 	return g.toDict()
+
+def update_game(name,fen):
+	rec = _get_game(name)
+	rec.fen = json.dumps(fen)
+	# for k in o:
+	# 	rec[k]=o[k]
+	db.session.commit()
+	return rec.toDict()
 
 
 

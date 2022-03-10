@@ -91,7 +91,9 @@ function dixit_get_card(ckey, index, h = 200) {
 	d.onclick = () => { face_up(item); };
 	return item;
 }
-
+function dixit_activate(fen,plname){
+	console.log('activating for',plname)
+}
 
 
 

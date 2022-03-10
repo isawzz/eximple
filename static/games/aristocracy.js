@@ -41,5 +41,8 @@ function aristocracy_setup(player_names) {
 function aristocracy_present(fen, dParent, plname) {
 	console.log('fen',fen);
 }
+function aristocracy_activate(fen,plname){
+	console.log('activating for',plname)
+}
 
 
