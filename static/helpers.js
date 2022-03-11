@@ -42,6 +42,10 @@ function hFunc(content, funcname, arg1, arg2, arg3) {
 	return html;
 }
 function processServerdata() {
+	// for (const u of Serverdata.users) {
+	// 	u.imgPath = `${Basepath}assets/images/${u.name}.jpg`;
+	// 	//console.log('user',u.name,u)
+	// }
 	for (const g of Serverdata.games) {
 		g.ofen = JSON.parse(g.fen);
 		g.turn = g.ofen.turn;
@@ -66,29 +70,49 @@ function show_home_logo() {
 	clearElement('dTitleLeft');
 	let d = miPic('airplane', mBy('dTitleLeft'), { fz: 28, padding: 6, h: 40, box: true, matop: 2, bg: bg, rounding: '50%' });
 }
-function show_instruction(msg=''){	let d=mBy('dInstruction');	d.innerHTML = msg;}
-function show_message(msg=''){	let d=mBy('dMessage');	d.innerHTML = msg;}
+function show_instruction(msg = '') { let d = mBy('dInstruction'); d.innerHTML = msg; }
+function show_message(msg = '') { let d = mBy('dMessage'); d.innerHTML = msg; }
 function show_table_for(g, dParent, uname) {
 
-	console.log('show table', g.name, 'for user', uname);
+	console.log('_____show table', g.name, 'for user', uname);
 	console.assert(isdef(g.fen), `game ${g.name} does not have a fen!`)
 	console.assert(isDict(g.ofen), "fen is NOT an object!!! " + g.name)
-
+	Prevturn = isdef(Turn)?jsCopy(Turn):null;
+	Turn = jsCopy(g.ofen.turn);
+	console.log('Prevturn',Prevturn,'Turn',Turn);
+	//if (isdef(U)) console.log('U.name', U.name, 'uname', uname);
+	let sameuser = isdef(U) && U.name == uname;
+	//if (isdef(G)) console.log('G.turn', G.turn, 'g.turn', g.turn); //,'G.ofen.turn',G.ofen.turn,'g.ofen.turn',g.ofen.turn);
+	let samegame = isdef(G) && G.name == g.name;
+	let sameturn = isList(Prevturn) && isList(Turn) && sameList(Prevturn,Turn);
+	// let sameturn = samegame && sameuser && isdef(G) && sameList(G.turn, g.turn);
+	
 	G = g;
 	if (nundef(uname)) uname = isdef(U) ? U.name : G.turn[0]; // default user is session user or first user on turn!
 	U = firstCond(Serverdata.users, x => x.name == uname);
-	let ismyturn = G.turn.includes(U.name);
-	console.log('U', U, 'G', G);
+	let wasmyturn = isList(Prevturn) && Prevturn.includes(U.name);
+	let ismyturn = isList(Turn) && Turn.includes(U.name);
+	// let wasmyturn = samegame && sameuser && G.turn.includes(U.name);
+	//let ismyturn = G.turn.includes(U.name);
+
+	console.log('same user',sameuser,'\nsame game',samegame,'\nsame turn',sameturn,'\nwas my turn',wasmyturn,'is my turn',ismyturn);
+	if (sameturn) return;
+
+	//console.log('U', U, 'G', G);
 	show_title();
 	show_user();
+	clearElement(dParent);
 
-	clearElement(dTable);
+	//dTable.innerHTML = `<img src='http://localhost:8080/aroot/base/assets/images/wolfgang.jpg' />`;
+	//console.log('basepath',Basepath);
+	ui_game_stats(dParent, G.ofen.players);
+	mLinebreak(dParent, 10)
 	show_message(G.ofen.message);
-	show_instruction(ismyturn?G.ofen.instruction:'NOT YOUR TURN');
+	show_instruction(ismyturn ? G.ofen.instruction : 'NOT YOUR TURN');
 	show_status(G.ofen.status);
-	window[`${G.gamename}_present`](G.ofen, dTable, uname); //dixit_present
-	if (!ismyturn) mShield(dTable);
-	// if (G.turn.includes(uname)) window[`${G.gamename}_activate`](G.ofen,uname);
+	window[`${G.gamename}_present`](G.ofen, dParent, uname); //dixit_present
+	if (!ismyturn) mShield(dParent);
+	if (G.turn.includes(uname)) activate_ui(); //window[`${G.gamename}_activate`](G.ofen,uname);
 }
 function show_title(s, styles = {}, funnyLetters = true) {
 	let d = mBy('dTitleCenter');
@@ -105,7 +129,7 @@ function show_title_right(s, styles, funnyLetters = false) {
 	d.innerHTML = `${funnyLetters ? mColorLetters(s) : s}`;
 	if (isdef(styles)) mStyle(d, styles);
 }
-function show_status(msg=''){	let d=mBy('dStatus');	d.innerHTML = msg;}
+function show_status(msg = '') { let d = mBy('dStatus'); d.innerHTML = msg; }
 function show_user() {
 	if (isdef(U) && U.name != 'anonymous') show_title_left(U.name, { fg: U.color });
 	else show_home_logo();

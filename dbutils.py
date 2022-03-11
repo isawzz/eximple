@@ -4,6 +4,25 @@ from sqlalchemy import inspect
 from datetime import datetime, timedelta
 import json
 
+#region yaml
+import yaml
+def ymlFile_jString(path):
+	try:
+		content = open(path, 'r')
+		return json.dumps(yaml.load(content))
+	except Exception as e:
+		msg = 'no such file' + path
+		print(msg)
+		return msg
+
+def ymlText(path):
+	return yaml.load(open(path, 'r'))
+
+def ymlFile_pyObject(path):
+	return yaml.load(open(path, 'r'))
+#endregion
+
+
 
 db = SQLAlchemy()
 
@@ -24,13 +43,22 @@ def db_reset():
 	add_user('nasi','YELLOW')	
 	add_user('sarah','PINK')	
 	add_user('annabel','PURPLE')
-	add_game('vienna','aristo',['mimi','felix'])
-	add_game('beijing','innovation',['felix','lauren'])
-	add_game('palma','bridge',['mimi','nasi','amanda','felix'])
-	add_game('manacor','ferrocarril',['mimi','nasi','mac','sarah'])
-	add_game('madrid','aristo',['mimi','lauren','amanda','felix'])
-	add_game('neuilly','catan',['mimi','gul','amanda','felix'])
-	add_game('avignon','chess',['gul','amanda'])
+	add_user('meckele','#F28DB2')
+	add_user('nimble','#6E52CCFF')
+	add_user('ally','#6660f3')
+	add_user('blade','#c06996')
+	add_user('bob','#033993')
+	add_user('leo','#3f3f03')
+	add_user('valerie','#03cf9c')
+	add_user('wolfgang','#93c6f3')
+	add_user('mitra','#9f3ff6')
+	# add_game('vienna','aristo',['mimi','felix'])
+	# add_game('beijing','innovation',['felix','lauren'])
+	# add_game('palma','bridge',['mimi','nasi','amanda','felix'])
+	# add_game('manacor','ferrocarril',['mimi','nasi','mac','sarah'])
+	# add_game('madrid','aristo',['mimi','lauren','amanda','felix'])
+	# add_game('neuilly','catan',['mimi','gul','amanda','felix'])
+	# add_game('avignon','chess',['gul','amanda'])
 
 from faker import Faker
 import random

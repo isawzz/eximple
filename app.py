@@ -15,6 +15,8 @@ import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 #endregion
+
+
 @app.route('/')
 def base_route():	return redirect ('/get'); 
 
@@ -36,11 +38,15 @@ def rpost():
 		print('created game',name,fen['turn'])
 		turn[name]=fen['turn']
 		return g
-	if msgtype == 'move':
+	elif msgtype == 'move':
 		name = data['game']
 		g=update_game(name,data['fen']) #{'fen':data['fen']})
 		print('updated game',g['fen'])
 		turn[name]=data['fen']['turn']
+		return g
+	elif msgtype == 'poll':
+		game = data['game']
+		g = get_game(game)
 		return g
 	return data
 
@@ -103,8 +109,10 @@ def r_index():
 
 @app.route('/reset')
 def r_reset(): 
-	create_random_data()
+	db_reset()
+	#create_random_data()
 	return redirect('/')
+
 #test routes
 @app.route('/get_players/<game>')
 def r_get_players(game): return jsonify(get_players(game))

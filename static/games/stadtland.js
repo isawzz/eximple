@@ -23,7 +23,8 @@ function stadtland_present(fen, dParent, plname) {
 			let d2 = mDiv(d1, {}, null, html);
 		}
 		let d2 = mDiv(d1, { w: '100%', padding: 20 });
-		mButton('SUBMIT', () => stadtland_answer(fen, plname), d2, {}, 'button', 'bSendMove');
+		// mButton('SUBMIT', () => stadtland_answer(fen, plname), d2, {}, 'button', 'bSendMove');
+		mButton('SUBMIT', () => interaction(fen, plname, stadtland_answer), d2, {}, 'button', 'bSendMove');
 	} else if (fen.phase == 'accept') {
 		let d1 = mDiv(dParent, { w: 400, align: 'left' }, null, `<h1>${fen.content}</h1>`);
 		let d2 = mDiv(d1, { w: '100%', padding: 20 });
@@ -31,6 +32,8 @@ function stadtland_present(fen, dParent, plname) {
 		if (!fen.turn.includes(plname)) return;
 		mButton('ACCEPT', () => stadtland_accept(fen, plname), d2, {hmargin:20}, 'button');
 		mButton('REJECT', () => stadtland_reject(fen, plname), d2, {}, 'button');
+		mButton('ACCEPT', () => interaction(fen,plname,stadtland_accept), d2, {hmargin:20}, 'button');
+		mButton('REJECT', () => interaction(fen,plname,stadtland_reject), d2, {}, 'button');
 	}
 
 }
@@ -49,9 +52,8 @@ function stadtland_newround(fen,score){
 	delete fen.move;
 	delete fen.message;
 }
-
 function stadtland_createmove(fen,plname){
-	let inputs = dTable.getElementsByTagName('input');
+	let inputs = dParent.getElementsByTagName('input');
 	let move = { uname: U.name, table: G.name, data: {} };
 	for (const inp of inputs) {
 		if (fen.cats.includes(inp.name)) {
@@ -60,7 +62,6 @@ function stadtland_createmove(fen,plname){
 	}
 	return move;
 }
-
 function stadtland_answer(fen, plname) {
 	let move = stadtland_createmove(fen,plname);
 	let islegal = stadtland_evalmove(fen, plname, move);
@@ -98,7 +99,6 @@ function stadtland_reject(fen, plname) {
 	sendmove(fen,plname);
 
 }
-
 function stadtland_evalmove(fen, plname, move) {
 	for (const cat of fen.cats) {
 		// if (nundef(move.data[cat])) return false;
@@ -110,9 +110,6 @@ function stadtland_evalmove(fen, plname, move) {
 
 }
 
-function stadtland_activate(fen, plname) {
-	//console.log('activating for', plname)
-}
 
 
 
