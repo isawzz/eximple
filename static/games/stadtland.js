@@ -30,8 +30,8 @@ function stadtland_present(fen, dParent, plname) {
 		let d2 = mDiv(d1, { w: '100%', padding: 20 });
 
 		if (!fen.turn.includes(plname)) return;
-		mButton('ACCEPT', () => stadtland_accept(fen, plname), d2, {hmargin:20}, 'button');
-		mButton('REJECT', () => stadtland_reject(fen, plname), d2, {}, 'button');
+		// mButton('ACCEPT', () => stadtland_accept(fen, plname), d2, {hmargin:20}, 'button');
+		// mButton('REJECT', () => stadtland_reject(fen, plname), d2, {}, 'button');
 		mButton('ACCEPT', () => interaction(fen,plname,stadtland_accept), d2, {hmargin:20}, 'button');
 		mButton('REJECT', () => interaction(fen,plname,stadtland_reject), d2, {}, 'button');
 	}

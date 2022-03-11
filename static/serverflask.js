@@ -76,17 +76,23 @@ function socketsend() {
 }
 
 
+
 async function route_path_yaml_dict(url) {
 	let data = await fetch(url);
 	let text = await data.text();
 	let dict = jsyaml.load(text);
 	return dict;
 }
-async function route_js(url){
+async function route_js(url='/'){
 	//url needs to start with /
 	let data = await fetch(SOCKETSERVER + url);
 	return await data.json();
 }
+
+
+
+
+
 async function route_js_callback(url,callback){
 	let data = await fetch(SOCKETSERVER + url);
 	let o = await data.json();

@@ -74,28 +74,30 @@ function show_instruction(msg = '') { let d = mBy('dInstruction'); d.innerHTML =
 function show_message(msg = '') { let d = mBy('dMessage'); d.innerHTML = msg; }
 function show_table_for(g, dParent, uname) {
 
-	console.log('_____show table', g.name, 'for user', uname);
+	//console.log('_____show table', g.name, 'for user', uname);
 	console.assert(isdef(g.fen), `game ${g.name} does not have a fen!`)
 	console.assert(isDict(g.ofen), "fen is NOT an object!!! " + g.name)
+	console.assert(isdef(uname),`uname ${uname}`);
 	Prevturn = isdef(Turn)?jsCopy(Turn):null;
 	Turn = jsCopy(g.ofen.turn);
-	console.log('Prevturn',Prevturn,'Turn',Turn);
+	//console.log('Prevturn',Prevturn,'Turn',Turn);
 	//if (isdef(U)) console.log('U.name', U.name, 'uname', uname);
 	let sameuser = isdef(U) && U.name == uname;
 	//if (isdef(G)) console.log('G.turn', G.turn, 'g.turn', g.turn); //,'G.ofen.turn',G.ofen.turn,'g.ofen.turn',g.ofen.turn);
 	let samegame = isdef(G) && G.name == g.name;
-	let sameturn = isList(Prevturn) && isList(Turn) && sameList(Prevturn,Turn);
+	let sameturn = sameuser && samegame && isList(Prevturn) && isList(Turn) && sameList(Prevturn,Turn);
 	// let sameturn = samegame && sameuser && isdef(G) && sameList(G.turn, g.turn);
 	
 	G = g;
-	if (nundef(uname)) uname = isdef(U) ? U.name : G.turn[0]; // default user is session user or first user on turn!
+	//if (nundef(uname)) uname = isdef(U) ? U.name : G.turn[0]; // default user is session user or first user on turn!
 	U = firstCond(Serverdata.users, x => x.name == uname);
+	//console.log('*** U',U.name)
 	let wasmyturn = isList(Prevturn) && Prevturn.includes(U.name);
 	let ismyturn = isList(Turn) && Turn.includes(U.name);
 	// let wasmyturn = samegame && sameuser && G.turn.includes(U.name);
 	//let ismyturn = G.turn.includes(U.name);
 
-	console.log('same user',sameuser,'\nsame game',samegame,'\nsame turn',sameturn,'\nwas my turn',wasmyturn,'is my turn',ismyturn);
+	//console.log('same user',sameuser,'\nsame game',samegame,'\nsame turn',sameturn,'\nwas my turn',wasmyturn,'is my turn',ismyturn);
 	if (sameturn) return;
 
 	//console.log('U', U, 'G', G);

@@ -1,8 +1,8 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-var ColorDi, DA = {}, Card = {}, TO = {}, Socket = null;
-var uiActivated = false,Turn,Prevturn;
+var ColorDi, DA = {}, Card = {}, TO = {}, Counter = {}, Socket = null;
+var uiActivated = false, Turn, Prevturn;
 var U, G, F, Users, Tables, Basepath, Serverdata, dParent, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 

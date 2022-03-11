@@ -21,6 +21,7 @@
 		<script src="{{ url_for('static', filename='games/mysterium.js') }}"></script>
 		<script src="{{ url_for('static', filename='games/wise.js') }}"></script>
 		<script src="{{ url_for('static', filename='onclick.js') }}"></script>
+		<script src="{{ url_for('static', filename='polling.js') }}"></script>
 		<script src="{{ url_for('static', filename='serverflask.js') }}"></script>
 		<script src="{{ url_for('static', filename='tests.js') }}"></script>
 
@@ -31,7 +32,7 @@
 			Basepath = "{{Basepath}}";
 			Serverdata = {{Serverdata|tojson}};
 			processServerdata();
-			console.log('Serverdata', jsCopy(Serverdata));
+			//console.log('Serverdata', jsCopy(Serverdata));
 		</script>
 		<title>simple</title>
 	</head>
@@ -70,8 +71,9 @@
 			<br />
 			<br />
 			<button onclick="onclick_poll()" class="button">poll</button>
-			<button onclick="onclick_startpolling()" class="button">start polling</button>
-			<button onclick="onclick_stoppolling()" class="button">stop polling</button>
+			<button onclick="onclick_reload()" class="button">RELOAD</button>
+			{# <button onclick="onclick_startpolling()" class="button">start polling</button>
+			<button onclick="onclick_stoppolling()" class="button">stop polling</button> #}
 		</div>
 	</body>
 </html>

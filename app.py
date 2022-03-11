@@ -35,13 +35,13 @@ def rpost():
 		g=startgame(data['game'],data['players'],data['fen'])
 		fen=data['fen']
 		name=g['name']
-		print('created game',name,fen['turn'])
+		#print('created game',name,fen['turn'])
 		turn[name]=fen['turn']
 		return g
 	elif msgtype == 'move':
 		name = data['game']
 		g=update_game(name,data['fen']) #{'fen':data['fen']})
-		print('updated game',g['fen'])
+		#print('updated game',g['fen'])
 		turn[name]=data['fen']['turn']
 		return g
 	elif msgtype == 'poll':

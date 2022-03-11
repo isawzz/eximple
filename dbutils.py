@@ -12,7 +12,7 @@ def ymlFile_jString(path):
 		return json.dumps(yaml.load(content))
 	except Exception as e:
 		msg = 'no such file' + path
-		print(msg)
+		#print(msg)
 		return msg
 
 def ymlText(path):
@@ -167,7 +167,7 @@ def get_user_actions(user):
 def get_actions_for(game,user): 
 	g=Game.query.filter_by(name=game).first()
 	u=User.query.filter_by(name=user).first()
-	print('...',g.name,g.id,u.name,u.id)
+	#print('...',g.name,g.id,u.name,u.id)
 	return [x.toDict() for x in Action.query.filter_by(game=g,user=u).all()]
 
 def get_user(name):	return User.query.filter_by(name=name).first().toDict()
@@ -175,9 +175,6 @@ def get_game(name):	return Game.query.filter_by(name=name).first().toDict()
 
 def delete_user(name):
 	db.session.delete(_get_user(name))
-	db.commit()
-def delete_game(name):
-	db.session.delete(_get_game(name))
 	db.commit()
 
 def update_user(name,o):
@@ -202,9 +199,6 @@ def get_gamenames_for(name):
 	u = User.query.filter_by(name=name).first()
 	games =  _get_user_games(u.id)
 	return [x.name for x in games]
-def get_game(name): 
-	print('name',name)
-	return _get_game(name).toDict()
 def updategame(game,step,fen):
 	g=_get_game(game)
 	g.fen = fen
@@ -259,11 +253,11 @@ def random_players(users,min,max): #ok
 def get_unique_gamename():
 	games = Game.query.all() #[x.toDict() for x in Game.query.all()]
 	names = [x.name for x in games]
-	print('_____names',names)
+	#print('_____names',names)
 	#print('___gamenames')
 	while True:
 		name=fake.city().lower()
-		print('name',name)
+		#print('name',name)
 		if not name in names: return name
 
 def get_fantasyname():
@@ -316,10 +310,18 @@ def create_random_data():
 
 #endregion
 
+def delete_game(name):
+	db.session.delete(_get_game(name))
+	db.commit()
+
+def get_game(name): 
+	#print('name',name)
+	return _get_game(name).toDict()
+
 def startgame(gamename,players,fen):
 	users = []
 	#print('fen',fen)
-	print('players',players)
+	#print('players',players)
 	for uname in players:
 		#print('uname',uname)
 		u=User.query.filter_by(name = uname).first()
@@ -327,8 +329,8 @@ def startgame(gamename,players,fen):
 		users.append(u)
 	# return {'h':1}
 	key=get_unique_gamename()
-	print('...key',key)
-	print('...gamename',gamename)
+	#print('...key',key)
+	#print('...gamename',gamename)
 	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=json.dumps(fen))
 	db.session.add(g)
 	db.session.commit()
