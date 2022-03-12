@@ -21,7 +21,7 @@ async function startgame(game, players) {
 	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
 	sendfen(o);
 }
-function sendmove(fen, plname) {
+function sendmove(plname,fen,step) {
 	pollStop();
 	let o = { type: 'move', uname: plname, game: G.name, fen: fen };
 	sendfen(o, plname);
@@ -44,7 +44,7 @@ async function sendfen(o, plname) {
 	let uname = isdef(plname) ? plname : isdef(U)? U.name : turn[0];
 	show_table_for(gamerec, dParent, uname);
 
-	if (!PollManual) TO.poll = setTimeout(poll, 2000);
+	if (Pollmode == 'auto') TO.poll = setTimeout(poll, 5000);
 }
 function interaction(fen, plname, func) {
 	if (!uiActivated) return;

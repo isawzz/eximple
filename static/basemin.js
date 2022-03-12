@@ -1,6 +1,7 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
+var Pollmode='manual';
 var ColorDi, DA = {}, Card = {}, TO = {}, Counter = {}, Socket = null;
 var uiActivated = false, Turn, Prevturn;
 var U, G, F, Users, Tables, Basepath, Serverdata, dParent, dTitle;

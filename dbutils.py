@@ -337,9 +337,10 @@ def startgame(gamename,players,fen):
 	#print('g',g.toDict())
 	return g.toDict()
 
-def update_game(name,fen):
+def update_game(name,fen,step):
 	rec = _get_game(name)
 	rec.fen = json.dumps(fen)
+	rec.step = step
 	# for k in o:
 	# 	rec[k]=o[k]
 	db.session.commit()

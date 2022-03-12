@@ -78,7 +78,7 @@ function stadtland_answer(fen, plname) {
 		fen.content = message;
 		fen.phase = 'accept';
 		arrRemovip(fen.turn,plname);
-		sendmove(fen,plname);
+		sendmove(plname,fen,true);
 	}else{
 		show_instruction('your move is not complete!')
 	}
@@ -89,7 +89,7 @@ function stadtland_accept(fen, plname) {
 	fen.players[plname].hasAccepted = true;
 	if (isEmpty(fen.turn)) { stadtland_newround(fen,true);	}
 	//console.log('===>fen.turn',fen.turn)
-	sendmove(fen,plname);
+	sendmove(plname,fen);
 }
 function stadtland_reject(fen, plname) {
 	//if one player rejects, nobody gets a point!

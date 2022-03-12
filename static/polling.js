@@ -1,21 +1,24 @@
-var PollManual=true,Polling=false;
+//var PollManual=true,Polling=false;
 function onclick_startpolling() {
-	if (Polling) return;
-	Polling = true;
+	pollStop();
+	Pollmode = 'auto';
 	poll();
 }
 function onclick_stoppolling() {
 	pollStop();
-	if (!Polling) return;
-	Polling = false;
+	Pollmode = 'manual';
 }
 async function onclick_poll() {
-	if (!PollManual || Polling) return;
+	//if (!PollManual || Polling) return;
+	if (Pollmode == 'manual') poll(true);
+	else {
+		console.log('STOP autopoll first!!!')
+	}
 
 }
 function pollStop() { clearTimeout(TO.poll); }
-function poll(manual=false) {
-	if (!manual && PollManual) {console.log('only manual polling!'); return;}
+function poll() {
+	if (nundef(U) || nundef(G)) return;
 	Counter.poll=isdef(Counter.poll)?Counter.poll+1:1;
 	console.log('poll:',Counter.poll)
 	let o = { type: 'poll', game: G.name };

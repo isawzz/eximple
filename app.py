@@ -39,8 +39,13 @@ def rpost():
 		turn[name]=fen['turn']
 		return g
 	elif msgtype == 'move':
+		g = get_game(name)
+		if g['step'] >= data['step']:
+			print('invalid move!')
+			#do NOT update
+			return g
 		name = data['game']
-		g=update_game(name,data['fen']) #{'fen':data['fen']})
+		g=update_game(name,data['fen'],data['step']) #{'fen':data['fen']})
 		#print('updated game',g['fen'])
 		turn[name]=data['fen']['turn']
 		return g

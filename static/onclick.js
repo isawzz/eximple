@@ -1,6 +1,7 @@
 function onclick_cancelmenu() { hide('dMenu'); }
 function onclick_player_in_gametable(uname, tablename) {
 	pollStop();
+	//statt dessen poll erstmal fuer user,table!
 	show_table_for(firstCond(Serverdata.games, x => x.name == tablename), dTable, uname);
 }
 function onclick_reload(){
