@@ -1,8 +1,8 @@
 //#region globals: Session data
 //var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-var Pollmode='manual';
-var ColorDi, DA = {}, Card = {}, TO = {}, Counter = {}, Socket = null;
+var Pollmode = 'manual';
+var ColorDi, Items = {}, DA = {}, Card = {}, TO = {}, Counter = {}, Socket = null;
 var uiActivated = false, Turn, Prevturn;
 var U, G, F, Users, Tables, Basepath, Serverdata, dParent, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
@@ -86,6 +86,7 @@ function mDiv(dParent, styles, id, inner, classes, sizing) {
 
 	return d;
 }
+function mDiv100(dParent, styles, id, sizing = true) { let d = mDiv(dParent, styles, id); mSize(d, 100, 100, '%', sizing); return d; }
 function mDover(dParent, styles = {}, sizing = true) {
 	let d = mDiv(dParent, styles);
 	mIfNotRelative(dParent);
@@ -107,7 +108,19 @@ function mInsertAt(dParent, el, index = 0) { mInsert(dParent, el, index); }
 function mInsertFirst(dParent, el) { mInsert(dParent, el, 0); }
 function mInsert(dParent, el, index = 0) { dParent.insertBefore(el, dParent.childNodes[index]); }
 function mInsertAfter(dParent, el, index = 0) { dParent.insertAfter(el, dParent.childNodes[index]); }
-function mLinebreak(dParent, gap) {
+function mItem(id, diDOM, di = {}, addSizing = false) {
+	let item = di;
+	id = isdef(id) ? id : isdef(diDOM) && isdef(diDOM.div) && !isEmpty(diDOM.div.id) ? diDOM.div.id : getUID();
+	item.id = iRegister(item, id);
+	if (isdef(diDOM) && isdef(diDOM.div)) { diDOM.div.id = id; iAdd(item, diDOM); }
+	if (addSizing) {
+		if (nundef(item.sizing)) item.sizing = 'sizeToContent';
+		if (nundef(item.positioning)) { item.positioning = 'absolute'; }
+		if (nundef(item.posType)) { item.posType = 'center'; }
+		if (isdef(diDOM) && item.sizing == 'sizeToContent') iMeasure(item, item.sizingOptions);
+	}
+	return item;
+} function mLinebreak(dParent, gap) {
 	if (isString(dParent)) dParent = mBy(dParent);
 	let d = mDiv(dParent);
 	if (dParent.style.display == 'flex') mStyle(d, { 'flex-basis': '100%', h: 0 });
@@ -260,7 +273,7 @@ function mRadioGroup(dParent, styles, id, legend) {
 	mAppend(dParent, f);
 	return f;
 }
-function mShield(dParent, styles={bg:'#00000050'}, id='dShield', classnames=null, hideonclick=false) {
+function mShield(dParent, styles = { bg: '#00000050' }, id = 'dShield', classnames = null, hideonclick = false) {
 	let d = mDiv(dParent, styles, id, classnames);
 	mIfNotRelative(dParent);
 	mStyle(d, { position: 'absolute', left: 0, top: 0, w: '100%', h: '100%' });
@@ -440,7 +453,7 @@ function mSym(key, dParent, styles = {}, pos, classes) {
 	styles.display = 'inline-block';
 	styles.family = info.family;
 
-	console.log('vorher: styles', jsCopy(styles))
+	//console.log('vorher: styles', jsCopy(styles))
 
 	let sizes;
 	if (isdef(styles.sz)) { sizes = mSymSizeToBox(info, styles.sz, styles.sz); }
@@ -456,7 +469,7 @@ function mSym(key, dParent, styles = {}, pos, classes) {
 	styles.align = 'center';
 	if (isdef(styles.bg) && info.family != 'emoNoto') { styles.fg = styles.bg; delete styles.bg; }
 
-	console.log('nachher: styles', jsCopy(styles))
+	//console.log('nachher: styles', jsCopy(styles))
 
 
 	let x = mDiv(dParent, styles, null, info.text);
@@ -547,7 +560,33 @@ function mYaml(d, js) {
 //#endregion
 
 //#region i prefix
+function iAdd(item, props) {
+	let id, l;
+	if (isString(item)) { id = item; item = Items[id]; }
+	else if (nundef(item.id)) { id = item.id = iRegister(item); }
+	else { id = item.id; if (nundef(Items[id])) Items[id] = item; }
+	if (nundef(item.live)) item.live = {};
+	l = item.live;
+	for (const k in props) {
+		let val = props[k];
+		if (nundef(val)) {
+			//console.log('k', k, 'item', item, 'props', props);
+			continue;
+		}
+		l[k] = val;
+		if (k == 'div') val.id = id;
+		if (isdef(val.id) && val.id != id) {
+			//console.log('adding', val.id, 'as member of', id)
+			lookupAddIfToList(val, ['memberOf'], id);
+		}
+	}
+}
 function iDiv(i) { return isdef(i.live) ? i.live.div : isdef(i.div) ? i.div : i; }
+function iMeasure(item, sizingOptions) {
+	if (nundef(iDiv(item))) return;
+	setRect(iDiv(item), valf(sizingOptions, { hgrow: true, wgrow: true }));
+}
+function iRegister(item, id) { let uid = isdef(id) ? id : getUID(); Items[uid] = item; return uid; }
 
 //#endregion
 
@@ -558,6 +597,7 @@ function arrRemovip(arr, el) {
 	return i;
 }
 function arrShufflip(arr) { if (isEmpty(arr)) return []; else return fisherYates(arr); }
+function arrSum(arr, props) { if (nundef(props)) return arr.reduce((a, b) => a + b); if (!isList(props)) props = [props]; return arr.reduce((a, b) => a + (lookup(b, props) || 0), 0); }
 function addKeys(ofrom, oto) { for (const k in ofrom) if (nundef(oto[k])) oto[k] = ofrom[k]; return oto; }
 function copyKeys(ofrom, oto, except = {}, only) {
 	//console.log(ofrom)
@@ -1776,7 +1816,194 @@ function pSBC(p, c0, c1, l) {
 
 //#endregion
 
+//#region keys.js
+//prep key sets at start of prog
+function getKeySets() {
+	//let ks = localStorage.getItem('KeySets');
+
+	makeCategories();	//console.log('Categories',Categories)
+
+	//if (isdef(ks)) { return JSON.parse(ks); }
+
+	//console.log('hallo'); return [];
+	let res = {};
+	for (const k in Syms) {
+		let info = Syms[k];
+		if (nundef(info.cats)) continue;
+		for (const ksk of info.cats) {
+			//console.log('ksk',ksk,'k',k);
+			lookupAddIfToList(res, [ksk], k);
+		}
+	}
+	res.animals = getAnimals();
+	res.nature = getNature();
+	localStorage.setItem('KeySets', JSON.stringify(res));
+	return res;
+
+}
+function getAnimals() {
+	let gr = 'Animals & Nature';
+	let result = [];
+	for (const sg in ByGroupSubgroup[gr]) {
+		if (startsWith(sg, 'anim')) result = result.concat(ByGroupSubgroup[gr][sg]);
+	}
+	return result;
+}
+function getNature() {
+	let gr = 'Animals & Nature';
+	let result = [];
+	for (const sg in ByGroupSubgroup[gr]) {
+		result = result.concat(ByGroupSubgroup[gr][sg]);
+	}
+	return result;
+}
+function getGSGElements(gCond, sCond) {
+	let keys = [];
+	let byg = ByGroupSubgroup;
+	for (const gKey in byg) {
+		if (!gCond(gKey)) continue;
+
+		for (const sKey in byg[gKey]) {
+			if (!sCond(sKey)) continue;
+
+			keys = keys.concat(byg[gKey][sKey]);
+		}
+	}
+	return keys.sort();
+}
+function makeCategories() {
+	//console.log(ByGroupSubgroup);
+	let keys = Categories = {
+		animal: getGSGElements(g => g == 'Animals & Nature', s => startsWith(s, 'animal')),
+		clothing: getGSGElements(g => g == 'Objects', s => s == 'clothing'),
+		emotion: getGSGElements(g => g == 'Smileys & Emotion', s => startsWith(s, 'face') && !['face-costume', 'face-hat'].includes(s)),
+		food: getGSGElements(g => g == 'Food & Drink', s => startsWith(s, 'food')),
+		'game/toy': (['sparkler', 'firecracker', 'artist palette', 'balloon', 'confetti ball'].concat(ByGroupSubgroup['Activities']['game'])).sort(),
+		gesture: getGSGElements(g => g == 'People & Body', s => startsWith(s, 'hand')),
+		job: ByGroupSubgroup['People & Body']['job'],
+		mammal: ByGroupSubgroup['Animals & Nature']['animal-mammal'],
+		music: getGSGElements(g => g == 'Objects', s => startsWith(s, 'musi')),
+		object: getGSGElements(g => g == 'Objects', s => true),
+		place: getGSGElements(g => g == 'Travel & Places', s => startsWith(s, 'place')),
+		plant: getGSGElements(g => g == 'Animals & Nature' || g == 'Food & Drink', s => startsWith(s, 'plant') || s == 'food-vegetable' || s == 'food-fruit'),
+		sport: ByGroupSubgroup['Activities']['sport'],
+		tool: getGSGElements(g => g == 'Objects', s => s == 'tool'),
+		transport: getGSGElements(g => g == 'Travel & Places', s => startsWith(s, 'transport')),
+	};
+
+	let incompatible = DA.incompatibleCats = {
+		animal: ['mammal'],
+		clothing: ['object'],
+		emotion: ['gesture'],
+		food: ['plant', 'animal'],
+		'game/toy': ['object', 'music'],
+		gesture: ['emotion'],
+		job: ['sport'],
+		mammal: ['animal'],
+		music: ['object', 'game/toy'],
+		object: ['music', 'clothing', 'game/toy', 'tool'],
+		place: [],
+		plant: ['food'],
+		sport: ['job'],
+		tool: ['object'],
+		transport: [],
+	}
+	//console.log('categories', keys);
+
+}
+
+//keys and categories
+function genCats(n) {
+	//console.log('???????',DA.incompatibleCats)
+	let di = {};
+	let cats = Object.keys(Categories);
+	//console.log('cats available:',cats)
+	for (let i = 0; i < n; i++) {
+		let cat = chooseRandom(cats);
+		let incompat = DA.incompatibleCats[cat];
+		//console.log('cats',cats,'\ncat',cat,'\nincompat',incompat)
+		cats = arrMinus(cats, incompat);
+		removeInPlace(cats, cat);
+		//console.log('cats after minus',cats);
+		di[cat] = Categories[cat];
+	}
+	return di;
+}
+function oneWordKeys(keys) { return keys.filter(x => !x.includes(' ')); }
+
+function removeDuplicates(keys, prop) {
+	let di = {};
+	let res = [];
+	let items = keys.map(x => Syms[x]);
+	for (const item of items) {
+		// if (item.key.includes('key')) console.log('hallo',item)
+		// if (isdef(di[item.best])) {console.log('dupl:',item.key); continue;}
+		if (isdef(di[item.best])) { continue; }
+		res.push(item);
+		di[item.key] = true;
+	}
+	return res.map(x => x.key);
+}
+function setKeys({ allowDuplicates, nMin = 25, lang, key, keySets, filterFunc, param, confidence, sortByFunc } = {}) {
+	let keys = jsCopy(keySets[key]);
+
+	if (isdef(nMin)) {
+		let diff = nMin - keys.length;
+		let additionalSet = diff > 0 ? nMin > 100 ? firstCondDictKeys(keySets, k => k != key && keySets[k].length > diff) : 'best100' : null;
+
+		//console.log('diff', diff, additionalSet, keys)
+		if (additionalSet) KeySets[additionalSet].map(x => addIf(keys, x)); //
+		//if (additionalSet) keys = keys.concat(keySets[additionalSet]);
+		//console.log(keys)
+	}
+
+	let primary = [];
+	let spare = [];
+	for (const k of keys) {
+		let info = Syms[k];
+
+		//console.log('info',info);
+		info.best = info[lang];
+		//console.log(info.best)
+
+		if (nundef(info.best)) {
+			let ersatzLang = (lang == 'D' ? 'D' : 'E');
+			let klang = 'best' + ersatzLang;
+			//console.log(k,lang,klang)
+			if (nundef(info[klang])) info[klang] = lastOfLanguage(k, ersatzLang);
+		}
+		//console.log(k,lang,lastOfLanguage(k,lang),info.best,info)
+		let isMatch = true;
+		//if (isdef(filterFunc)) console.log(filterFunc,filterFunc(k,info.best))
+		if (isdef(filterFunc)) isMatch = isMatch && filterFunc(param, k, info.best);
+		if (isdef(confidence)) isMatch = info[klang + 'Conf'] >= confidence;
+		if (isMatch) { primary.push(k); } else { spare.push(k); }
+	}
+
+	if (isdef(nMin)) {
+		//if result does not have enough elements, take randomly from other
+		let len = primary.length;
+		let nMissing = nMin - len;
+		if (nMissing > 0) { let list = choose(spare, nMissing); spare = arrMinus(spare, list); primary = primary.concat(list); }
+	}
+
+	if (isdef(sortByFunc)) { sortBy(primary, sortByFunc); }
+
+	if (isdef(nMin)) console.assert(primary.length >= nMin);
+	//console.log(primary)
+	if (nundef(allowDuplicates)) {
+		//console.log('hhhhhhhhhhhhhhh',primary.length)
+		primary = removeDuplicates(primary);
+	}
+	return primary;
+}
+
+//#endregion
+
 //#region random
+function choose(arr, n, excepti) { return rChoose(arr, n, null, excepti); }
+function chooseRandom(arr) { return rChoose(arr); }
+function coin(percent = 50) { let r = Math.random(); r *= 100; return r < percent; }
 function rAlphanums(n) { return rChoose(toLetters('0123456789abcdefghijklmnopq'), n); }
 function rCoin(percent = 50) {
 	let r = Math.random();
@@ -1808,12 +2035,12 @@ function rColor() {
 }
 function randomColor() { return rColor(); }
 function rHue() { return (rNumber(0, 36) * 10) % 360; }
-function rLetter(except) { return rLetters(1,except)[0]; }
-function rLetters(n,except=[]) { 
-	let all='abcdefghijklmnopqrstuvwxyz';
-	for(const l of except) all = all.replace(l,'');
-	console.log('all',all,except)
-	return rChoose(toLetters(all), n); 
+function rLetter(except) { return rLetters(1, except)[0]; }
+function rLetters(n, except = []) {
+	let all = 'abcdefghijklmnopqrstuvwxyz';
+	for (const l of except) all = all.replace(l, '');
+	console.log('all', all, except)
+	return rChoose(toLetters(all), n);
 }
 function rNumber(min = 0, max = 100) {
 	return Math.floor(Math.random() * (max - min + 1)) + min; //min and max inclusive!

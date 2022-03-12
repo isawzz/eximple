@@ -10,7 +10,7 @@ async function ensureAssets() {
 		Syms = await route_path_yaml_dict(`${Basepath}assets/allSyms.yaml`);
 		SymKeys = get_keys(Syms);
 		ByGroupSubgroup = await route_path_yaml_dict(`${Basepath}assets/symGSG.yaml`);
-		//KeySets = getKeySets();
+		KeySets = getKeySets();
 		C52 = await route_path_yaml_dict(`${Basepath}assets/c52.yaml`);
 		ari_create_card_assets('rb');
 	}
@@ -74,6 +74,8 @@ function show_home_logo() {
 function show_instruction(msg = '') { let d = mBy('dInstruction'); d.innerHTML = msg; }
 function show_message(msg = '') { let d = mBy('dMessage'); d.innerHTML = msg; }
 function show_table_for(g, dParent, uname) {
+
+	spotit_test1(g,dParent,uname); return;
 
 	//console.log('_____show table', g.name, 'for user', uname);
 	console.assert(isdef(g.fen), `game ${g.name} does not have a fen!`)
