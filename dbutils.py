@@ -26,8 +26,12 @@ def ymlFile_pyObject(path):
 
 db = SQLAlchemy()
 
-def db_init(app):
-	app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+def db_init(app,build):
+	if build == 'heroku':
+		s1='postgresql://yrvygqeoxvvsbc:a1626c4355cc68f0e885cdd1a136d47b05f0a1dbc13c3b48e591663c3be1abae@ec2-54-145-9-12.compute-1.amazonaws.com:5432/d82a71hp3riqvf'
+		app.config['SQLALCHEMY_DATABASE_URI'] = s1
+	else:
+		app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 	app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 	db.init_app(app)
 
