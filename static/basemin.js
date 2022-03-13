@@ -518,7 +518,7 @@ function mTableRow(t, o, headers) {
 	mAppend(t, elem);
 	let colitems = [];
 	for (const k of headers) {
-		let val = isdef(o[k]) ? o[k] : '';
+		let val = isdef(o[k]) ? isDict(o[k]) ? JSON.stringify(o[k]) : o[k] : '';
 		let col = mTableCol(elem, val);
 		colitems.push({ div: col, key: k, val: val });
 	}

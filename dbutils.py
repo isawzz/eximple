@@ -342,8 +342,8 @@ def startgame(gamename,players,fen,expected):
 def update_game(name,fen,action,expected,step):
 	rec = _get_game(name)
 	rec.fen = json.dumps(fen)
-	rec.fen = json.dumps(action)
-	rec.fen = json.dumps(expected)
+	rec.action = json.dumps(action)
+	rec.expected = json.dumps(expected)
 	rec.step = step
 	# for k in o:
 	# 	rec[k]=o[k]

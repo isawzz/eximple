@@ -24,6 +24,7 @@
 		<script src="{{ url_for('static', filename='onclick.js') }}"></script>
 		<script src="{{ url_for('static', filename='polling.js') }}"></script>
 		<script src="{{ url_for('static', filename='serverflask.js') }}"></script>
+		<script src="{{ url_for('static', filename='showtable.js') }}"></script>
 		<script src="{{ url_for('static', filename='tests.js') }}"></script>
 
 		<script src="{{ url_for('static', filename='helpers.js') }}"></script>
@@ -64,7 +65,11 @@
 		<div id="dTable" style="opacity: 0; min-height: 440px"></div>
 		<div id="dStatus"></div>
 		<div id="dButtons" style="text-align: center">
-			<button onclick="spotit_test0()" class="button">spotit</button>
+			<button onclick="spotit_start()" class="button">*spotit</button>
+			<button onclick="spotit_success()" class="button">spotit: success</button>
+			<button onclick="spotit_fail()" class="button">spotit: fail</button>
+			<br />
+			<br />
 			<button onclick="test1()" class="button">text</button>
 			<button onclick="test2()" class="button">json</button>
 			<button onclick="test4()" class="button">dixit</button>

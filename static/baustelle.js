@@ -17,8 +17,8 @@ async function startgame(game, players) {
 	if (nundef(game)) game = 'dixit';
 	if (nundef(players)) players = rChoose(Serverdata.users, 2).map(x => x.name);
 	//console.log('players', players);
-	let g = window[`${game}_setup`](players);
-	let o = { type: 'startgame', game: game, players: players, fen: g.fen, expected: g.expected };
+	let fe = window[`${game}_setup`](players);
+	let o = { type: 'startgame', game: game, players: players, fen: fe.fen, expected: fe.expected };
 	sendfen(o);
 }
 function sendmove(plname,fen,action,expected,step) {
@@ -39,7 +39,7 @@ async function sendfen(o, plname) {
 	console.log('Serverdata', Serverdata);
 
 	DA.gameItems = show_gametable(mBy('dAllTables'));
-	let turn = gamerec.ofen.turn;
+	let turn = gamerec.fen.turn;
 	//let uname = isdef(plname) ? plname : (isdef(U) && turn.includes(U.name)) ? U.name : turn[0];
 	let uname = isdef(plname) ? plname : isdef(U)? U.name : turn[0];
 	show_table_for(gamerec, dParent, uname);

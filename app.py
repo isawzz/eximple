@@ -37,15 +37,20 @@ def rpost():
 		name=g['name']
 		return g
 	elif msgtype == 'move':
+		name = data['game']
 		g = get_game(name)
 		expected = g['expected']
+		e1=json.loads(expected)
+		#print('===>expected',type(e1),e1)
 		action = data['action']
 		uname = data['uname']
 		if uname in expected:
-			e = expected[uname]
+			e = e1[uname]
 			if action['type'] == e['type'] and action['step'] == e['step']:
-				name = data['game']
+				print('updating!!!')
+				print(data['expected'])
 				g=update_game(name,data['fen'],data['action'],data['expected'],data['step']) 
+				print('===>',g['expected'])
 				return g
 		print('invalid move!')
 		return g

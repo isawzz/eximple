@@ -46,10 +46,13 @@ function processServerdata() {
 	// 	u.imgPath = `${Basepath}assets/images/${u.name}.jpg`;
 	// 	//console.log('user',u.name,u)
 	// }
+	console.log('Serverdata.games:',Serverdata.games);
 	for (const g of Serverdata.games) {
-		g.ofen = JSON.parse(g.fen);
-		g.turn = g.ofen.turn;
-		g.round = g.ofen.round;
+		if (isString(g.fen)) g.fen = JSON.parse(g.fen);
+		if (isString(g.action)) g.action = JSON.parse(g.action);
+		if (isString(g.expected)) g.expected = JSON.parse(g.expected);
+		g.turn = g.fen.turn;
+		g.round = g.fen.round;
 	}
 }
 function show_gametable(dParent, clickplayer = 'onclick_player_in_gametable', clickgame = 'onclick_game') {
@@ -73,20 +76,21 @@ function show_home_logo() {
 }
 function show_instruction(msg = '') { let d = mBy('dInstruction'); d.innerHTML = msg; }
 function show_message(msg = '') { let d = mBy('dMessage'); d.innerHTML = msg; }
-function show_table_for(g, dParent, uname) {
+function show_table_for_old(g, dParent, uname) {
 
-	spotit_test1(g,dParent,uname); return;
+	//spotit_test1(g,dParent,uname); return;
 
 	//console.log('_____show table', g.name, 'for user', uname);
 	console.assert(isdef(g.fen), `game ${g.name} does not have a fen!`)
-	console.assert(isDict(g.ofen), "fen is NOT an object!!! " + g.name)
+	console.assert(isDict(g.fen), "fen is NOT an object!!! " + g.name)
 	console.assert(isdef(uname),`uname ${uname}`);
 	Prevturn = isdef(Turn)?jsCopy(Turn):null;
-	Turn = jsCopy(g.ofen.turn);
+	console.log('g.fen.turn',g.fen.turn)
+	Turn = jsCopy(g.fen.turn);
 	//console.log('Prevturn',Prevturn,'Turn',Turn);
 	//if (isdef(U)) console.log('U.name', U.name, 'uname', uname);
 	let sameuser = isdef(U) && U.name == uname;
-	//if (isdef(G)) console.log('G.turn', G.turn, 'g.turn', g.turn); //,'G.ofen.turn',G.ofen.turn,'g.ofen.turn',g.ofen.turn);
+	//if (isdef(G)) console.log('G.turn', G.turn, 'g.turn', g.turn); //,'G.fen.turn',G.fen.turn,'g.fen.turn',g.fen.turn);
 	let samegame = isdef(G) && G.name == g.name;
 	let sameturn = sameuser && samegame && isList(Prevturn) && isList(Turn) && sameList(Prevturn,Turn);
 	// let sameturn = samegame && sameuser && isdef(G) && sameList(G.turn, g.turn);
@@ -110,14 +114,14 @@ function show_table_for(g, dParent, uname) {
 
 	//dTable.innerHTML = `<img src='http://localhost:8080/aroot/base/assets/images/wolfgang.jpg' />`;
 	//console.log('basepath',Basepath);
-	ui_game_stats(dParent, G.ofen.players);
+	ui_game_stats(dParent, G.fen.players);
 	mLinebreak(dParent, 10)
-	show_message(G.ofen.message);
-	show_instruction(ismyturn ? G.ofen.instruction : 'NOT YOUR TURN');
-	show_status(G.ofen.status);
-	window[`${G.gamename}_present`](G.ofen, dParent, uname); //dixit_present
+	show_message(G.fen.message);
+	show_instruction(ismyturn ? G.fen.instruction : 'NOT YOUR TURN');
+	show_status(G.fen.status);
+	window[`${G.gamename}_present`](G, dParent, uname); //dixit_present
 	if (!ismyturn) mShield(dParent);
-	if (G.turn.includes(uname)) activate_ui(); //window[`${G.gamename}_activate`](G.ofen,uname);
+	if (G.turn.includes(uname)) activate_ui(); //window[`${G.gamename}_activate`](G,uname);
 }
 function show_title(s, styles = {}, funnyLetters = true) {
 	let d = mBy('dTitleCenter');
