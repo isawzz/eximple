@@ -17,13 +17,13 @@ async function startgame(game, players) {
 	if (nundef(game)) game = 'dixit';
 	if (nundef(players)) players = rChoose(Serverdata.users, 2).map(x => x.name);
 	//console.log('players', players);
-	let fen = window[`${game}_setup`](players);
-	let o = { type: 'startgame', game: game, players: players, fen: fen, turn: fen.turn };
+	let g = window[`${game}_setup`](players);
+	let o = { type: 'startgame', game: game, players: players, fen: g.fen, expected: g.expected };
 	sendfen(o);
 }
-function sendmove(plname,fen,step) {
+function sendmove(plname,fen,action,expected,step) {
 	pollStop();
-	let o = { type: 'move', uname: plname, game: G.name, fen: fen };
+	let o = { type: 'move', uname: plname, game: G.name, fen: fen, action: action, expected: expected, step:step };
 	sendfen(o, plname);
 }
 async function sendfen(o, plname) {

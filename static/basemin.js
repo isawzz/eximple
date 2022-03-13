@@ -3,7 +3,7 @@
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
 var Pollmode = 'manual';
 var ColorDi, Items = {}, DA = {}, Card = {}, TO = {}, Counter = {}, Socket = null;
-var uiActivated = false, Turn, Prevturn;
+var uiActivated = false, Selected, Turn, Prevturn;
 var U, G, F, Users, Tables, Basepath, Serverdata, dParent, dTitle;
 var Syms, SymKeys, ByGroupSubgroup, KeySets, C52, Cinno, Aristocards;
 
@@ -651,6 +651,25 @@ function firstCondDict(dict, func) {
 	for (const k in dict) { if (func(dict[k])) return k; }
 	return null;
 }
+function firstCondDictKey() { return firstCondDictKeys(...arguments); }
+function firstCondDictKeys(dict, func) {
+	//return first elem that fulfills condition
+	for (const k in dict) { if (func(k)) return k; }
+	return null;
+}
+function firstNCond(n, arr, func) {
+	//return first n elements that fulfills condition
+	if (nundef(arr)) return [];
+	let result = [];
+	let cnt = 0;
+	for (const a of arr) {
+		cnt += 1; if (cnt > n) break;
+		if (func(a)) result.push(a);
+
+	}
+	return result;
+}
+function forAll(arr, func) { for (const a of arr) if (!func(a)) return false; return true; }
 function get_keys(o) { return Object.keys(o); }
 function get_values(o) { return Object.values(o); }
 function lookup(dict, keys) {
@@ -2123,6 +2142,106 @@ function clearElement(elem) {
 	}
 	return elem;
 }
+function divInt(a, b) { return Math.trunc(a / b); }
+function errlog() { console.log('ERROR!', ...arguments); }
+function evNoBubble(ev) { ev.preventDefault(); ev.cancelBubble = true; }
+function evToClass(ev, className) {
+	//returns first ancestor that has this class
+	let elem = findParentWithClass(ev.target, className);
+	return elem;
+}
+function evToClosestId(ev) {
+	//returns first ancestor that has an id
+	let elem = findParentWithId(ev.target);
+	return elem.id;
+}
+function evToId(ev) {
+	let elem = findParentWithId(ev.target);
+	return elem.id;
+}
+function evToProp(ev, prop) {
+	let x = ev.target;
+	while (isdef(x) && nundef(x.getAttribute(prop))) x = x.parentNode;
+	return isdef(x) ? x.getAttribute(prop) : null;
+}
+function evToTargetAttribute(ev, attr) {
+	let val = ev.target.getAttribute(attr);
+	if (nundef(val)) { val = ev.target.parentNode.getAttribute(attr); }
+	return val;
+}
+function evToClass(ev, className) {
+	let elem = findParentWithClass(className);
+	return elem;
+}
+function findAttributeInAncestors(elem, attr) { 
+	let val;
+	while (elem && nundef(val = elem.getAttribute(attr))) { elem = elem.parentNode; } 
+	return val; 
+}
+function findParentWithClass(elem, className) { while (elem && !mHasClass(elem, className)) { elem = elem.parentNode; } return elem; }
+function findParentWithId(elem) { while (elem && !(elem.id)) { elem = elem.parentNode; } return elem; }
+function findAncestorElemWithParentOfType(el, type) {
+	while (el && el.parentNode) {
+		let t = getTypeOf(el);
+		let tParent = getTypeOf(el.parentNode);
+		//console.log('el', t, tParent, 'el.id', el.id, 'parentNode.id', el.parentNode.id);
+		if (tParent == type) break;
+		el = el.parentNode;
+	}
+	return el;
+
+}
+function findAncestorElemOfType(el, type) {
+	while (el) {
+		let t = getTypeOf(el);
+		if (t == type) break;
+		el = el.parentNode;
+	}
+	return el;
+
+}
+function findDescendantWithId(id, parent) {
+	if (parent.id == id) return parent;
+	let children = arrChildren(parent);
+	if (isEmpty(children)) return null;
+	for (const ch of children) {
+		let res = findDescendantWithId(id, ch);
+		if (res) return res;
+	}
+	return null;
+}
+function findChildWithId(id, parentElem) {
+	testHelpers(parentElem);
+	let children = arrChildren(parentElem);
+	for (const ch of children) {
+		if (ch.id == id) return ch;
+	}
+	return null;
+}
+function findChildWithClass(className, parentElem) {
+	testHelpers(parentElem);
+	let children = arrChildren(parentElem);
+	for (const ch of children) {
+		//console.log('....findChildWithClass', ch, ch.classList, className)
+		if (ch.classList.includes(className)) return ch;
+	}
+	return null;
+}
+function findChildOfType(type, parentElem) {
+	let children = arrChildren(parentElem);
+	for (const ch of children) {
+		if (getTypeOf(ch) == type) return ch;
+	}
+	return null;
+}
+function findChildrenOfType(type, parentElem) {
+	let children = arrChildren(parentElem);
+	let res = [];
+	for (const ch of children) {
+		if (getTypeOf(ch) == type) res.push(ch);
+	}
+	return res;
+}
 function getRect(elem, relto) {
 
 	if (isString(elem)) elem = document.getElementById(elem);
@@ -2153,6 +2272,7 @@ function getUID(pref = '') {
 	UIDCounter += 1;
 	return pref + '_' + UIDCounter;
 }
+function hasWhiteSpace(s) { return /\s/g.test(s); }
 function jsCopy(o) { return JSON.parse(JSON.stringify(o)); }
 function jsCopySafe(o) { return JSON.parse(JSON.stringify(jsClean(o))); }
 function jsClean(o) {

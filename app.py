@@ -20,7 +20,7 @@ log.setLevel(logging.ERROR)
 @app.route('/')
 def base_route():	return redirect ('/get'); 
 
-turn={}
+#turn={}
 
 @app.route('/get', methods=['GET'])
 def rget():
@@ -32,22 +32,22 @@ def rpost():
 	data = request.get_json(force = True)
 	msgtype = data['type']
 	if msgtype == 'startgame':
-		g=startgame(data['game'],data['players'],data['fen'])
+		g=startgame(data['game'],data['players'],data['fen'],data['expected'])
 		fen=data['fen']
 		name=g['name']
-		#print('created game',name,fen['turn'])
-		turn[name]=fen['turn']
 		return g
 	elif msgtype == 'move':
 		g = get_game(name)
-		if g['step'] >= data['step']:
-			print('invalid move!')
-			#do NOT update
-			return g
-		name = data['game']
-		g=update_game(name,data['fen'],data['step']) #{'fen':data['fen']})
-		#print('updated game',g['fen'])
-		turn[name]=data['fen']['turn']
+		expected = g['expected']
+		action = data['action']
+		uname = data['uname']
+		if uname in expected:
+			e = expected[uname]
+			if action['type'] == e['type'] and action['step'] == e['step']:
+				name = data['game']
+				g=update_game(name,data['fen'],data['action'],data['expected'],data['step']) 
+				return g
+		print('invalid move!')
 		return g
 	elif msgtype == 'poll':
 		game = data['game']

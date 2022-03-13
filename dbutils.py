@@ -105,12 +105,14 @@ class Game(db.Model):
 	gamename = db.Column(db.String(30), nullable=False, index=True)
 	name = db.Column(db.String(50), nullable=False, unique=True, index=True)
 	fen = db.Column(db.Text)
+	step = db.Column(db.Integer, default=0)
+	expected = db.Column(db.Text)
+	action = db.Column(db.Text)
 	status = db.Column(db.String(10), default='start', index=True)
 	created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	modified = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	host_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True, nullable=False)
-	step = db.Column(db.Integer, default=0)
-	actions = db.relationship('Action', backref='game') #now I can call Action.game and Game.choices (=list of moves that are pending for this game)
+	#actions = db.relationship('Action', backref='game') #now I can call Action.game and Game.choices (=list of moves that are pending for this game)
 	players = db.relationship('User',secondary=plays_at_game, back_populates="games")
 	def toDict(self):
 		o = { c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs }
@@ -318,7 +320,7 @@ def get_game(name):
 	#print('name',name)
 	return _get_game(name).toDict()
 
-def startgame(gamename,players,fen):
+def startgame(gamename,players,fen,expected):
 	users = []
 	#print('fen',fen)
 	#print('players',players)
@@ -331,15 +333,17 @@ def startgame(gamename,players,fen):
 	key=get_unique_gamename()
 	#print('...key',key)
 	#print('...gamename',gamename)
-	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=json.dumps(fen))
+	g = Game(name=key, gamename=gamename, host_id=0, players=users, fen=json.dumps(fen), expected = json.dumps(expected))
 	db.session.add(g)
 	db.session.commit()
 	#print('g',g.toDict())
 	return g.toDict()
 
-def update_game(name,fen,step):
+def update_game(name,fen,action,expected,step):
 	rec = _get_game(name)
 	rec.fen = json.dumps(fen)
+	rec.fen = json.dumps(action)
+	rec.fen = json.dumps(expected)
 	rec.step = step
 	# for k in o:
 	# 	rec[k]=o[k]
