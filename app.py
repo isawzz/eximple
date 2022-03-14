@@ -149,7 +149,7 @@ def db_reset():
 #endregion
 
 @app.route('/')
-def base_route():	return redirect ('/indexmenu'); 
+def base_route():	return redirect ('/indexbase'); 
 
 @app.route('/index')
 def r_index():
@@ -158,6 +158,10 @@ def r_index():
 @app.route('/indexmenu')
 def r_indexmenu():
 	return render_template('indexmenu.html')
+
+@app.route('/indexbase')
+def r_indexbase():
+	return render_template('indexbase.html')
 
 @app.route('/reset')
 def r_reset(): 
