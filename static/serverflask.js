@@ -46,7 +46,7 @@ async function post_test0() {
 
 
 function socketinit() {
-	Socket = isdef(window.io)? io.connect(SOCKETSERVER):null;
+	Socket = isdef(window.io) ? io.connect(SOCKETSERVER) : null;
 	if (!Socket) {
 		console.log('no sockets!!!!!!!!!!!');
 		mBy('dChat').style.display = 'none';
@@ -71,19 +71,28 @@ function socketsend() {
 	let text = elem.value;
 	//elem.value = '';
 	//Socket.send(text); //ok
-	Socket.emit('message',{text:text, user:'felix'}); //ok
+	Socket.emit('message', { text: text, user: 'felix' }); //ok
 	return false;
 }
 
 
 
 async function route_path_yaml_dict(url) {
-	let data = await fetch(url);
+	let data = await fetch(url, {
+		mode: 'cors', // no-cors, *cors, same-origin
+		cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+		credentials: 'omit', // include, *same-origin, omit
+		headers: {
+			'Content-Type': 'application/json',
+			'Access-Control-Allow-Origin': '*'
+			// 'Content-Type': 'application/x-www-form-urlencoded',
+		},
+	});
 	let text = await data.text();
 	let dict = jsyaml.load(text);
 	return dict;
 }
-async function route_js(url='/'){
+async function route_js(url = '/') {
 	//url needs to start with /
 	let data = await fetch(SOCKETSERVER + url);
 	return await data.json();
@@ -93,27 +102,27 @@ async function route_js(url='/'){
 
 
 
-async function route_js_callback(url,callback){
+async function route_js_callback(url, callback) {
 	let data = await fetch(SOCKETSERVER + url);
 	let o = await data.json();
 	callback(o);
 }
-async function route_post_callback(url,data,callback){
-	let res = await fetch(SOCKETSERVER + url,{method:'POST',body:data});
+async function route_post_callback(url, data, callback) {
+	let res = await fetch(SOCKETSERVER + url, { method: 'POST', body: data });
 	let o = await res.json();
 	if (isdef(callback)) callback(o);
 }
-async function route_post_form_callback(url,formname,callback){
+async function route_post_form_callback(url, formname, callback) {
 	let formdata = new FormData(mBy(formname));
 	formdata.fen = DA.fen;
-	let res = await fetch(SOCKETSERVER + url,{method:'POST',body:formdata});
+	let res = await fetch(SOCKETSERVER + url, { method: 'POST', body: formdata });
 	let o = await res.text();
-	if (isdef(callback)) callback(o); 
+	if (isdef(callback)) callback(o);
 	return o;
 }
-async function route_post_form_callback_js(url,formname,callback){
+async function route_post_form_callback_js(url, formname, callback) {
 	let formdata = new FormData(mBy(formname));
-	let res = await fetch(SOCKETSERVER + url,{method:'POST',body:formdata});
+	let res = await fetch(SOCKETSERVER + url, { method: 'POST', body: formdata });
 	let o = await res.json();
 	callback(o);
 	return o;
