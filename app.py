@@ -149,7 +149,27 @@ def db_reset():
 #endregion
 
 @app.route('/')
-def base_route():	return redirect ('/index'); 
+def base_route():	return redirect ('/indexmenu'); 
+
+@app.route('/index')
+def r_index():
+	return render_template('index.html')
+
+@app.route('/indexmenu')
+def r_indexmenu():
+	return render_template('indexmenu.html')
+
+@app.route('/reset')
+def r_reset(): 
+	db_reset()
+	return redirect('/')
+
+#region rest
+
+if __name__ == "__main__":
+	app.run(debug = True, port = 5000)
+
+	
 
 # @app.route('/get', methods=['GET'])
 # def rget():
@@ -189,23 +209,5 @@ def base_route():	return redirect ('/index');
 # 		return g
 # 	return data
 
-#region other routes
-@app.route('/index')
-def r_index():
-	return render_template('index.html')
 
-@app.route('/reset')
-def r_reset(): 
-	db_reset()
-	return redirect('/')
-
-
-if __name__ == "__main__":
-	#print('hallo')
-	#app.run()
-	#app.run() #host='0.0.0.0', port=5051, debug=True)
-	app.run(debug = True, port = 5000)
-
-	
-
-
+#endregion
