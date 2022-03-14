@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="{{ url_for('static', filename='base/assets/fonts/fonts.css') }}"/>
-	<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}" />
-	<script src="{{ url_for('static', filename='base/alibs/jsyaml.js') }}"></script>
-	<script src="{{ url_for('static', filename='basemin.js') }}"></script>
-	<script src="{{ url_for('static', filename='startindexmenu.js') }}"></script>
-	<title>Document</title>
-</head>
-<body>
-	<div class="topmenu" style="background: silver; padding-left: 10px">
-		<a href="/">home</a>
-		<a href="javascript:onclick_startgame()">startgame</a>
-		<a href="/reset" style="color: red">dbinit!</a>
-	</div>
-	hallo das ist ein test und muessten gehen!!!
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='base/assets/fonts/fonts.css') }}" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='basemin.css') }}" />
+		<script src="{{ url_for('static', filename='base/alibs/jsyaml.js') }}"></script>
+		<script src="{{ url_for('static', filename='basemin.js') }}"></script>
+		<script src="{{ url_for('static', filename='startindexmenu.js') }}"></script>
+		<title>Document</title>
+		<script>
+			var Basepath = "{{Basepath}}";
+			console.log('basepath',Basepath);
+		</script>
+	</head>
+	<body>
+		<div class="topmenu" style="background: silver; padding-left: 10px">
+			<a href="/">home</a>
+			<a href="javascript:onclick_startgame()">startgame</a>
+			<a href="/reset" style="color: red">dbinit!</a>
+		</div>
+		hallo das ist ein test und muessten gehen!!!
+		<script>
+			onload = startloading;
+		</script>
+	</body>
 </html>
