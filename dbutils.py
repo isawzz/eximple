@@ -28,7 +28,8 @@ db = SQLAlchemy()
 
 def db_init(app,build):
 	if build == 'heroku':
-		s1='postgresql://yrvygqeoxvvsbc:a1626c4355cc68f0e885cdd1a136d47b05f0a1dbc13c3b48e591663c3be1abae@ec2-54-145-9-12.compute-1.amazonaws.com:5432/d82a71hp3riqvf'
+		s1='postgresql://fqfvndftkoapxn:cdebf87c414f9b02028ddb454c543016b92722f07b12a7a806a02876ead8bfb1@ec2-44-194-113-156.compute-1.amazonaws.com:5432/d3rg8gpmjvusbu'
+		#s1='postgresql://yrvygqeoxvvsbc:a1626c4355cc68f0e885cdd1a136d47b05f0a1dbc13c3b48e591663c3be1abae@ec2-54-145-9-12.compute-1.amazonaws.com:5432/d82a71hp3riqvf'
 		app.config['SQLALCHEMY_DATABASE_URI'] = s1
 	else:
 		app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
