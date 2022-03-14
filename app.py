@@ -4,7 +4,7 @@ app = Flask(__name__)
 BUILD = 'heroku' # dev | heroku
 Basepath = "https://www.telecave.net/aroot/base/" if BUILD == 'heroku' else "http://127.10.0.1:8080/aroot/base/" if BUILD == 'public' else "http://localhost:8080/aroot/base/"
 app.config['SECRET_KEY'] = 'IJustHopeThisWorks!' #do I need this???
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 CORS(app)
 import json
 import logging
@@ -149,6 +149,7 @@ def db_reset():
 #endregion
 
 @app.route('/')
+@cross_origin()
 def base_route():	return redirect ('/indexbase'); 
 
 @app.route('/index')
@@ -160,6 +161,7 @@ def r_indexmenu():
 	return render_template('indexmenu.html')
 
 @app.route('/indexbase')
+@cross_origin()
 def r_indexbase():
 	return render_template('indexbase.html')
 
