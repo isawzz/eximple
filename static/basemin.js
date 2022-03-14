@@ -1,5 +1,4 @@
 //#region globals: Session data
-//var SOCKETSERVER = 'http://127.0.0.1:5000'; //'http://localhost:5000'
 //var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
 var SOCKETSERVER = `https://eximple.herokuapp.com/5000/`
 var Pollmode = 'manual';
