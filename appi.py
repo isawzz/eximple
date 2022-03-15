@@ -1,7 +1,7 @@
 #region init
 from flask import jsonify, Flask, request, send_from_directory, render_template, redirect, url_for
 app = Flask(__name__)
-BUILD = 'heroku' # public | heroku   False #set True for production (need to re-create db on heroku!)
+BUILD = 'dev' # public | heroku   False #set True for production (need to re-create db on heroku!)
 Basepath = "http://www.telecave.net/aroot/base/" if BUILD == 'heroku' else "http://127.10.0.1:8080/aroot/base/" if BUILD == 'public' else "http://localhost:8080/aroot/base/"
 app.config['SECRET_KEY'] = 'IJustHopeThisWorks!' #do I need this???
 
