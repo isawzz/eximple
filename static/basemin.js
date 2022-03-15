@@ -1,6 +1,6 @@
 //#region globals: Session data
 var SOCKETSERVER = 'http://localhost:5000'; //geht im spital
-//var SOCKETSERVER = `https://eximple.herokuapp.com/5000/`
+//var SOCKETSERVER = `https://eximple.herokuapp.com/5000/` geht nicht!!!!!!!
 var Pollmode = 'manual';
 var ColorDi, Items = {}, DA = {}, Card = {}, TO = {}, Counter = {}, Socket = null;
 var uiActivated = false, Selected, Turn, Prevturn;
